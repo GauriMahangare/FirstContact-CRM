@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=firstcontactcrm
+POSTGRES_USER=uOdVmSvMBOVgbYuplRQBSRPbxzuxrcol
+POSTGRES_PASSWORD=PD8mbbbdh3dudVgDjRpUmiA7PzpJ72cwlOxxJlcpWDDLeG2QoiLp3UKoU2VcPXfA

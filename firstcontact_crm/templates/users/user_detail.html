@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}User: {{ object.username }}{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="row">
+    <div class="col-sm-12">
+
+      <h2>Username : {{ object.username }}</h2>
+      {% if object.name %}
+        <p>Name : {{ object.name }}</p>
+      {% endif %}
+      {% if object.userorganization %}
+        <p>Organisation : {{ object.userorganization }}</p>
+      {% endif %}
+      <p>Current Access:</p>
+      <ul>
+        {% if request.user.is_admin %}
+          <li>Organisation Admin</li>
+          {% if object.is_team_manager %}
+            <li>Team Manager </li>
+          {% endif %}
+          {% if object.is_team_member %}
+            <li>Team Member</li>
+          {% endif %}
+        {% else %}
+          {% if request.user.is_team_manager %}
+              <li>Team Manager </li>
+              {% if object.is_team_member %}
+              <li>Team Member</li>
+              {% endif %}
+          {% else %}
+            {% if request.user.is_team_member %}
+              <li>Team Member</li>
+            {% endif %}
+        {% endif %}
+      {% endif %}
+      </ul>
+    </div>
+  </div>
+
+{% if object == request.user %}
+<!-- Action buttons -->
+<div class="row">
+
+  <div class="col-sm-12">
+    <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">My Info</a>
+    <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">E-Mail</a>
+    <!-- Your Stuff: Custom user template urls -->
+  </div>
+
+</div>
+<!-- End Action buttons -->
+{% endif %}
+
+
+</div>
+{% endblock content %}
+

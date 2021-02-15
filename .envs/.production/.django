@@ -1,0 +1,45 @@
+# General
+# ------------------------------------------------------------------------------
+# DJANGO_READ_DOT_ENV_FILE=True
+DJANGO_SETTINGS_MODULE=config.settings.production
+DJANGO_SECRET_KEY=DjwF5cSXHtMvBradDIviFAFWACUesSwmrE9Va7TrztZ8It65vOy8OtS84FBxcxkJ
+DJANGO_ADMIN_URL=XYUIewh63f5qpBVypLx42kiyUr1gOrO9/
+DJANGO_ALLOWED_HOSTS=.firstcontactcrm.avanengineering.com
+
+# Security
+# ------------------------------------------------------------------------------
+# TIP: better off using DNS, however, redirect is OK too
+DJANGO_SECURE_SSL_REDIRECT=False
+
+# Email
+# ------------------------------------------------------------------------------
+DJANGO_SERVER_EMAIL=
+
+MAILGUN_API_KEY=
+MAILGUN_DOMAIN=
+
+
+# django-allauth
+# ------------------------------------------------------------------------------
+DJANGO_ACCOUNT_ALLOW_REGISTRATION=True
+
+# Gunicorn
+# ------------------------------------------------------------------------------
+WEB_CONCURRENCY=4
+
+# Sentry
+# ------------------------------------------------------------------------------
+SENTRY_DSN=
+
+
+# Redis
+# ------------------------------------------------------------------------------
+REDIS_URL=redis://redis:6379/0
+
+# Celery
+# ------------------------------------------------------------------------------
+
+# Flower
+CELERY_FLOWER_USER=FSQofEYcCpwZgmTaSEoEhNzYMlMGltbz
+CELERY_FLOWER_PASSWORD=CvPAGPhNJNmmcomfgrf1jz0Dvg3W5flaTWKHbvEbxnE3tdOX5uCbBmZPcuirtFuK
+
