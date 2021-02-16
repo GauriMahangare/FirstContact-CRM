@@ -10,7 +10,7 @@ from django.conf import settings
 User = settings.AUTH_USER_MODEL
 class Campaign(models.Model):
     user = models.ForeignKey(User,null=True,on_delete=models.SET_NULL)
-    
+
     description = models.CharField(
         'Description',
         max_length=200,
@@ -23,18 +23,18 @@ class Campaign(models.Model):
     dateTimeCreated = models.DateTimeField(
         'Created',
         auto_now_add =True,
-    )    
+    )
 
     def __str__(self):
         return "{self.description}".format(self=self)
-    
+
     class Meta:
         verbose_name = 'Campaign'
         verbose_name_plural = 'Campaigns'
 
 class Category(models.Model):
     user = models.ForeignKey(User,null=True,on_delete=models.SET_NULL)
-    
+
     description = models.CharField(
         'Description',
         max_length=200,
@@ -47,18 +47,18 @@ class Category(models.Model):
     dateTimeCreated = models.DateTimeField(
         'Created',
         auto_now_add =True,
-    )    
+    )
 
     def __str__(self):
         return "{self.description}".format(self=self)
-    
+
     class Meta:
         verbose_name = 'Category'
-        verbose_name_plural = 'Category' 
+        verbose_name_plural = 'Category'
 
 class Agent(models.Model):
     user = models.OneToOneField(
-        User, 
+        User,
         on_delete=models.CASCADE,
     )
 
@@ -70,14 +70,14 @@ class Agent(models.Model):
     dateTimeCreated = models.DateTimeField(
         'Created',
         auto_now_add =True,
-    )    
+    )
 
     def __str__(self):
         return "{self.user.name}".format(self=self)
-    
+
     class Meta:
         verbose_name = 'Agent'
-        verbose_name_plural = 'Agent' 
+        verbose_name_plural = 'Agent'
 
 class LeadManager(models.Manager):
     def get_queryset(self):
@@ -126,7 +126,7 @@ class Lead(models.Model):
         'Mobile number',
         max_length=20,
     )
-    
+
     class ContactPreferenceChoices(models.TextChoices):
         Phone = 'PHONE', _('Landline')
         Mobile = 'MOBILE.', _('Mobile')
@@ -169,8 +169,8 @@ class Lead(models.Model):
     )
 
     profile_picture = models.ImageField(
-        null=True, 
-        blank=True, 
+        null=True,
+        blank=True,
         upload_to="profile_pictures/",
     )
 
@@ -181,35 +181,35 @@ class Lead(models.Model):
     )
 
     assigned_campaign = models.ForeignKey(
-        Campaign, 
+        Campaign,
         null=True,
-        blank=True, 
+        blank=True,
         on_delete=models.SET_NULL,
     )
 
     assigned_agent = models.ForeignKey(
-        Agent, 
+        Agent,
         null=True,
-        blank=True, 
+        blank=True,
         on_delete=models.SET_NULL,
     )
 
     lead_status = models.ForeignKey(
-        Category, 
-        related_name="leads", 
-        null=True, 
-        blank=True, 
+        Category,
+        related_name="leads",
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
     )
 
-    description = models.TextField(      
-        'Description', 
+    description = models.TextField(
+        'Description',
         max_length=200,
         blank=True,
     )
 
-    closeReason = models.TextField(      
-        'Lead Close Reason', 
+    closeReason = models.TextField(
+        'Lead Close Reason',
         max_length=200,
         blank=True,
     )
@@ -228,7 +228,7 @@ class Lead(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} {self.lead_status}"
-    
+
     class Meta:
         verbose_name = 'Leads'
         verbose_name_plural = 'Leads'
@@ -238,24 +238,24 @@ def handle_upload_follow_ups(instance, filename):
 
 class FollowUp(models.Model):
     lead = models.ForeignKey(
-        Lead, 
+        Lead,
         related_name="followups",
          on_delete=models.CASCADE,
     )
 
     notes = models.TextField(
-        blank=True, 
+        blank=True,
         null=True,
     )
 
     action = models.TextField(
-        blank=True, 
+        blank=True,
         null=True,
     )
 
     file = models.FileField(
-        null=True, 
-        blank=True, 
+        null=True,
+        blank=True,
         upload_to=handle_upload_follow_ups
     )
 
@@ -271,7 +271,7 @@ class FollowUp(models.Model):
 
     def __str__(self):
         return f"{self.lead.first_name} {self.lead.last_name}"
-    
+
     class Meta:
         verbose_name = 'Follow-Ups'
         verbose_name_plural = 'Follow-Ups'

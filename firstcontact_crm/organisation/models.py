@@ -13,7 +13,7 @@ class Organisation(models.Model):
     is_verified = models.BooleanField(default=True)
     is_access_enabled = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
-    
+
     dateTimeModified = models.DateTimeField(
         'Last Modified',
         auto_now =True,
@@ -30,7 +30,7 @@ class Organisation(models.Model):
 
     def __str__(self):
         return f"{self.work_org_name}"
-        
+
     class Meta:
         verbose_name = 'Organisation'
         verbose_name_plural = 'Organisations'
