@@ -85,12 +85,14 @@
                 {# URL provided by django-allauth/account/urls.py #}
                 <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">{% trans "Leads" %}</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">{% trans "Organisation" %}</a>
-              </li>
+                {% if not request.user.is_organisation_default %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">{% trans "Leads" %}</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">{% trans "Team" %}</a>
+                  </li>
+                {% endif %}
               <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}
                 <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
@@ -187,4 +189,3 @@
 </footer>
 
 </html>
-

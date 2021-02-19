@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from organisation.models import Organisation
 
 class User(AbstractUser):
@@ -21,7 +21,7 @@ class User(AbstractUser):
         Mrs = 'Mrs.', _('Mrs.')
         Miss = 'Miss.', _('Miss.')
         Ms = 'Ms.', _('Ms.')
-        default = '', _('Prefer not to say')
+        default = 'NotProvided', _('Prefer not to say')
     title = models.CharField(
         'Title',
         max_length=25,
@@ -58,6 +58,8 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=True)
     is_team_manager = models.BooleanField(default=False)
     is_team_member = models.BooleanField(default=False)
+    is_organisation_default = models.BooleanField(default=True)
+    is_profile_complete = models.BooleanField(default=False)
 
     def get_absolute_url(self):
         """Get url for user's detail view.
@@ -70,3 +72,15 @@ class User(AbstractUser):
                                               }
                     )
 
+# def post_user_created_signal(sender, instance, created, **kwargs):
+#     if created:
+#         Organisation.objects.create(user=instance)
+
+
+# post_save.connect(post_user_created_signal, sender=User)
+
+# def pre_user_created_signal(sender, instance, created, **kwargs):
+#     if created:
+#         Organisation.objects.create(user=instance)
+
+# pre_save.connect(pre_user_created_signal, sender=User)

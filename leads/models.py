@@ -275,4 +275,3 @@ class FollowUp(models.Model):
     class Meta:
         verbose_name = 'Follow-Ups'
         verbose_name_plural = 'Follow-Ups'
-

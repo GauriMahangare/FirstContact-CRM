@@ -28,10 +28,14 @@ class UserAdmin(auth_admin.UserAdmin):
                     "is_admin",
                     "is_team_manager",
                     "is_team_member",
+                    "is_organisation_default",
+                    "is_profile_complete",
                 ),
             },
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
-    list_display = ["username", "name", "is_superuser"]
-    search_fields = ["name"]
+    list_display = ["username","name", "userorganization","last_login","date_joined"]
+    list_filter = ('userorganization',)
+    search_fields = ["name","email",]
+    date_hierarchy = 'date_joined'
