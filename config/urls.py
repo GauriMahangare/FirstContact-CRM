@@ -11,13 +11,23 @@ urlpatterns = [
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),
+    path(
+        "pricing/", TemplateView.as_view(template_name="pages/pricing.html"), name="pricing"
+    ),
+    path(
+        "contactus/", TemplateView.as_view(template_name="pages/ContactUs.html"), name="contactus"
+    ),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
+
     # User management
     path("users/", include("firstcontact_crm.users.urls", namespace="users")),
-    path("organisation/", include("firstcontact_crm.organisation.urls", namespace="organisation")),
     path("accounts/", include("allauth.urls")),
+
     # Your stuff: custom urls includes go here
+    path("organisation/", include("firstcontact_crm.organisation.urls", namespace="organisation")),
+    path("payment/", include("firstcontact_crm.payment.urls", namespace="payment")),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # API URLS

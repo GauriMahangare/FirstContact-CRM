@@ -6,15 +6,16 @@ from django.conf import settings
 from django.urls import reverse
 from django.db.models.signals import post_save
 
+
 # Create your models here.
 User = settings.AUTH_USER_MODEL
 
 class Organisation(models.Model):
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User,null=True,on_delete=models.SET_NULL)
 
     work_org_name = models.CharField('Work organisation',
         max_length=300,
-        blank=True,
+        default='',
         help_text='Required: Organisation Name'
     )
     work_address_line1 = models.CharField(
@@ -58,9 +59,7 @@ class Organisation(models.Model):
         auto_now_add =True,
     )
 
-    subscriptionType = models.TextField('Subscription',
-        blank=True,
-    )
+
 
     def __str__(self):
         return f"{self.work_org_name}"

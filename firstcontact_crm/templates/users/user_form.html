@@ -1,17 +1,21 @@
-{% extends "base.html" %}
+{% extends "users/base.html" %}
 {% load crispy_forms_tags %}
 
-{% block title %}{{ user.username }}{% endblock %}
+{% block title %}{{ user.username }}{% block head_title %} - Update Profile{% endblock head_title %}{% endblock title %}
 
-{% block content %}
-  <h1>{{ user.username }}</h1>
+{% block inner %}
+  <h1>Update profile</h1>
+  <hr>
   <form class="form-horizontal" method="post" action="{% url 'users:update' %}">
     {% csrf_token %}
     {{ form|crispy }}
     <div class="control-group">
       <div class="controls">
         <button type="submit" class="btn btn-primary">Update</button>
+        <a href="{% url 'users:detail' username=user.username %}" class="btn btn-link">Cancel</a>
       </div>
     </div>
   </form>
+</br>
+<p><small>* If you have updated email address, you will receive verification email shortly.Please check your inbox</small></p>
 {% endblock %}

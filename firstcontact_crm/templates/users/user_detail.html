@@ -1,48 +1,72 @@
 {% extends "users/base.html" %}
-{% load static %}
+{% load static i18n compress%}
 
-{% block title %}User: {{ object.username }}{% endblock %}
+{% block head_title %}"View Profile"{% endblock %}
 
-{% block content %}
+{% block inner %}
 <div class="container">
 
   <div class="row">
     <div class="col-sm-12">
-
-      <h2>Username : {{ object.username }}</h2>
-      {% if object.name %}
-        <p>Name : {{ object.name }}</p>
-      {% endif %}
-      {% if object.is_organisation_default%}
-        <p> You must complete your organisation details to enable access to CRM.</p>
-      {% else %}
-        {% if object.userorganization %}
-          <p>Organisation : {{ object.userorganization }}</p>
-        {% endif %}
-      {% endif %}
-      <p>Current Access:</p>
-      <ul>
-        {% if request.user.is_admin %}
-          <li>Organisation Admin</li>
-          {% if object.is_team_manager %}
-            <li>Team Manager </li>
+      <h1>Your profile</h1>
+      <hr/>
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary"><h4>Username : {{ request.user.username }}</h4></h6>
+        </div>
+        <div class="card-body">
+          {% if object.name %}
+            <p><b>Name : </b>{{ object.name }}</p>
           {% endif %}
-          {% if object.is_team_member %}
-            <li>Team Member</li>
-          {% endif %}
-        {% else %}
-          {% if request.user.is_team_manager %}
-              <li>Team Manager </li>
-              {% if object.is_team_member %}
-              <li>Team Member</li>
-              {% endif %}
+        {% if request.user.is_organisation_default%}
+          <div class="px-3 py-3 bg-gradient-danger text-white">
+            <b> Nearly there..You must complete setup of your work organisation to enable access to the CRM.</b>
+          </div>
+          <br>
+          <a class="btn btn-primary" href="{% url 'organisation:create' %}" >Create Organisation</a>
+          <br>
           {% else %}
-            {% if request.user.is_team_member %}
+          {% if object.userorganization %}
+            <p><b>Organisation :</b> {{ object.userorganization }}</p>
+    
+          {% endif %}
+        {% endif %}
+        
+        <hr>
+        <p><b>Current Access: </b></p>
+        <ul>
+          {% if request.user.is_admin %}
+            <li>Organisation Administrator</li>
+            {% if object.is_team_manager %}
+              <li>Team Manager </li>
+            {% endif %}
+            {% if object.is_team_member %}
               <li>Team Member</li>
             {% endif %}
+          {% else %}
+            {% if request.user.is_team_manager %}
+                <li>Team Manager </li>
+                {% if object.is_team_member %}
+                <li>Team Member</li>
+                {% endif %}
+            {% else %}
+              {% if request.user.is_team_member %}
+                <li>Team Member</li>
+              {% endif %}
+          {% endif %}
         {% endif %}
-      {% endif %}
-      </ul>
+        </ul>
+        {% if not request.user.is_organisation_default%}
+        <div class="px-3 py-3 bg-gradient-info text-white">
+          Who else is part of this organisation?
+        </div>
+        <br>
+          <a class="btn btn-primary" href="#" >Add My Team</a>
+        {%endif%}
+        <br/>
+        <p><small>**Use Account Set up menu to update profile information</small></p>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -51,13 +75,6 @@
 <div class="row">
 
   <div class="col-sm-12">
-    {% if object.is_organisation_default%}
-    <a class="btn btn-primary" href="{% url 'organisation:create' %}" role="button">My Organisation</a>
-    {% else %}
-    <a class="btn btn-primary" href="{% url 'organisation:update' %}" role="button">My Organisation</a>
-    {% endif %}
-    <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">My Info</a>
-    <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">E-Mail</a>
     <!-- Your Stuff: Custom user template urls -->
   </div>
 
@@ -67,5 +84,5 @@
 
 
 </div>
-{% endblock content %}
+{% endblock %}
 

@@ -35,7 +35,7 @@ class OrganisationCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.Cr
     template_name = "organisation/organisation_create_update.html"
     model = Organisation
     fields = ["work_org_name","work_address_line1","work_address_line2","work_address_line3","work_address_line4","work_address_postcode",]
-    # success_message = _("Organisation has been set; Now create your team and you are all set")
+    # success_message = _("Congratulations!!Organisation has been set; Now create your team and you are all set")
 
     def get_success_url(self):
         return reverse("users:detail", kwargs={"username": self.request.user.username})
@@ -59,7 +59,7 @@ class OrganisationCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.Cr
             organisation.save()
             # Update user data so that org cannot be created any more by this user
             User.objects.update(is_organisation_default=False, userorganization_id=organisation.pk)
-            messages.success(self.request, "Organisation has been set; Now create your team and you are all set")
+            messages.success(self.request, "Congratulations!! Organisation set up is complete; Now invite your team members to collaborate.. Happy working!")
             return redirect('/organisation/~redirect/')
 
 Organisation_create_view = OrganisationCreateView.as_view()

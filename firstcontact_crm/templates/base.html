@@ -32,6 +32,7 @@
     <!-- This file stores project-specific CSS -->
 
     <link href="{% static 'css/project.css' %}" rel="stylesheet">
+    <!-- <link href="{% static 'css/sb-admin-2.css' %}" rel="stylesheet"> -->
 
     {% endcompress %}
     {% endblock %}
@@ -80,6 +81,12 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'about' %}">About</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'pricing' %}">Pricing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'contactus' %}">Contact Us</a>
+            </li>
             {% if request.user.is_authenticated %}
               <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}
@@ -104,22 +111,23 @@
                 {# URL provided by django-allauth/account/urls.py #}
                 <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
               </li>
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}
                 <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
-              </li>
+              </li> -->
             {% endif %}
 
           </ul>
+          <a id="log-in-link" class="btn btn-primary" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
           <!-- Navbar Search-->
-          <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+          <!-- <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
             <div class="input-group">
                 <input class="form-control" type="text" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2" />
                 <div class="input-group-append">
                     <button class="btn btn-primary" type="button"><i class="fas fa-search"></i></button>
                 </div>
             </div>
-          </form>
+          </form> -->
 
         </div>
       </nav>
@@ -137,6 +145,11 @@
 
       {% block content %}
         <p>Use this document as a way to quick start any new project.</p>
+        <div class="row">
+          <div class="col-md-6 offset-md-3">
+            {% block inner %}{% endblock %}
+          </div>
+        </div>
       {% endblock content %}
 
     </div> <!-- /container -->
@@ -148,44 +161,43 @@
     {% endblock inline_javascript %}
   </body>
   <footer class="footer text-center">
-    <div class="container">
-        <div class="row">
-            <!-- Footer Location-->
-            <div class="col-lg-4 mb-2 mb-lg-0">
-                <p class="text-uppercase mb-3">Location</p>
-                <p class="lead mb-0">
-                   15 Falconer Road,Bushey
-                    <br />
-                   Hertfordshire, WD23 3AQ ,
-                    <br />
-                   United Kingdom.
-                </p>
-            </div>
-            <!-- Footer Social Icons-->
-            <div class="col-lg-4 mb-5 mb-lg-0">
-                <p class="text-uppercase mb-3">Around the Web</p>
-                <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-facebook-f"></i></a>
-                <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-twitter"></i></a>
-                <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-linkedin-in"></i></a>
-                <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-dribbble"></i></a>
-            </div>
-            <!-- Footer About Text-->
-            <div class="col-lg-4">
-                <p class="text-uppercase mb-4">Our Brands</p>
-                <p class="lead mb-0">
-                    <p>Backlit</p>
-                    <p>xxx</p>
-                </p>
-            </div>
-        </div>
+      <div class="container">
+          <div class="row">
+              <!-- Footer Location-->
+              <div class="col-lg-4 mb-2 mb-lg-0">
+                  <p class="text-uppercase mb-3">Location</p>
+                  <p class="lead mb-0">
+                    15 Falconer Road,Bushey
+                      <br />
+                    Hertfordshire, WD23 3AQ ,
+                      <br />
+                    United Kingdom.
+                 
+                  </p>
+              </div>
+              <!-- Footer Social Icons-->
+              <div class="col-lg-4 mb-5 mb-lg-0">
+                  <p class="text-uppercase mb-3">Around the Web</p>
+                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-facebook-f"></i></a>
+                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-twitter"></i></a>
+                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-linkedin-in"></i></a>
+                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-dribbble"></i></a>
+              </div>
+              <!-- Footer About Text-->
+              <div class="col-lg-4">
+                  <p class="text-uppercase mb-4">Our Brands</p>
+                  <p class="lead mb-0">
+                      <p>Backlit</p>
+                      <p>xxx</p>
+                  </p>
+              </div>
+          </div>
 
-
-    </div>
-     <!-- Copyright Section-->
-    <div class="copyright py-4 text-center text-white">
-      <div class="container"><small> Copyright © <a href = "https://www.avanengineering.com/" target="_blank">Avan Engineering Services Ltd </a>: 2021</small></div>
-    </div>
-
-</footer>
-
+  
+      </div>
+      <!-- Copyright Section-->
+      <div class="copyright py-4 text-center text-white">
+        <div class="container"><small> Copyright © <a href = "https://www.avanengineering.com/" target="_blank">Avan Engineering Services Ltd </a>: 2021</small></div>
+      </div>  
+  </footer>
 </html>
