@@ -77,6 +77,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "inline_static",
     "stripe",
+    "waffle",
 ]
 
 LOCAL_APPS = [
@@ -84,6 +85,7 @@ LOCAL_APPS = [
     # Your stuff: custom apps go here
     "organisation.apps.OrganisationConfig",
     "payment.apps.PaymentConfig",
+    "feature.apps.FeatureConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -142,6 +144,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "waffle.middleware.WaffleMiddleware",
 ]
 
 # STATIC
@@ -326,3 +329,5 @@ CORS_URLS_REGEX = r"^/api/.*$"
 # Your stuff...
 # ------------------------------------------------------------------------------
 
+# Waffle Feature flags
+WAFFLE_FLAG_MODEL = 'feature.Flag'

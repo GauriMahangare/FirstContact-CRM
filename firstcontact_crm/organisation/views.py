@@ -12,6 +12,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import RedirectView, UpdateView
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from waffle.decorators import waffle_flag,flag_is_active
+from waffle.mixins import WaffleFlagMixin
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -30,21 +32,29 @@ class OrganisationUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView
 
 Organisation_update_view = OrganisationUpdateView.as_view()
 
-class OrganisationCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.CreateView):
-    print("in create org view")
+# class OrganisationCreateView(LoginRequiredMixin, WaffleFlagMixin,SuccessMessageMixin, generic.CreateView):
+    
+class OrganisationCreateView(LoginRequiredMixin,SuccessMessageMixin, generic.CreateView):
     template_name = "organisation/organisation_create_update.html"
     model = Organisation
     fields = ["work_org_name","work_address_line1","work_address_line2","work_address_line3","work_address_line4","work_address_postcode",]
     # success_message = _("Congratulations!!Organisation has been set; Now create your team and you are all set")
+    #waffle_flag = "Create Organsation"
 
     def get_success_url(self):
         return reverse("users:detail", kwargs={"username": self.request.user.username})
 
     def get_object(self):
         return self.request.user.userorganization
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+    
 
     def form_valid(self, form):
         organisation = form.save(commit=False)
+        print("In create org - form valid")
         organisation.created_by = self.request.user
         if  not organisation.work_org_name:
             messages.error(self.request, "Work Organisation name is required")
