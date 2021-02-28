@@ -1,0 +1,47 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load waffle_tags %}
+
+{% block head_title %} {{ user.username }}- Update Organisation {% endblock head_title %}
+
+{% block inner %}
+    
+    
+  {% flag "Create Organsation" %}
+    {% if request.user.is_organisation_default %}
+      <h1>{% trans "Create Organisation" %}</h1>
+      <hr/>
+      <h5>{% trans "Please provide your work organisation or company details." %}</h5>
+      </br >
+      <form class="create_org" id="create_org_form" method="post" action="{% url 'organisation:create' %}">
+        {% csrf_token %}
+          {{ form|crispy }}
+          {% if redirect_field_value %}
+              <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+          {% endif %}
+        <button class="btn btn-primary" type="submit">{% trans "Create organisation" %} &raquo;</button>
+      </form>
+    {% else %}
+      <h1>{% trans "Update Organisation" %}</h1>
+     <hr/>
+      <h5>{% trans "Please provide your work organisation or company details" %}</h5>
+      </br >
+      <form class="create_org" id="create_org_form" method="post" action="{% url 'organisation:update' %}">
+        {% csrf_token %}
+          {{ form|crispy }}
+          {% if redirect_field_value %}
+              <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+          {% endif %}
+        <button class="btn btn-primary" type="submit">{% trans "Update organisation" %} &raquo;</button>
+        <a href="{% url 'users:detail' username=user.username %}" class="btn btn-link">Cancel</a>
+        
+      </form>
+    {% endif%}
+  {% else %}
+      <p>To get access to Organisation, please upgrade your subscription</p>
+  {% endflag %}
+{% endblock %}
+

@@ -1,0 +1,21 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block head_title %} {{ user.username }} - Checkout {% endblock head_title %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/stripe.css' %}" />
+    <script src="https://js.stripe.com/v3/"></script>
+{% endblock extra_head %}
+<!-- {% block inner %} -->
+{% block content %}
+
+<h1>Payment</h1>
+
+
+
+
+{% endblock content %}  
+<!-- {% endblock %} -->

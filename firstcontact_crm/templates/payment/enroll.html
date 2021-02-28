@@ -1,0 +1,188 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block head_title %} {{ user.username }} - Subscriptions {% endblock head_title %}
+
+<!-- {% block inner %} -->
+{% block content %}
+    
+<h1>Pricing Plan</h1>
+
+<div class="card shadow mb-4">
+    <!-- Card Header - Accordion -->
+    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
+        role="button" aria-expanded="true" aria-controls="collapseCardExample">
+        <h6 class="m-0 font-weight-bold text-primary">Your current plan</h6>
+    </a>
+    <!-- Card Content - Collapse -->
+    <div class="collapse show" id="collapseCardExample">
+        <div class="card-body">
+            <p><strong>Created on:</strong> </p>
+            <p><strong>Expires on:</strong> </p>
+            <p><strong>Next payment due:</strong> </p>
+            <p><strong>Next payment due Date:</strong> </p>
+        </div>
+    </div>
+</div>
+
+<h3>Here's what's included in each plan. Select the pricing plan that best suits you.</h3>
+
+<div class="row">
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-m font-weight-bold text-primary text-uppercase mb-1">
+                            Free Plan
+                        </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                £0 for life
+                            </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                    <ul>
+                        <li>
+                           <p> Register using social media account </p>
+                        </li>
+                        <li>
+                            <p> Manage upto 50 leads </p>
+                        </li>
+                        <li>
+                            <p> Create two email templates </p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Basic Card  -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-m font-weight-bold text-success text-uppercase mb-1">
+                            Basic</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">£5 per month</div>
+                    </div>
+                </div>
+                <hr>
+                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                    <ul>
+                        <li>
+                           <p> Register using social media account </p>
+                        </li>
+                        <li>
+                            <p> Manage upto 50 leads </p>
+                        </li>
+                        <li>
+                            <p> Create two email templates </p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="my-2"></div>
+                <a href="{% url 'payment:checkout' %}" class="btn btn-success btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">Upgrade</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Essential Subscription -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-m font-weight-bold text-info text-uppercase mb-1">Essential 
+                            <span class="icon text-gold-50">
+                                <i class="fa fa-star"></i>
+                            </span>
+                            <span class="icon text-gold-50">
+                                <i class="fa fa-star"></i>
+                            </span>
+                        </div>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">£10 per month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                    <ul>
+                        <li>
+                           <p> Register using social media account </p>
+                        </li>
+                        <li>
+                            <p> Manage upto 50 leads </p>
+                        </li>
+                        <li>
+                            <p> Create two email templates </p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="my-2"></div>
+                <a href="{% url 'payment:checkout' %}" class="btn btn-info btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">Upgrade</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enterprise Subscription -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-m font-weight-bold text-warning text-uppercase mb-1">
+                            Enterprise </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">£15 per month</div>
+                    </div>
+                </div>
+                <hr>
+                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                    <ul>
+                        <li>
+                           <p> Register using social media account </p>
+                        </li>
+                        <li>
+                            <p> Manage upto 50 leads </p>
+                        </li>
+                        <li>
+                            <p> Create two email templates </p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="my-2"></div>
+                <a href="{% url 'payment:checkout' %}" class="btn btn-warning btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">Upgrade</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}  
+<!-- {% endblock %} -->
