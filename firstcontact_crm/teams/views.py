@@ -20,7 +20,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 # from waffle.decorators import waffle_flag,flag_is_active
-# from waffle.mixins import WaffleFlagMixin
+from waffle.mixins import WaffleFlagMixin
 from django.http import Http404
 from organisation.models import Organisation
 
@@ -36,7 +36,7 @@ def get_teams(user):
         return teams_qs
     return None
 
-class SearchView(View):
+class SearchView(LoginRequiredMixin,SuccessMessageMixin,View):
     def get(self, request, *args, **kwargs):
         queryset = Team.objects.all()
         query = request.GET.get('q')
@@ -52,7 +52,7 @@ class SearchView(View):
 
 Team_search_view = SearchView.as_view()
 
-class TeamListView(ListView):
+class TeamListView(LoginRequiredMixin,SuccessMessageMixin,ListView):
     model = Team
     template_name = 'teams/team_list.html'
     paginate_by = 5
@@ -100,31 +100,36 @@ class TeamUpdateView(LoginRequiredMixin, SuccessMessageMixin,UpdateView):
 
     
     def form_valid(self, form):
-        team = form.save(commit=False)
-        team.created_by = self.request.user
-        if  not team.name:
-            messages.error(self.request, "Team name is required")
-            return super(TeamUpdateView, self).form_valid(form)
-        
+        if waffle.flag_is_active(self.request, 'create_team'):
+            team = form.save(commit=False)
+            team.created_by = self.request.user
+            if  not team.name:
+                messages.error(self.request, "Team name is required")
+                return super(TeamUpdateView, self).form_valid(form)
+            
+            else:
+                try:
+                    team.save()
+                except:
+                    logger.critical('Team Update error')
+                    raise Http404 ("There was an error updating your Team. If the error persists, please try again after sometime.")
+                messages.success(self.request, "Information has been updated.")
+                return redirect('/teams/~redirect/')
+            #     return redirect(reverse("team-list", kwargs={
+            #     'pk': form.instance.pk
+            # }))
         else:
-            try:
-                team.save()
-            except:
-                logger.critical('Team Update error')
-                raise Http404 ("There was an error updating your Team. If the error persists, please try again after sometime.")
-            messages.success(self.request, "Information has been updated.")
-            return redirect('/teams/~redirect/')
-        #     return redirect(reverse("team-list", kwargs={
-        #     'pk': form.instance.pk
-        # }))
+            messages.error(self.request, "Please update your subscription to continue using this feature.")
+            return super(TeamUpdateView, self).form_valid(form)
 
 Team_update_view = TeamUpdateView.as_view()
 
 
-class TeamDetailView(DetailView):
+class TeamDetailView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,DetailView):
     model = Team
     template_name = 'teams/team_detail.html'
     context_object_name = 'team'
+    waffle_flag = "create_team"
 
 Team_detail_view = TeamDetailView.as_view()
     
@@ -138,23 +143,27 @@ class TeamCreateView(CreateView):
         return context
 
     def form_valid(self, form):
-        team = form.save(commit=False)
-        team.created_by = self.request.user
-        team.organisation = self.request.user.userorganization
-        if  not team.name:
-            messages.error(self.request, "Team name is required")
-            return super(TeamCreateView, self).form_valid(form)
-        
+        if waffle.flag_is_active(self.request, 'create_team'):
+            team = form.save(commit=False)
+            team.created_by = self.request.user
+            team.organisation = self.request.user.userorganization
+            if  not team.name:
+                messages.error(self.request, "Team name is required")
+                return super(TeamCreateView, self).form_valid(form)
+            
+            else:
+                try:
+                    team.save()
+                except:
+                    logger.critical('Team Create error')
+                    raise Http404 ("There was an error creating your Team. If the error persists, please try again after sometime.")
+                # Update user data so that org cannot be created any more by this user
+            
+                messages.success(self.request, "Congratulations!! Team has been set; Now assign team members to this team")
+                return redirect('/teams/~redirect/')
         else:
-            try:
-                team.save()
-            except:
-                logger.critical('Team Create error')
-                raise Http404 ("There was an error creating your Team. If the error persists, please try again after sometime.")
-            # Update user data so that org cannot be created any more by this user
-        
-            messages.success(self.request, "Congratulations!! Team has been set; Now assign team members to this team")
-            return redirect('/teams/~redirect/')
+            messages.error(self.request, "Please update your subscription to continue using this feature.")
+            return super(TeamCreateView, self).form_valid(form)    
 
 Team_create_view = TeamCreateView.as_view()
 
@@ -167,23 +176,13 @@ class TeamRedirectView(LoginRequiredMixin, RedirectView):
 
 Team_redirect_view = TeamRedirectView.as_view()
 
-class TeamDeleteView(DeleteView):
+class TeamDeleteView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,DeleteView):
     model = Team
     success_url = '/teams/~redirect/'
     template_name = 'teams/team_confirm_delete.html'
     context_object_name = 'team'
     warning_message = _("Team has been deleted.")
-
-    # def form_valid(self, form):
-    #     try:
-    #         team.delete()
-    #     except:
-    #         logger.critical('Team Delete error')
-    #         raise Http404 ("There was an error deleting your Team. If the error persists, please try again after sometime.")
-    #         # Update user data so that org cannot be created any more by this user
-        
-    #     messages.success(self.request, "Congratulations!! Team has been set; Now assign team members to this team")
-    #     return redirect('/teams/~redirect/')
+    waffle_flag = "create_team"
 
 Team_delete_view = TeamDeleteView.as_view()
 

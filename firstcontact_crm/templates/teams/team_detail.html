@@ -3,11 +3,15 @@
 {% load static %}
 {% load i18n %}
 {% load crispy_forms_tags %}
-
+{% load waffle_tags %}
 {% block head_title %} {{ user.username }} - Team_List {% endblock head_title %}
 
 
 {% block content %}
- <h1>Team Detail View</h1>
-
+{% flag "create_team" %}
+    <h1>Team Detail View</h1>
+{% else %}
+ <h3>To manage Teams, please upgrade your subscription.</h3>
+ <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+{% endflag %}
 {% endblock content %}

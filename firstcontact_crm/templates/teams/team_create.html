@@ -3,10 +3,12 @@
 {% load static %}
 {% load i18n %}
 {% load crispy_forms_tags %}
+{% load waffle_tags %}
 
 {% block head_title %} {{ user.username }} - Team_Create {% endblock head_title %}
 
 {% block inner %}
+{% flag "create_team" %}
     <h1>Create Team</h1>
     <hr/>
     <h5>{% trans "Set up your team to collaborate." %}</h5>
@@ -20,5 +22,9 @@
         <button class="btn btn-primary" type="submit">{% trans "Create Team" %} &raquo;</button>
         <a id="create-team" class="btn-link ml-5" href="{% url 'teams:list' %}">{% trans "Cancel" %}</a>
     </form>  
+{% else %}
+    <h3>To manage Teams, please upgrade your subscription.</h3>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+{% endflag %}
 
 {% endblock %}

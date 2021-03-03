@@ -3,11 +3,13 @@
 {% load static %}
 {% load i18n %}
 {% load crispy_forms_tags %}
+{% load waffle_tags %}
 
 {% block head_title %} {{ user.username }} - Team_List {% endblock head_title %}
 
 
 {% block content %}
+{% flag "create_team" %}
     <a id="create-team" class="btn btn-primary float-right" href="{% url 'teams:create' %}">{% trans "Add New Team" %}</a>
     <h1>Your Teams</h1>
     <hr/>   
@@ -117,4 +119,8 @@
           }
         }
     </script>
+{% else %}
+    <h3>To manage Teams, please upgrade your subscription.</h3>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+{% endflag %}
 {% endblock content %}

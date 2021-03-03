@@ -41,7 +41,8 @@
       </form>
     {% endif%}
   {% else %}
-      <p>To get access to Organisation, please upgrade your subscription</p>
+      <h3>To manage Organisation, please upgrade your subscription.</h3>
+      <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
   {% endflag %}
 {% endblock %}
 

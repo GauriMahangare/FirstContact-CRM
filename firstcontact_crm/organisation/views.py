@@ -42,7 +42,7 @@ class OrganisationCreateView(LoginRequiredMixin,SuccessMessageMixin, generic.Cre
     fields = ["work_org_name","work_address_line1","work_address_line2","work_address_line3","work_address_line4","work_address_postcode",]
     # success_message = _("Congratulations!!Organisation has been set; Now create your team and you are all set")
     #waffle_flag = "Create Organsation"
-    '''Waffle flag has been commented as View just returns 404 error if the flag is off. Need to find a way to handle 404 error for class based views.'''
+   
 
     def get_success_url(self):
         return reverse("users:detail", kwargs={"username": self.request.user.username})
