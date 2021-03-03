@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 import logging
+import waffle
 from django.urls import reverse
 from django.shortcuts import render, redirect, reverse
 from django.views.generic.base import RedirectView
@@ -14,6 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from waffle.decorators import waffle_flag,flag_is_active
 from waffle.mixins import WaffleFlagMixin
+from django.http import Http404
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -40,6 +42,7 @@ class OrganisationCreateView(LoginRequiredMixin,SuccessMessageMixin, generic.Cre
     fields = ["work_org_name","work_address_line1","work_address_line2","work_address_line3","work_address_line4","work_address_postcode",]
     # success_message = _("Congratulations!!Organisation has been set; Now create your team and you are all set")
     #waffle_flag = "Create Organsation"
+    '''Waffle flag has been commented as View just returns 404 error if the flag is off. Need to find a way to handle 404 error for class based views.'''
 
     def get_success_url(self):
         return reverse("users:detail", kwargs={"username": self.request.user.username})
@@ -53,24 +56,39 @@ class OrganisationCreateView(LoginRequiredMixin,SuccessMessageMixin, generic.Cre
     
 
     def form_valid(self, form):
-        organisation = form.save(commit=False)
-        print("In create org - form valid")
-        organisation.created_by = self.request.user
-        if  not organisation.work_org_name:
-            messages.error(self.request, "Work Organisation name is required")
-            return super(OrganisationCreateView, self).form_valid(form)
-        elif not organisation.work_address_line1:
-            messages.error(self.request, "First line of address is required")
-            return super(OrganisationCreateView, self).form_valid(form)
-        elif not organisation.work_address_postcode:
-            messages.error(self.request, "Postcode is required")
-            return super(OrganisationCreateView, self).form_valid(form)
+        if waffle.flag_is_active(self.request, 'create_organisation'):
+            organisation = form.save(commit=False)
+            organisation.created_by = self.request.user
+            if  not organisation.work_org_name:
+                messages.error(self.request, "Work Organisation name is required")
+                return super(OrganisationCreateView, self).form_valid(form)
+            elif not organisation.work_address_line1:
+                messages.error(self.request, "First line of address is required")
+                return super(OrganisationCreateView, self).form_valid(form)
+            elif not organisation.work_address_postcode:
+                messages.error(self.request, "Postcode is required")
+                return super(OrganisationCreateView, self).form_valid(form)
+            else:
+                try:
+                    organisation.save()
+                except:
+                    logger.critical('Organisation Create error')
+                    raise Http404 ("There was an error creating your Organisation. If the error persists, please try again after sometime.")
+                # Update user data so that org cannot be created any more by this user
+                user = User.objects.get(pk= self.request.user.pk)
+                user.is_organisation_default=False
+                user.userorganization_id = organisation.pk
+                try:
+                    user.save()
+                except:
+                    logger.critical('Error updating user with organisation')
+                    raise Http404 ("There was an error creating your Organisation. If the error persists, please try again after sometime.")
+                # User.objects.update(is_organisation_default=False, userorganization_id=organisation.pk)
+                messages.success(self.request, "Congratulations!! Organisation set up is complete; Now invite your team members to collaborate.. Happy working!")
+                return redirect('/organisation/~redirect/')
         else:
-            organisation.save()
-            # Update user data so that org cannot be created any more by this user
-            User.objects.update(is_organisation_default=False, userorganization_id=organisation.pk)
-            messages.success(self.request, "Congratulations!! Organisation set up is complete; Now invite your team members to collaborate.. Happy working!")
-            return redirect('/organisation/~redirect/')
+            messages.error(self.request, "Please update your subscription to continue using this feature.")
+            return super(OrganisationCreateView, self).form_valid(form)
 
 Organisation_create_view = OrganisationCreateView.as_view()
 

@@ -6,11 +6,14 @@ from waffle import managers, get_waffle_flag_model
 from waffle.models import AbstractUserFlag, CACHE_EMPTY
 from django.utils.translation import gettext_lazy as _
 from django.core.cache import cache
-
+from django.http import Http404
+import logging
+# Create your views here.
+logger = logging.getLogger(__name__)
 # Create your models here.
-# User = settings.AUTH_USER_MODEL
 class Flag(AbstractUserFlag):
     ''' Customisable version of Waffle Model to have feature flags based on user subscriptions'''
+
     FLAG_PRICINGS_CACHE_KEY = 'FLAG_PRICINGS_CACHE_KEY'
     FLAG_PRICINGS_CACHE_KEY_DEFAULT = 'flag:%s:pricings'
 
@@ -31,14 +34,15 @@ class Flag(AbstractUserFlag):
         is_active = super(Flag, self).is_active_for_user(user)
         if is_active:
             return is_active
-
-        usersubscription=Subscription.objects.get(user_id=user.pk)
+        try:
+            usersubscription=Subscription.objects.get(user_id=user.pk)
+        except:
+            logger.critical('User does not have subscription')
         if  usersubscription:
             pricing_ids = self._get_pricing_ids() 
             if usersubscription.pricing_id in pricing_ids:
                return True
         else:
-            print("User does not have Subscription!!")
             return False
 
     def _get_pricing_ids(self):
@@ -55,6 +59,7 @@ class Flag(AbstractUserFlag):
         pricing_ids = set(self.pricings.all().values_list('pk', flat=True))
         if not pricing_ids:
             cache.add(cache_key, CACHE_EMPTY)
+            logger.warning('Feature flag does not have assigned subscriptions')
             return set()
 
         cache.add(cache_key, pricing_ids)

@@ -71,8 +71,8 @@ class Organisation(models.Model):
         verbose_name = 'Organisation'
         verbose_name_plural = 'Organisations'
 
-def get_queryset(self):
-        return User.objects.filter(user=1)
+# def get_queryset(self):
+#         return User.objects.filter(user=1)
 
 # Code has been commented as current request user cannot be accessed in models.
 

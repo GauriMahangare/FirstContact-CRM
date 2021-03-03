@@ -188,5 +188,17 @@
       $('#horizontal-stepper').nextStep();
       }, 2000);
     }
+//Search box above tables 
+$(document).ready(function(){
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#myTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+
+// Sort table columns
+
 
   })(jQuery); // End of use strict

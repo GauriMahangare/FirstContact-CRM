@@ -40,11 +40,9 @@ class User(AbstractUser):
     )
     first_name = models.CharField('First Name',
         max_length=60,
-        blank=True,
     )
     last_name = models.CharField('Last Name',
         max_length=60,
-        blank=True,
     )
 
     userorganization = models.ForeignKey(

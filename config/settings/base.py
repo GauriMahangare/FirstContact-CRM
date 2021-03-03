@@ -78,6 +78,7 @@ THIRD_PARTY_APPS = [
     "inline_static",
     "stripe",
     "waffle",
+    "invitations",
 ]
 
 LOCAL_APPS = [
@@ -86,6 +87,7 @@ LOCAL_APPS = [
     "organisation.apps.OrganisationConfig",
     "payment.apps.PaymentConfig",
     "feature.apps.FeatureConfig",
+    "teams.apps.TeamsConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -305,7 +307,8 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_ADAPTER = "firstcontact_crm.users.adapters.AccountAdapter"
+# ACCOUNT_ADAPTER = "firstcontact_crm.users.adapters.AccountAdapter"
+ACCOUNT_ADAPTER = 'invitations.models.InvitationsAdapter'
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_ADAPTER = "firstcontact_crm.users.adapters.SocialAccountAdapter"
 # django-compressor

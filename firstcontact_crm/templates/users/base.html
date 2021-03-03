@@ -27,10 +27,10 @@
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
-   
+    
 
     <!-- Your stuff: Third-party CSS libraries go here -->
-
+    <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
 
     {% compress css %}
     <!-- This file stores project-specific CSS -->
@@ -54,7 +54,11 @@
     <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>    
     <!-- Core plugin JavaScript-->
     <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>         
-    
+        <!-- Page level plugins -->
+    <script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.j' %}s"></script>
+    <!-- Page level custom scripts -->
+    <script src="{% static 'js/demo/datatables-demo.js' %}"></script>    
 
     <!-- Custom scripts for all pages-->
     {% compress js %}
@@ -111,13 +115,14 @@
                   aria-expanded="true" aria-controls="collapseTwo">
                   <i class="fas fa-fw fa-cog"></i>
                   <span>Account Setup</span>
-                  {% if request.user.is_organisation_default%}
+                  {% if request.user.is_profile_complete%}
                     <!-- <a href="#" class="btn btn-warning btn-circle btn-sm"> -->
-                        <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
+                        <i class=" fa fa-check-circle" style="font-size:11px;color:#10db3f"></i>
+                        
                     <!-- </a> -->
                   {% else %}  
                     <!-- <a href="#" class="btn btn-success btn-circle btn-sm"> -->
-                        <i class=" fa fa-check-circle" style="font-size:11px;color:#10db3f"></i>
+                        <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
                     <!-- </a> -->
                   {% endif %}  
               </a>
@@ -125,12 +130,9 @@
                   <div class="bg-white py-2 collapse-inner rounded">
                       <h6 class="collapse-header">My Info</h6>
                       <a class="collapse-item" href="{% url 'users:update' %}">Update Profile</a>
-                      {% if request.user.is_organisation_default%}
-                        <a class="collapse-item" href="{% url 'organisation:create' %}" >Create Organisation</a>
-                      {% else %}
-                        <a class="collapse-item" href="{% url 'organisation:update' %}" >Update Organisation</a>
-                      {% endif %}
-                      <a class="collapse-item" href="{% url 'account_email' %}">Preferences</a>
+
+                      <a class="collapse-item" href="{% url 'account_email' %}">Update Email</a>
+                      <a class="collapse-item" href="{% url 'account_email' %}">Update Password</a>
                   </div>
               </div>
           </li>
@@ -152,19 +154,25 @@
               </div>
           </li>
 
-        {% if not request.user.is_organisation_default%}<!-- Nav Item - Utilities Collapse Menu -->
+        <!-- {% if not request.user.is_organisation_default%} -->
+        <!-- Nav Item - Utilities Collapse Menu -->
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
                 aria-expanded="true" aria-controls="collapseUtilities">
                 <i class="fas fa-handshake"></i>
-                <span>My Team</span>
+                <span>Manage Teams</span>
             </a>
             <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
                 data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Manage Team</h6>
-                    <a class="collapse-item" href="#">My Team</a>
-                    <a class="collapse-item" href="#">Add Members</a>
+                    {% if request.user.is_organisation_default%}
+                        <a class="collapse-item" href="{% url 'organisation:create' %}" >Create Organisation</a>
+                    {% else %}
+                        <a class="collapse-item" href="{% url 'organisation:update' %}" >Update Organisation</a>
+                    {% endif %}
+                    <a class="collapse-item" href="{% url 'teams:list' %}">My Teams</a>
+                    <a class="collapse-item" href="#">Invite Users</a>
                 </div>
             </div>
         </li>
@@ -237,7 +245,7 @@
           <div class="text-center d-none d-md-inline">
               <button class="rounded-circle border-0" id="sidebarToggle"></button>
           </div>
-          {% endif %}
+          <!-- {% endif %} -->
           <!-- Sidebar Message -->
           <div class="sidebar-card">
               <img class="sidebar-card-illustration mb-2" src="{% static 'images/undraw_rocket.svg' %}" alt="">
@@ -476,7 +484,7 @@
                         {% endblock %}
                     </div>
                     </div>
-              {% endblock content %}  
+                {% endblock content %}  
 
               </div>
               <!-- /.container-fluid -->
