@@ -1,0 +1,24 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block head_title %} {{ user.username }} - Team_delete {% endblock head_title %}
+
+{% block inner %}
+    <h1>Delete Team</h1>
+    <hr/>
+    <h5>{% trans "Delete team details." %}</h5>
+    </br >
+    <form method="post">{% csrf_token %} 
+        <h2>Are you sure?</h2>
+        <h5>Are you sure you want to delete the Team "{{team.name}}"? </h5>
+        <h6>Membership of following team members will also be removed:</h6>
+        <br>
+        <strong><h6>Users :</h6></strong>
+        <br>
+        <button class="btn btn-danger" type="submit">{% trans "Yes, I'm sure" %} &raquo;</button>
+        <a id="delete-team" class="btn btn-secondary ml-5" href="{% url 'teams:list' %}">{% trans "No, take me back" %} &raquo;</a>
+    </form> 
+{% endblock %}
