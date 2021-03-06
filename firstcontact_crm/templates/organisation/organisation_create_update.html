@@ -16,26 +16,35 @@
       <hr/>
       <h5>{% trans "Please provide your work organisation or company details." %}</h5>
       </br >
-      <form class="create_org" id="create_org_form" method="post" action="{% url 'organisation:create' %}">
+      <form class="create_org" id="myForm" method="post" action="{% url 'organisation:create' %}">
         {% csrf_token %}
           {{ form|crispy }}
           {% if redirect_field_value %}
               <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
           {% endif %}
-        <button class="btn btn-primary" type="submit">{% trans "Create organisation" %} &raquo;</button>
+        <button class="btn btn-primary" id="btnSubmit" type="submit">
+          <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+          <span class="btn-txt">{% trans "Create organisation" %} &raquo;</span>
+        </button>
       </form>
     {% else %}
       <h1>{% trans "Update Organisation" %}</h1>
      <hr/>
       <h5>{% trans "Please provide your work organisation or company details" %}</h5>
       </br >
-      <form class="create_org" id="create_org_form" method="post" action="{% url 'organisation:update' %}">
+      <form class="create_org" id="myForm" method="post" action="{% url 'organisation:update' %}">
         {% csrf_token %}
           {{ form|crispy }}
           {% if redirect_field_value %}
               <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
           {% endif %}
-        <button class="btn btn-primary" type="submit">{% trans "Update organisation" %} &raquo;</button>
+        <button class="btn btn-primary" id="btnSubmit" type="submit">
+          <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+          <span class="btn-txt">{% trans "Update organisation" %} &raquo;</span>
+        </button>
+        <!-- <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div> -->
         <a href="{% url 'users:detail' username=user.username %}" class="btn btn-link">Cancel</a>
         
       </form>

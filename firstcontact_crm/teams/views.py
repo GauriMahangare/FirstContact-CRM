@@ -133,7 +133,7 @@ class TeamDetailView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,Deta
 
 Team_detail_view = TeamDetailView.as_view()
     
-class TeamCreateView(CreateView):
+class TeamCreateView(LoginRequiredMixin,SuccessMessageMixin,CreateView):
     model = Team
     fields = ["name","description",]
     template_name = 'teams/team_create.html'

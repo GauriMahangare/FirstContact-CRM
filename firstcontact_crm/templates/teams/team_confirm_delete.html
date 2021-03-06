@@ -11,14 +11,17 @@
     <hr/>
     <h5>{% trans "Delete team details." %}</h5>
     </br >
-    <form method="post">{% csrf_token %} 
+    <form id="myForm" method="post">{% csrf_token %} 
         <h2>Are you sure?</h2>
         <h5>Are you sure you want to delete the Team "{{team.name}}"? </h5>
         <h6>Membership of following team members will also be removed:</h6>
         <br>
         <strong><h6>Users :</h6></strong>
         <br>
-        <button class="btn btn-danger" type="submit">{% trans "Yes, I'm sure" %} &raquo;</button>
+        <button class="btn btn-danger" type="submit">
+            <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+            <span class="btn-txt">{% trans "Yes, I'm sure" %} &raquo;</span>
+        </button>
         <a id="delete-team" class="btn btn-secondary ml-5" href="{% url 'teams:list' %}">{% trans "No, take me back" %} &raquo;</a>
     </form> 
 {% endblock %}

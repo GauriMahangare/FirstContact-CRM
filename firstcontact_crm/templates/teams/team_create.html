@@ -13,18 +13,21 @@
     <hr/>
     <h5>{% trans "Set up your team to collaborate." %}</h5>
     </br >
-    <form class="create_team" id="create_team_form" method="post" action="{% url 'teams:create' %}">
+    <form class="create_team" id="myForm" method="post" action="{% url 'teams:create' %}">
         {% csrf_token %}
           {{ form|crispy }}
           {% if redirect_field_value %}
               <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
           {% endif %}
-        <button class="btn btn-primary" type="submit">{% trans "Create Team" %} &raquo;</button>
+        <button class="btn btn-primary" type="submit">
+            <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+            <span class="btn-txt">{% trans "Create Team" %} &raquo;</span>
+        </button>
         <a id="create-team" class="btn-link ml-5" href="{% url 'teams:list' %}">{% trans "Cancel" %}</a>
     </form>  
 {% else %}
     <h3>To manage Teams, please upgrade your subscription.</h3>
-    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}"> {% trans "Upgrade now" %}</a>
 {% endflag %}
 
 {% endblock %}

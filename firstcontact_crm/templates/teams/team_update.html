@@ -13,13 +13,16 @@
     <hr/>
     <h5>{% trans "Update team details." %}</h5>
     </br >
-    <form class="create_team" id="create_team_form" method="post" action="{% url 'teams:update' team.pk %}">
+    <form class="create_team" id="myForm" method="post" action="{% url 'teams:update' team.pk %}">
         {% csrf_token %}
           {{ form|crispy }}
           {% if redirect_field_value %}
               <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
           {% endif %}
-        <button class="btn btn-primary" type="submit">{% trans "Update Team" %} &raquo;</button>
+        <button class="btn btn-primary" type="submit">
+            <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+            <span class="btn-txt">{% trans "Update Team" %} &raquo;</span>
+        </button>
         <a id="create-team" class="btn-link ml-5" href="{% url 'teams:list' %}">{% trans "Cancel" %}</a>
     </form> 
 {% else %}

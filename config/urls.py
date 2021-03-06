@@ -22,13 +22,14 @@ urlpatterns = [
 
     # User management
     path("users/", include("firstcontact_crm.users.urls", namespace="users")),
-    path("accounts/", include("allauth.urls")),
+    path("accouts/n", include("allauth.urls")),
 
     # Your stuff: custom urls includes go here
     path("organisation/", include("firstcontact_crm.organisation.urls", namespace="organisation")),
     path("payment/", include("firstcontact_crm.payment.urls", namespace="payment")),
     path("invitations/", include('invitations.urls', namespace='invitations')),
     path("teams/", include('teams.urls', namespace='teams')),
+
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

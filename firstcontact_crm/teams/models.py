@@ -6,6 +6,8 @@ from django.conf import settings
 from django.urls import reverse
 from django.db.models.signals import post_save
 from organisation.models import Organisation
+from invitations.utils import get_invitation_model
+from invitations.models import Invitation
 
 # Create your models here.
 User = settings.AUTH_USER_MODEL
@@ -47,3 +49,5 @@ class Team(models.Model):
         verbose_name = 'Team'
         verbose_name_plural = 'Teams'
 # Create your models here.
+
+

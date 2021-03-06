@@ -1,0 +1,42 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load waffle_tags %}
+
+{% block head_title %} {{ user.username }} - Team_Invite {% endblock head_title %}
+
+{% block inner %}
+{% flag "create_team" %}
+<h1>Invite Team members</h1>
+<hr/>
+<h5>{% trans "Please add an email below. The user will receive an email with instructions." %}</h5>
+</br >
+
+<form id="invite-form" method="POST" action="{% url 'invitations:send-invite' %}">
+  {% csrf_token %}
+  <!-- {{ form|crispy }} -->
+  {% if redirect_field_value %}
+      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  {% endif %}
+  <div class="form-group">
+      <input type="text" name="email" id="id_email" value="{{ form.email.value }}" class="form-control validate-email" placeholder="{% trans 'Email' %}">
+  </div>
+  <div class="form-group">
+    {% if success_message %} 
+        <div class="alert alert-success">{{ success_message }}</div>
+    {% else %}
+        {% for error in form.email.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    {% endif %}
+  </div>
+  <input type="submit" value="Submit" class="btn btn-primary generic-ajax-submit">  
+</form>  
+{% else %}
+    <h3>To invite team members, please upgrade your subscription.</h3>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+{% endflag %}
+
+{% endblock %}
