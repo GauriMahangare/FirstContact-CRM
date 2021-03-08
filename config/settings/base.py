@@ -110,7 +110,8 @@ AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "users:redirect"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 LOGIN_URL = "account_login"
-
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 3
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400 # 1 day in seconds
 # PASSWORDS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#password-hashers
@@ -336,7 +337,7 @@ CORS_URLS_REGEX = r"^/api/.*$"
 WAFFLE_FLAG_MODEL = 'feature.Flag'
 
 # Invitation Email Setup
-INVITATION_EXPIRY = '2'
+INVITATION_EXPIRY = '2' # 2 days from the date of sent.
 INVITATION_ONLY = True
 ACCEPT_INVITE_AFTER_SIGNUP = True
 ALLOW_JSON_INVITES = True

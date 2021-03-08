@@ -34,14 +34,17 @@ for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
 <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 {% endif %}
 
-<form class="login" method="POST" action="{% url 'account_login' %}">
+<form class="login" id="myForm" method="POST" action="{% url 'account_login' %}">
   {% csrf_token %}
   {{ form|crispy }}
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
   <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-  <button class="primaryAction btn btn-primary" type="submit">{% trans "Sign In" %}</button>
+  <button class="primaryAction btn btn-primary" id="btnSubmit" type="submit">
+    <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+    <span class="btn-txt">{% trans "Sign In" %} &raquo;</span>
+  </button>
 </form>
 
 {% endblock %}

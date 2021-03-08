@@ -87,38 +87,36 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'contactus' %}">Contact Us</a>
             </li>
-            {% if request.user.is_authenticated %}
-              <li class="nav-item">
-                {# URL provided by django-allauth/account/urls.py #}
-                <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
-              </li>
-                {% if not request.user.is_organisation_default %}
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">{% trans "Leads" %}</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">{% trans "Team" %}</a>
-                  </li>
-                {% endif %}
-              <li class="nav-item">
-                {# URL provided by django-allauth/account/urls.py #}
-                <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
-              </li>
-              <p class="navbar-text pull-right"> Welcome {{ request.user.first_name }} , Last Login : {{ request.user.last_login }}
-              </p>
-            {% else %}
-              <li class="nav-item">
-                {# URL provided by django-allauth/account/urls.py #}
-                <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
-              </li>
-              <!-- <li class="nav-item">
-                {# URL provided by django-allauth/account/urls.py #}
-                <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
-              </li> -->
+            {% if not request.user.is_authenticated %}
+            <li class="nav-item">
+              {# URL provided by django-allauth/account/urls.py #}
+              <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
+            </li>
             {% endif %}
-
           </ul>
-          <a id="log-in-link" class="btn btn-primary" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
+          
+          <ul class="navbar-nav float-right">
+            {% if request.user.is_authenticated %}
+            <li class="nav-item ">
+              {# URL provided by django-allauth/account/urls.py #}
+              <span class="navbar-text">
+                Hello {{ request.user.first_name }} , <a href="{% url 'account_logout' %}">{% trans "Not you? Sign out " %}</a>
+              </span>
+            </li>
+            {% endif %}
+            <!-- <a id="log-in-link" class="btn btn-primary " href="{% url 'account_login' %}"><i class='fas fa-sign-in-alt'></i>{% trans "Sign In" %}</a> -->
+            <li class="nav-item ">
+              <a href="{% url 'account_login' %}" class="btn btn-primary btn-icon-split">
+                <span class="icon text-white-50">
+                    <i class="fas fa-sign-in-alt"></i>
+                </span>
+                <span class="text">{% trans "Sign In" %}</span>
+              </a>
+            </li>
+          </ul>
+
+          
+          
           <!-- Navbar Search-->
           <!-- <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
             <div class="input-group">
@@ -144,7 +142,6 @@
       {% endif %}
 
       {% block content %}
-        <p>Use this document as a way to quick start any new project.</p>
         <div class="row">
           <div class="col-md-6 offset-md-3">
             {% block inner %}{% endblock %}

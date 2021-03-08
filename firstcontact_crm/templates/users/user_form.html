@@ -1,21 +1,52 @@
 {% extends "users/base.html" %}
 {% load crispy_forms_tags %}
+{% load i18n %}
+{% load static %}
+{% load waffle_tags %}
 
 {% block title %}{{ user.username }}{% block head_title %} - Update Profile{% endblock head_title %}{% endblock title %}
 
 {% block inner %}
   <h1>Update profile</h1>
   <hr>
-  <form class="form-horizontal" method="post" action="{% url 'users:update' %}">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <div class="control-group">
-      <div class="controls">
-        <button type="submit" class="btn btn-primary">Update</button>
-        <a href="{% url 'users:detail' username=user.username %}" class="btn btn-link">Cancel</a>
-      </div>
+  <div class="row">
+    <div class="col-xl-4">
+        <!-- Profile picture card-->
+        <div class="card">
+            <div class="card-header">Profile Picture</div>
+            <div class="card-body text-center">
+                <!-- Profile picture image-->
+                <img class="img-account-profile rounded-circle mb-2" src="assets/img/illustrations/profiles/profile-1.png" alt="">
+                <!-- Profile picture help block-->
+                <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
+                <!-- Profile picture upload button-->
+                <button class="btn btn-primary" type="button">Upload new image</button>
+            </div>
+        </div>
     </div>
-  </form>
-</br>
-<p><small>* If you have updated email address, you will receive verification email shortly.Please check your inbox</small></p>
+    <div class="col-xl-8">
+        <!-- Account details card-->
+        <div class="card mb-4">
+            <div class="card-header">Account Details</div>
+            <div class="card-body">
+              <form class="form-horizontal" id="myForm" method="post" action="{% url 'users:update' %}">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="control-group">
+                  <div class="controls">
+                    <button class="btn btn-primary" type="submit">
+                      <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                      <span class="btn-txt">{% trans 'Update' %} &raquo;</span>
+                    </button>
+                    <a href="{% url 'users:detail' username=user.username %}" class="btn btn-link">Cancel</a>
+                  </div>
+                </div>
+              </form>
+            </br>
+            <p><small>* If you have updated email address, you will receive verification email shortly.Please check your inbox</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

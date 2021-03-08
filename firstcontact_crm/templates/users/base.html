@@ -131,31 +131,54 @@
                   <div class="bg-white py-2 collapse-inner rounded">
                       <h6 class="collapse-header">My Info</h6>
                       <a class="collapse-item" href="{% url 'users:update' %}">Update Profile</a>
-
+                      <h6 class="collapse-header">Manage Credentials</h6>
                       <a class="collapse-item" href="{% url 'account_email' %}">Update Email</a>
-                      <a class="collapse-item" href="{% url 'account_email' %}">Update Password</a>
+                      <a class="collapse-item" href="{% url 'account_change_password' %}">Update Password</a>
+                      <h6 class="collapse-header">Alerts and Notifications</h6>
                       <a class="collapse-item" href="{% url 'account_email' %}">Notifications</a>
                   </div>
               </div>
           </li>
 
           <!-- Nav Item - Utilities Collapse Menu -->
-          <li class="nav-item">
-              <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
-                  aria-expanded="true" aria-controls="collapseThree">
-                  <i class="fa fa-credit-card"></i>
-                  <span>Subscription</span>
-              </a>
-              <div id="collapseThree" class="collapse" aria-labelledby="headingUtilities"
-                  data-parent="#accordionSidebar">
-                  <div class="bg-white py-2 collapse-inner rounded">
-                      <h6 class="collapse-header">Billing details:</h6>
-                      <a class="collapse-item" href="{% url 'payment:enroll' %}"> Subscription</a>
-                      <a class="collapse-item" href="#">Invoices</a>
-                  </div>
-              </div>
-          </li>
-
+        {% if request.user.is_admin %}
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
+                    aria-expanded="true" aria-controls="collapseThree">
+                    <i class="fa fa-credit-card"></i>
+                    <span>Subscription</span>
+                </a>
+                <div id="collapseThree" class="collapse" aria-labelledby="headingUtilities"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Billing details:</h6>
+                        <a class="collapse-item" href="{% url 'payment:enroll' %}"> Subscription</a>
+                        <a class="collapse-item" href="#">Invoices</a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour"
+                    aria-expanded="true" aria-controls="collapseFour">
+                    <i class="fas fa-globe"></i>
+                    <span>My Organisation</span>
+                </a>
+                <div id="collapseFour" class="collapse" aria-labelledby="headingUtilities"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        
+                        {% if request.user.is_organisation_default%}
+                            <a class="collapse-item" href="{% url 'organisation:create' %}" >Create Organisation</a>
+                        {% else %}
+                            <a class="collapse-item" href="{% url 'organisation:update' %}" >Update Organisation</a>
+                        {% endif %}
+                        <h6 class="collapse-header">Manage Users</h6>
+                        <a class="collapse-item" href="{% url 'organisation:list' %}">Manage Users</a>
+                        <a class="collapse-item" href="{% url 'invitations:send-invite' %}">Invite Users</a>
+                    </div>
+                </div>
+            </li> 
+        {% endif %}
         <!-- {% if not request.user.is_organisation_default%} -->
         <!-- Nav Item - Utilities Collapse Menu -->
         <li class="nav-item">
@@ -168,16 +191,12 @@
                 data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Manage Team</h6>
-                    {% if request.user.is_organisation_default%}
-                        <a class="collapse-item" href="{% url 'organisation:create' %}" >Create Organisation</a>
-                    {% else %}
-                        <a class="collapse-item" href="{% url 'organisation:update' %}" >Update Organisation</a>
-                    {% endif %}
                     <a class="collapse-item" href="{% url 'teams:list' %}">My Teams</a>
-                    <a class="collapse-item" href="{% url 'invitations:send-invite' %}">Invite Users</a>
+                    <a class="collapse-item" href="{% url 'invitations:send-invite' %}">Assign agents</a>
                 </div>
             </div>
         </li>
+
 
           <!-- Divider -->
           <hr class="sidebar-divider">
@@ -249,11 +268,13 @@
           </div>
           <!-- {% endif %} -->
           <!-- Sidebar Message -->
-          <div class="sidebar-card">
-              <img class="sidebar-card-illustration mb-2" src="{% static 'images/undraw_rocket.svg' %}" alt="">
-              <p class="text-center mb-2"><strong>FirstContact</strong> is packed with premium features, components, and more!</p>
-              <a class="btn btn-success btn-sm" href="{% url 'payment:enroll' %}">Upgrade now</a>
-          </div>
+        {% if request.user.is_admin %}
+            <div class="sidebar-card">
+                <img class="sidebar-card-illustration mb-2" src="{% static 'images/undraw_rocket.svg' %}" alt="">
+                <p class="text-center mb-2"><strong>FirstContact</strong> is packed with premium features, components, and more!</p>
+                <a class="btn btn-success btn-sm" href="{% url 'payment:enroll' %}">Upgrade now</a>
+            </div>
+        {% endif %}
           
       </ul>
       <!-- End of Sidebar -->
@@ -497,9 +518,9 @@
           <!-- Footer -->
           <footer class="sticky-footer bg-white">
               <div class="container my-auto">
-                  <div class="copyright text-center my-auto">
-                      <span>Copyright &copy; Avan Engineering Services Ltd 2021</span>
-                  </div>
+                    <div class="text-left my-auto">
+                        <span class="text-gray-600 text-xs">Copyright &copy; Avan Engineering Services Ltd 2021</span>
+                    </div>
               </div>
           </footer>
           <!-- End of Footer -->
@@ -532,20 +553,24 @@ aria-hidden="true">
             <button class="btn btn-primary" type="button" data-dismiss="modal">Cancel</button>
 
             <!-- <a class="btn btn-danger" href="{% url 'account_logout' %}">Logout</a> -->
-            <form method="post" action="{% url 'account_logout' %}">
+            <form method="post" id="myForm" action="{% url 'account_logout' %}">
               {% csrf_token %}
               {% if redirect_field_value %}
               <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
-              {% endif %}
-              <button class="btn btn-danger" type="submit">{% trans 'Sign Out' %}</button>
+              {% endif %}   
+              <button class="btn btn-danger" id="btnSubmit" type="submit">
+                <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                <span class="btn-txt">{% trans "Sign Out" %} &raquo;</span>
+              </button>
             </form>
         </div>
     </div>
 </div>
 </div>
 {% endblock modal %}
+
 {% block inline_javascript %}
-<script src="{% static 'js/project.js' %}"></script>
+    <script src="{% static 'js/project.js' %}"></script>
 {% endblock inline_javascript %}
 
 

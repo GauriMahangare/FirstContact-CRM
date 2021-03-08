@@ -1,0 +1,16 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+
+{% block title %}
+    {{ title }} | FirstContact
+{% endblock %}
+
+{% block branding %}
+    <h1 id="site-name"><a href="{% url 'admin:index' %}">FirstContact</a></h1>
+    <link rel="stylesheet" type="text/css" href={% static 'css/admin.css' %}>
+{% endblock %}
+
+{% block extrastyles %}
+    <link rel="stylesheet" href={% static 'css/admin.css' %}>
+{% endblock %}

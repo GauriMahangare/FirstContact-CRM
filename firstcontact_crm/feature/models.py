@@ -1,6 +1,7 @@
 from django.conf import settings
 from waffle.utils import get_setting, keyfmt
 from payment.models import Pricing,Subscription
+from organisation.models import Organisation
 from django.db import models
 from waffle import managers, get_waffle_flag_model
 from waffle.models import AbstractUserFlag, CACHE_EMPTY
@@ -8,7 +9,9 @@ from django.utils.translation import gettext_lazy as _
 from django.core.cache import cache
 from django.http import Http404
 import logging
+from django.contrib.auth import get_user_model
 # Create your views here.
+User = get_user_model()
 logger = logging.getLogger(__name__)
 # Create your models here.
 class Flag(AbstractUserFlag):
@@ -34,16 +37,41 @@ class Flag(AbstractUserFlag):
         is_active = super(Flag, self).is_active_for_user(user)
         if is_active:
             return is_active
-        try:
-            usersubscription=Subscription.objects.get(user_id=user.pk)
-        except:
-            logger.critical('User does not have subscription')
-        if  usersubscription:
-            pricing_ids = self._get_pricing_ids() 
-            if usersubscription.pricing_id in pricing_ids:
-               return True
+        if user.is_admin:
+            print("User is admin")
+            try:
+                usersubscription=Subscription.objects.get(user_id=user.pk)
+            except:
+                logger.critical('User is admin and does not have subscription')
+            else:
+                if  usersubscription:
+                    pricing_ids = self._get_pricing_ids() 
+                    if usersubscription.pricing_id in pricing_ids:
+                        return True
+                    else:
+                        return False
         else:
-            return False
+            if user.is_team_member:
+                try:
+                    organisation = Organisation.objects.get(pk=user.userorganization_id)
+                except:
+                    logger.critical('Organisation of the user is not found.')
+                else:
+                    try:
+                        org_admin_user = User.objects.get(pk=organisation.created_by_id)
+                    except:
+                        logger.critical('Organisation Admin of the user is not found.')
+                    else:
+                        try:
+                            usersubscription=Subscription.objects.get(user_id=org_admin_user.pk)
+                        except:
+                            logger.critical('Organisation Admin does not have subscription')
+                        else:
+                            pricing_ids = self._get_pricing_ids() 
+                            if usersubscription.pricing_id in pricing_ids:
+                                return True
+                            else:
+                                return False
 
     def _get_pricing_ids(self):
         cache_key = keyfmt(

@@ -10,18 +10,17 @@
 
 {% block content %}
 {% flag "create_team" %}
-    <a id="create-team" class="btn btn-primary float-right" href="{% url 'teams:create' %}">{% trans "Add New Team" %}</a>
-    <h1>Your Teams</h1>
+    <h1>Your Organisation Members</h1>
     <hr/>   
 
     <div class="List_team" id="List_team_form">
-    {% if team_list %}
+    {% if user_list %}
         <div class="card shadow mb-4">
             <div class="card-header py-3 ">
                 <div class=" col-xs-2 float-right" >
                     <input id="myInput" class="form-control m-0" type="text" placeholder="Search..">
                 </div>
-                <h6 class="m-0 font-weight-bold text-primary">{% trans "Create teams to collaborate." %}</h6>
+                <h6 class="m-0 font-weight-bold text-primary">{% trans "Users in your Organisation" %}</h6>
             </div>
             <div class="card-body">
                 <div class="table-responsive ">
@@ -29,24 +28,41 @@
                         <thead>
                             <tr>
                                 <!-- <th><div>Name <div class="container"><i class='fas fa-caret-up'></i> <i class='fas fa-caret-down'></i></div></div></th> -->
-                                <th class="asc" onclick="sortTable()">Name </th>
-                                <th class="asc" onclick="sortTable()">Description </th>
-                                <th class="asc" onclick="sortTable()">Updated By </th>
-                                <th class="asc" onclick="sortTable()">Changed DateTime </th>
-                                <th>Update </th>
-                                <th>Delete </th>
+                                <th class="asc" onclick="sortTable()">Email </th>
+                                <th class="asc" onclick="sortTable()">Invitation Accepted? </th>
+                                <th class="asc" onclick="sortTable()">Invitation Sent Date </th>
+                                <th>Resend Invitation? </th>
+                                <th>Remove user? </th>
                             </tr>
                         </thead>
                         <tbody id="myTable">
-                            {% for team in team_list %}
+                            {% for user in user_list %}
                             <tr>
-                                <td> <a href="#">{{ team.name }}</a></td>
-                                <td> {{ team.description }}</td>
-                                <td> {{ team.created_by }}</td>
-                                <td> {{ team.dateTimeModified }}</td>
-                                <td> <a href="{% url 'teams:update' team.pk %}">Update</a></td>
-                                <td> <a href="{% url 'teams:delete' team.pk %}" class="btn btn-danger btn-circle btn-sm"><i class="fas fa-trash"></i></a></td>
-                                
+                                <td> {% if user.accepted %} 
+                                        <a href="#">{{ user.email }}</a>
+                                     {% else %}
+                                        {{ user.email }}
+                                     {% endif %}
+                                </td>
+                                <td> {% if user.accepted %} 
+                                        <i class='fas fa-smile' style='font-size:20px;color:green'></i>
+                                    {% else %}
+                                        <i class='fas fa-frown' style='font-size:20px;color:Red'></i>
+                                    {% endif %}
+                                </td>
+                                <td> {{ user.sent}}</td>
+                                <td> {% if not user.accepted %} 
+                                    <form method="POST" id="myForm" action="{% url 'organisation:invite' user.pk %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-info" type="submit" name="action">
+                                            <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                                            <span class="btn-txt">{% trans "Resend Invitation" %} &raquo;</span>
+                                        </button>
+                                        <!-- <input class="btn btn-primary" type="submit" name="action" value="{% trans 'Change password' %}"/> -->
+                                    </form>
+                                    {% endif %}
+                                </td>
+                                <td> <a href="{% url 'organisation:delete' user.pk %}" class="btn btn-danger btn-circle btn-sm"><i class="fas fa-trash"></i></a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -79,8 +95,9 @@
                 </div>    
             </div>
     {% else %}
-        <h5>{% trans "You don't have any teams set up yet." %}</h5>
+        <h5>{% trans "You have not invited any team members as yet." %}</h5>
         </br >
+        <a id="create-team" class="btn btn-primary" href="{% url 'invitations:send-invite' %}">{% trans "Invite team members" %}</a>
     {%endif%}
 
     </div>  
@@ -121,12 +138,7 @@
         }
     </script>
 {% else %}
-    {% if request.user.is_admin %}
-        <h3>To manage Teams, please upgrade your subscription.</h3>
-        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
-    {% else %}
-        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade.</h3>
-    {% endif %}
+    <h3>To manage Teams, please upgrade your subscription.</h3>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
 {% endflag %}
-
 {% endblock content %}

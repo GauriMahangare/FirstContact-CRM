@@ -8,7 +8,7 @@
 
 {% block inner %}
 <h1>{% trans "E-mail Addresses" %}</h1>
-
+<hr>
 {% if user.emailaddress_set.all %}
 <p>{% trans 'The following e-mail addresses are associated with your account:' %}</p>
 
@@ -55,9 +55,13 @@
         {% csrf_token %}
         {{ form|crispy }}
         <button class="btn btn-primary" name="action_add" type="submit">{% trans "Add E-mail" %}</button>
+        <!-- <button class="btn btn-primary" type="submit" name="action_add">
+          <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+          <span class="btn-txt">{% trans "Add E-mail" %} &raquo;</span>
+        </button> -->
         <a href="{% url 'users:detail' username=user.username %}" class="btn btn-link">Cancel</a>
     </form>
-    </br>
+  </br>
     <p><small>* Please check you you inbox for verification email.</small></p>
 {% endblock %}
 
@@ -78,6 +82,7 @@ window.addEventListener('DOMContentLoaded',function() {
 });
 
 $('.form-group').removeClass('row');
+
 </script>
 {% endblock %}
 

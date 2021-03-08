@@ -1,3 +1,4 @@
+
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -24,6 +25,9 @@ class Pricing(models.Model):
         Basic = 'Basic', _('Basic')
         Essential = 'Essential', _('Essential')
         Enterprise = 'Enterprise', _('Enterprise')
+        Individual = 'Individual', _('Individual')
+        Team = 'Team', _('Team')
+        Organisation = 'Organisation', _('Organisation')
 
     name = models.CharField(
         'Pricing Type',

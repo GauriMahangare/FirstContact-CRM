@@ -22,7 +22,7 @@ urlpatterns = [
 
     # User management
     path("users/", include("firstcontact_crm.users.urls", namespace="users")),
-    path("accouts/n", include("allauth.urls")),
+    path("accounts/", include("allauth.urls")),
 
     # Your stuff: custom urls includes go here
     path("organisation/", include("firstcontact_crm.organisation.urls", namespace="organisation")),

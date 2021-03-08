@@ -26,6 +26,7 @@
           <i class="loading-icon fa fa-spinner fa-spin hide"></i>
           <span class="btn-txt">{% trans "Create organisation" %} &raquo;</span>
         </button>
+        <a href="{% url 'users:detail' username=user.username %}" class="btn btn-link">Cancel</a>
       </form>
     {% else %}
       <h1>{% trans "Update Organisation" %}</h1>
@@ -42,9 +43,6 @@
           <i class="loading-icon fa fa-spinner fa-spin hide"></i>
           <span class="btn-txt">{% trans "Update organisation" %} &raquo;</span>
         </button>
-        <!-- <div class="spinner-border text-primary" role="status">
-          <span class="sr-only">Loading...</span>
-        </div> -->
         <a href="{% url 'users:detail' username=user.username %}" class="btn btn-link">Cancel</a>
         
       </form>

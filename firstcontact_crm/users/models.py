@@ -7,10 +7,13 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save, pre_save
-from allauth.account.signals import email_confirmed
+from allauth.account.signals import email_confirmed,user_signed_up
+from allauth.account.models import EmailAddress
 from django.core.exceptions import ObjectDoesNotExist
 from organisation.models import Organisation
 from payment.models import Pricing, Subscription
+
+from invitations.utils import get_invitation_model
 
 import stripe
 logger = logging.getLogger(__name__)
@@ -64,7 +67,6 @@ class User(AbstractUser):
     )
 
     is_admin = models.BooleanField(default=True)
-    is_team_manager = models.BooleanField(default=False)
     is_team_member = models.BooleanField(default=False)
     is_organisation_default = models.BooleanField(default=True)
     is_profile_complete = models.BooleanField(default=False)
@@ -91,7 +93,7 @@ def post_email_confirmed(request, email_address, *args, **kwargs):
 
     user = User.objects.get(email=email_address.email)
     if  user.is_admin:
-        free_trial_pricing = get_object_or_404(Pricing, name='FreeTrial')
+        free_trial_pricing = get_object_or_404(Pricing, name='Individual')
 
         subscription = Subscription.objects.create(
             user=user, 
@@ -119,5 +121,55 @@ def post_email_confirmed(request, email_address, *args, **kwargs):
         user.stripe_customer_id = stripe_customer["id"]
         user.save()
 
-email_confirmed.connect(post_email_confirmed)
+def post_user_signed_up_checkinvitation(request, user,*args, **kwargs):
+    Invitation = get_invitation_model()
+    try:
+        invite = Invitation.objects.get(email=user.email)
+    except:
+        logger.info('User is not an invited user. Register as admin')
+        '''
+        is_admin is true
+        is_organisation_default is true
+        userorganization is blank
+        '''
+    else:
+        '''
+            is_admin is true
+            is_organisation_default is true
+            userorganization is blank
+        '''
+        try :
+            inviter_user= User.objects.get(pk=invite.inviter_id)
+        except :
+            logger.critical('Error setting up invited user - Inviter user not found')
+        else:
+            user.userorganization = inviter_user.userorganization
+            user.is_admin = False
+            user.is_team_member = True
+            user.is_organisation_default = False
+            try:
+                user.save()
+            except:
+                logger.critical('Error updating invited users')
+            else:
+                try:
+                    emailAddress=EmailAddress.objects.get(email=user.email)
+                except:
+                    emailAddress.user = user.pk
+                    emailAddress.email = user.email 
+                    emailAddress.verified = True
+                    emailAddress.primary = True
+                    try: 
+                        emailAddress.save()
+                    except:
+                        logger.critical('Error setting up verified email')
+                else:
+                    logger.info('Invited users - email already verified.')
 
+
+
+
+
+user_signed_up.connect(post_user_signed_up_checkinvitation)
+
+email_confirmed.connect(post_email_confirmed)

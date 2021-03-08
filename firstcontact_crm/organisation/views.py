@@ -1,5 +1,8 @@
 
 from django.views import generic
+from typing import Any
+from django.http.request import HttpRequest
+from django.http.response import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
@@ -16,10 +19,16 @@ from django.contrib.auth import get_user_model
 from waffle.decorators import waffle_flag,flag_is_active
 from waffle.mixins import WaffleFlagMixin
 from django.http import Http404
+from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView,RedirectView
+from invitations.utils import get_invitation_model
+from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
 
 # Create your views here.
 logger = logging.getLogger(__name__)
 User = get_user_model()
+Invitation = get_invitation_model()
 class OrganisationUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     template_name = "organisation/organisation_create_update.html"
     model = Organisation
@@ -101,15 +110,114 @@ class OrganisationRedirectView(LoginRequiredMixin, RedirectView):
 
 Organisation_redirect_view = OrganisationRedirectView.as_view()
 
+class OrganisationUserListView(LoginRequiredMixin,SuccessMessageMixin,ListView):
+    model = Invitation
+    template_name = 'organisation/user_list.html'
+    paginate_by = 5
+    
+
+    def get_context_data(self, **kwargs: Any):
+        user_qs = Invitation.objects.filter(inviter_id=self.request.user.pk).order_by('-sent')
+        # for u in user_qs:
+        #     print(u.email)
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(user_qs, self.paginate_by)
+        page = self.request.GET.get('page')
+
+        
+        try:
+            user_list = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            user_list = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            user_list = paginator.page(paginator.num_pages)
+        context['user_list'] = user_list
+        context['page_list'] = paginator.page_range
+        return context
 
 
+    
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        return super().get(request, *args, **kwargs)
+        
+    
+Organisation_userList_view = OrganisationUserListView.as_view()
 
+class OrganisationUserReinviteView(LoginRequiredMixin,SuccessMessageMixin,View):
+    def post(self, request, pk, *args, **kwargs):
+        try:
+            user = Invitation.objects.get(pk=pk)
+        except:
+            logger.info('Error deleting user invitation:User invitation does not exist.')
+            messages.error(request, 'The user you are trying to invite has been already removed.')
+            return redirect('/organisation/~userlist/')
+        if not user.accepted: 
+            email = user.email
+            try:
+                user.delete()
+            except:
+                messages.error(request, 'There was an error in reinviting the user. Please try after sometime')
+                logger.critical('Error deleting user invitation:System error')
+                return redirect('/organisation/~userlist/')
+            logger.info('Invitation Deleted')
+            invite = Invitation.create(email, inviter=request.user)
+            invite.send_invitation(request)
+            logger.info('Invitation Sent')
+            messages.success(request, 'User has been reinvited')
+            return redirect('/organisation/~userlist/')
 
+Organisation_userReinvite_view = OrganisationUserReinviteView.as_view()
 
+class OrganisationUserdeleteView(LoginRequiredMixin,SuccessMessageMixin,View):
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            user = Invitation.objects.get(pk=pk)
+        except:
+            logger.critical('Error deleting user.User does not exist.')
+            messages.error(request, 'The user you are trying to delete has been removed already.')
+            return redirect('/organisation/~userlist/')
+        context={"usermember":user}
+        return render(request,'organisation/user_confirm_delete.html',context)
 
-
-
-
+    def post(self, request, pk, *args, **kwargs):
+        try:
+            user = Invitation.objects.get(pk=pk)
+        except:
+            logger.critical('Error deleting user.User does not exist.')
+            messages.error(request, 'The user you are trying to delete has been removed already.')
+            return redirect('/organisation/~userlist/')
+        email = user.email
+        accepted = user.accepted
+        try:
+            user.delete()
+        except:
+            messages.error(request, 'There was an error deleting the user. Please try after sometime')
+            logger.critical('Error deleting user.System error')
+            return redirect('/organisation/~userlist/')
+        logger.info('Invited user deleted')
+        if  accepted: 
+            try:
+                user=User.objects.get(email__exact=email)
+            except:
+                logger.critical('Error deleting registered user.User does not exist.')
+                messages.error(request, 'The user you are trying to delete has been removed already.')
+                return redirect('/organisation/~userlist/')  
+            try:
+                user.delete()
+            except:
+                messages.error(request, 'There was an error deleting the user. Please try after sometime')
+                logger.critical('Error deleting registered user.System error')
+                return redirect('/organisation/~userlist/')
+            logger.info('Registered user deleted')              
+            messages.success(request, 'User has been deleted.')
+            return redirect('/organisation/~userlist/')
+        else:
+            messages.success(request, 'User has been deleted.')
+            return redirect('/organisation/~userlist/')
+        
+Organisation_userdelete_view = OrganisationUserdeleteView.as_view()
 
 
 
