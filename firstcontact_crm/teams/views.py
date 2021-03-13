@@ -1,4 +1,5 @@
-from typing import Any
+from typing import Any, Optional
+from django.db import models
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.views import generic
@@ -10,7 +11,7 @@ import waffle
 from django.urls import reverse
 from django.shortcuts import render, redirect, reverse
 from django.views.generic.base import RedirectView
-from .models import Team
+from .models import Team, TeamMembership
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView,RedirectView
 from django.utils.translation import gettext_lazy as _
@@ -89,15 +90,25 @@ class TeamUpdateView(LoginRequiredMixin, SuccessMessageMixin,UpdateView):
     template_name = "teams/team_update.html"
     model = Team
     fields = ["name","description",]
-    success_message = _("Information successfully updated")
-
+    success_message = _("Information successfully updated.")
+    waffle_flag = 'create_team'
+    slug_field = 'slug'  # The name of the field on the model that contains the slug
+    slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
+ 
     def get_context_data(self, **kwargs):
         kwargs['team'] = self.get_object()
         return super().get_context_data(**kwargs)
+    
+    # def get_queryset(self):
+    #     slug_text = self.kwargs['slug_text']
+    #     qs=Team.objects.filter(slug=slug_text)
+    #     if qs.exists():
+    #         return qs.first()
+    #     else:
+    #         return HttpResponse("<h1> Page not found. </h1>")
 
-    def get_object(self, queryset=None):
-        return Team.objects.get(pk=self.kwargs.get("pk"))
-
+    # def get_object(self, queryset: Optional[models.query.QuerySet]) -> models.Model:
+    #     return super().get_object(queryset=queryset)
     
     def form_valid(self, form):
         if waffle.flag_is_active(self.request, 'create_team'):
@@ -129,8 +140,11 @@ class TeamDetailView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,Deta
     model = Team
     template_name = 'teams/team_detail.html'
     context_object_name = 'team'
-    waffle_flag = "create_team"
+    waffle_flag = 'create_team'
+    slug_field = 'slug'  # The name of the field on the model that contains the slug
+    slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
 
+    
 Team_detail_view = TeamDetailView.as_view()
     
 class TeamCreateView(LoginRequiredMixin,SuccessMessageMixin,CreateView):
@@ -180,10 +194,108 @@ class TeamDeleteView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,Dele
     model = Team
     success_url = '/teams/~redirect/'
     template_name = 'teams/team_confirm_delete.html'
+    success_message = _("Team has been deleted.")
     context_object_name = 'team'
     warning_message = _("Team has been deleted.")
     waffle_flag = "create_team"
+    slug_field = 'slug'  # The name of the field on the model that contains the slug
+    slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
+
 
 Team_delete_view = TeamDeleteView.as_view()
 
+class TeamMembersView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,ListView):
+    model = TeamMembership
+    waffle_flag = 'create_team'
+    template_name = 'teams/team_members_list.html'
+    paginate_by = 5
+    slug_field = 'slug'  # The name of the field on the model that contains the slug
+    slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
+    
+        
+    def get_context_data(self, **kwargs: Any):
+        slug_text = self.kwargs['slug_text']
+        print(slug_text)
+        qs=Team.objects.filter(slug=slug_text)
+        if qs.exists():
+            print("Team found")
+            team= qs.first()
+            print(team)
+            print(team.pk)
+            print(team.name)
+        else:
+            return HttpResponse("<h1> Page not found. </h1>")
+        team_qs = TeamMembership.objects.filter(team=team.pk).order_by('-dateTimeModified')
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(team_qs, self.paginate_by)
+        page = self.request.GET.get('page')
 
+        
+        try:
+            team_list = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            team_list = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            team_list = paginator.page(paginator.num_pages)
+        context['team_list'] = team_list
+        context['page_list'] = paginator.page_range
+        context['team_name'] = team.name
+        return context
+
+
+    
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        return super().get(request, *args, **kwargs)
+
+Team_members_view = TeamMembersView.as_view()
+
+
+class TeamMemberDeleteView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,DeleteView):
+    model = TeamMembership
+    success_url = '/teams/~redirect/'
+    template_name = 'teams/team_membership_confirm_delete.html'
+    context_object_name = 'team_member'
+    warning_message = _("Membership has been removed.")
+    waffle_flag = "create_team"
+    slug_field = 'slug'  # The name of the field on the model that contains the slug
+    slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
+
+
+Team_members_delete_view = TeamMemberDeleteView.as_view()
+
+class TeammembershipCreateView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,CreateView):
+    model = TeamMembership
+    fields = ["team","member",]
+    template_name = 'teams/team_membership_add.html'
+    waffle_flag = "create_team"
+    # slug_field = 'slug'  # The name of the field on the model that contains the slug
+    # slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+    def get_queryset(self) -> models.query.QuerySet:
+        return super().get_queryset()
+
+
+    def form_valid(self, form):
+        if waffle.flag_is_active(self.request, 'create_team'):
+            team_membership = form.save(commit=False)
+            print(team_membership)
+            try:
+                team_membership.save()
+            except:
+                logger.critical('Team Create error')
+                raise Http404 ("There was an error adding the user to the team. If the error persists, please try again after sometime.")
+                # Update user data so that org cannot be created any more by this user
+            
+            messages.success(self.request, "User has been added to the team.")
+            return redirect('/teams/~redirect/')
+        else:
+            messages.error(self.request, "Please update your subscription to continue using this feature.")
+            return super(TeamCreateView, self).form_valid(form)    
+
+Team_membership_add_view = TeammembershipCreateView.as_view()

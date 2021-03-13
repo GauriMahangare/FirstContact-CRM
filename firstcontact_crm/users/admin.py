@@ -26,7 +26,6 @@ class UserAdmin(auth_admin.UserAdmin):
                     "groups",
                     "user_permissions",
                     "is_admin",
-                    "is_team_manager",
                     "is_team_member",
                     "is_organisation_default",
                     "is_profile_complete",

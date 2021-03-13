@@ -19,7 +19,7 @@ User = settings.AUTH_USER_MODEL
 class Pricing(models.Model):
 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-
+    slug = models.SlugField(null=True,unique=True)
     class PricingTierChoices(models.TextChoices):
         Free = 'FreeTrial', _('Free Trial')
         Basic = 'Basic', _('Basic')
@@ -36,8 +36,6 @@ class Pricing(models.Model):
         default=PricingTierChoices.Free,
     )  # Basic / Pro / Premium
     
-    slug = models.SlugField()
-
     stripe_price_id = models.CharField(        
         'Pricing Tier Stripe Id',
         max_length=100,
@@ -82,6 +80,8 @@ class Pricing(models.Model):
 
 class Subscription(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    slug = models.SlugField(null=True,unique=True)
+
     pricing = models.ForeignKey(Pricing, on_delete=models.CASCADE, related_name='subscriptions')
     
     stripe_subscription_id = models.CharField(
@@ -117,3 +117,24 @@ class Subscription(models.Model):
     @property
     def is_active(self):
         return self.status == "active" or self.status == "trialing"
+
+def create_slug(instance,new_slug=None):
+    # Remove spaces and replace it by -
+    slug = slugify(instance.name)
+
+    if new_slug is not None:
+        slug = new_slug
+        
+    qs = Pricing.objects.filter(slug=slug).order_by("-id")
+    exists = qs.exists()
+    if exists:
+        new_slug = "%s-%s" %(slug,qs.first().id)
+        return create_slug(instance, new_slug=new_slug )
+    return slug
+
+
+def pre_save_pricing_create_slug(sender,instance,*args, **kwargs):
+    if not instance.slug:
+        instance.slug = create_slug(instance)
+
+pre_save.connect(pre_save_pricing_create_slug,sender=Pricing)

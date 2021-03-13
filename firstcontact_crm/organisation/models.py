@@ -4,7 +4,8 @@ from django.db.models.deletion import SET_NULL
 from django.contrib.auth import get_user, get_user_model
 from django.conf import settings
 from django.urls import reverse
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
+from django.utils.text import slugify
 
 
 # Create your models here.
@@ -12,6 +13,8 @@ User = settings.AUTH_USER_MODEL
 
 class Organisation(models.Model):
     created_by = models.ForeignKey(User,null=True,on_delete=models.SET_NULL)
+
+    slug = models.SlugField(null=True,unique=True)
 
     work_org_name = models.CharField('Work organisation',
         max_length=300,
@@ -70,6 +73,27 @@ class Organisation(models.Model):
     class Meta:
         verbose_name = 'Organisation'
         verbose_name_plural = 'Organisations'
+
+def create_slug(instance,new_slug=None):
+    # Remove spaces and replace it by -
+    slug = slugify(instance.work_org_name)
+
+    if new_slug is not None:
+        slug = new_slug
+        
+    qs = Organisation.objects.filter(slug=slug).order_by("-id")
+    exists = qs.exists()
+    if exists:
+        new_slug = "%s-%s" %(slug,qs.first().id)
+        return create_slug(instance, new_slug=new_slug )
+    return slug
+
+
+def pre_save_organisation_create_slug(sender,instance,*args, **kwargs):
+    if not instance.slug:
+        instance.slug = create_slug(instance)
+
+pre_save.connect(pre_save_organisation_create_slug,sender=Organisation)
 
 # def get_queryset(self):
 #         return User.objects.filter(user=1)

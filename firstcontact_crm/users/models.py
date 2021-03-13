@@ -155,6 +155,7 @@ def post_user_signed_up_checkinvitation(request, user,*args, **kwargs):
                 try:
                     emailAddress=EmailAddress.objects.get(email=user.email)
                 except:
+                    emailAddress = EmailAddress()
                     emailAddress.user = user.pk
                     emailAddress.email = user.email 
                     emailAddress.verified = True

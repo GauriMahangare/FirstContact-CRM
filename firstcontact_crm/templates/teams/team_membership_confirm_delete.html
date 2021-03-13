@@ -9,15 +9,14 @@
 
 {% block inner %}
 {% flag "create_team" %}
-    {% if team.organisation == user.userorganization %}  
-        <h1>Delete Team</h1>
+    {% if team_member.team_organisation == user.userorganization %}  
+        <h1>Remove user from team</h1>
         <hr/>
-        <h5>{% trans "Delete team details." %}</h5>
+        <!-- <h5>{% trans "Remove the user from team" %}</h5> -->
         </br >
         <form id="myForm" method="post">{% csrf_token %} 
             <h2>Are you sure?</h2>
-            <h5>Are you sure you want to delete the Team "{{team.name}}"? </h5>
-            <br>
+            <h5>Are you sure you want to remove the user "{{ team_member.member_email }}" from the team "{{team_member.team}}" ? </h5>
             <button class="btn btn-danger" type="submit">
                 <i class="loading-icon fa fa-spinner fa-spin hide"></i>
                 <span class="btn-txt">{% trans "Yes, I'm sure" %} &raquo;</span>

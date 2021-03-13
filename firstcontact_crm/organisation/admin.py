@@ -1,13 +1,39 @@
 from organisation.models import Organisation
 from django.contrib import admin
-from django.contrib.admin.models import LogEntry
+from django.contrib.admin.models import DELETION, LogEntry
 from django.utils.html import escape
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 # Register your models here.
 
-admin.site.register(Organisation)
+class OrganisationAdmin(admin.ModelAdmin):
+    date_hierarchy = 'dateTimeModified'
+
+    # to filter the resultes by users, content types and action flags
+    list_filter = [
+        'work_org_name',
+        'created_by',
+        'is_verified',
+        'is_access_enabled',
+        'is_active',
+    ]
+
+    # when searching the user will be able to search in both object_repr and change_message
+    search_fields = [
+        'work_org_name',
+    ]
+
+    list_display = [
+        'work_org_name',
+        'created_by',
+        'is_verified',
+        'is_access_enabled',
+        'is_active',
+    ]
+    #prepopulated_fields = {'slug': ('work_org_name',)}
+
+admin.site.register(Organisation,OrganisationAdmin)
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
@@ -33,6 +59,7 @@ class LogEntryAdmin(admin.ModelAdmin):
         'content_type',
         'action_flag',
     ]
+    
 
     def has_add_permission(self, request):
         return False
