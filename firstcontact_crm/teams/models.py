@@ -83,7 +83,7 @@ User = get_user_model()
 class TeamMembership(models.Model):
     
     team = models.ForeignKey(Team,null=True,on_delete=models.CASCADE)
-    member = models.ForeignKey(User,null=True,on_delete=models.SET_NULL)
+    member = models.ForeignKey(User,null=True,on_delete=models.CASCADE,limit_choices_to={'is_staff': False})
     slug = models.SlugField(null=True, unique=True)
 
     class roleChoices(models.TextChoices):
@@ -122,6 +122,16 @@ class TeamMembership(models.Model):
     def member_email(self):
         user =  User.objects.get(pk=self.member_id)
         return user.email
+    
+    @property
+    def member_organisation(self):
+        user =  User.objects.get(pk=self.member_id)
+        return user.userorganization
+    
+    @property
+    def users_in_same_org(self):
+        user_qs =  User.objects.filter(userorganization=self.team_organisation)
+        return user_qs
 
     def __str__(self):
         return f"{self.team}"

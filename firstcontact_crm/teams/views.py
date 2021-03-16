@@ -1,11 +1,14 @@
-from typing import Any, Optional
+from .forms import MembershipForm
+from typing import Any, Optional, Type
 from django.db import models
+from django.forms import forms
+from django.forms.models import BaseModelForm
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views import generic
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 import logging
 import waffle
 from django.urls import reverse
@@ -24,6 +27,7 @@ from django.core.paginator import PageNotAnInteger
 from waffle.mixins import WaffleFlagMixin
 from django.http import Http404
 from organisation.models import Organisation
+# from .forms import TeamMembershipForm
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -242,6 +246,7 @@ class TeamMembersView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,Lis
         context['team_list'] = team_list
         context['page_list'] = paginator.page_range
         context['team_name'] = team.name
+        context['slug_text'] = slug_text
         return context
 
 
@@ -265,37 +270,97 @@ class TeamMemberDeleteView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixi
 
 Team_members_delete_view = TeamMemberDeleteView.as_view()
 
-class TeammembershipCreateView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,CreateView):
-    model = TeamMembership
-    fields = ["team","member",]
-    template_name = 'teams/team_membership_add.html'
-    waffle_flag = "create_team"
-    # slug_field = 'slug'  # The name of the field on the model that contains the slug
-    # slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
-    def get_queryset(self) -> models.query.QuerySet:
-        return super().get_queryset()
+# class TeammembershipCreateView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,CreateView):
+#     model = User
+#     fields = ["email"]
+#     template_name = 'teams/team_membership_add.html'
+#     waffle_flag = "create_team"
+#     form_class = TeamMembershipForm
+#     slug_field = 'slug'  # The name of the field on the model that contains the slug
+#     slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
 
 
-    def form_valid(self, form):
-        if waffle.flag_is_active(self.request, 'create_team'):
-            team_membership = form.save(commit=False)
-            print(team_membership)
-            try:
-                team_membership.save()
-            except:
-                logger.critical('Team Create error')
-                raise Http404 ("There was an error adding the user to the team. If the error persists, please try again after sometime.")
-                # Update user data so that org cannot be created any more by this user
+#     def get_context_data(self, **kwargs: Any):
+#         print("in context data")
+#         context = super().get_context_data(**kwargs)
+#         # slug_text = self.kwargs['slug_text']
+#         print("*** in team membership create ***")
+#         # print(slug_text)
+#         try:
+#             team=Team.objects.get(pk=54)
+#         except:
+#             return HttpResponse("<h1> Team not found. </h1>")
+#         else:
+#             print("Team found")
+#             # team= qs.first()
+#             print(team)
+#             print(team.pk)
+#             print(team.name)
+#             context['pk'] = team.pk
+#             context['team_name'] = team.name
+#             return context
+
+#     # def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+#     #     return super().get(request, *args, **kwargs)
+
+#     def form_valid(self, form):
+#         if waffle.flag_is_active(self.request, 'create_team'):
+#             slug_text = self.kwargs['slug_text']
+#             print("*** in team membership post ***")
+#             print(slug_text)
+#             qs=Team.objects.filter(slug=slug_text)
+#             if qs.exists():
+#                 print("Team found")
+#                 team= qs.first()
+#                 print(team)
+#                 print(team.pk)
+#                 print(team.name)
+#             else:
+#                 return HttpResponse("<h1> Page not found. </h1>")
+#             membership = TeamMembership()
+#             membership.team = team.pk
+#             membership.member = form.save(commit=False)
+#             print(membership)
+#             try:
+#                 membership.save()
+#             except:
+#                 logger.critical('Membership create error')
+#                 raise Http404 ("There was an error adding the user to the team. If the error persists, please try again after sometime.")
+#                 # Update user data so that org cannot be created any more by this user
             
-            messages.success(self.request, "User has been added to the team.")
-            return redirect('/teams/~redirect/')
-        else:
-            messages.error(self.request, "Please update your subscription to continue using this feature.")
-            return super(TeamCreateView, self).form_valid(form)    
+#             messages.success(self.request, "User has been added to the team.")
+#             return redirect('/teams/~redirect/')
+#         else:
+#             messages.error(self.request, "Please update your subscription to continue using this feature.")
+#             return super(TeamCreateView, self).form_valid(form)    
 
-Team_membership_add_view = TeammembershipCreateView.as_view()
+# Team_membership_add_view = TeammembershipCreateView.as_view()
+
+def add_member_view(request,*args, **kwargs):
+    user = get_object_or_404(User, id=request.user.pk)
+    organisation = user.userorganization
+    team_qs = Team.objects.filter(organisation = organisation )
+    if team_qs.exists():
+        team_defined = True
+    else:
+        team_defined = False
+    user_qs = User.objects.filter(userorganization = organisation)
+    if user_qs.exists():
+        user_defined = True
+    else:
+        user_defined = False
+    context={}
+    if request.POST:
+        form = MembershipForm(organisation,request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/teams/~redirect/')
+    else:
+        form = MembershipForm(organisation)
+    
+    context={   "form":form,
+                "user_defined" : user_defined,
+                "team_defined" : team_defined
+            }
+    
+    return render(request,'teams/team_membership_add.html', context)

@@ -1,6 +1,7 @@
 
 from django.urls import path
 
+
 from teams.views import (
     Team_redirect_view,
     Team_update_view,
@@ -11,7 +12,7 @@ from teams.views import (
     Team_detail_view,
     Team_members_view,
     Team_members_delete_view,
-    Team_membership_add_view,
+    add_member_view,
 )
 
 app_name = "teams"
@@ -27,6 +28,5 @@ urlpatterns = [
     path("~redirect/", view=Team_redirect_view, name="redirect"),
     path("~members/<slug:slug_text>", view=Team_members_view, name="members"),
     path("~members/delete/<slug:slug_text>", view=Team_members_delete_view, name="remove_members"),
-    path("~members/add/", view=Team_membership_add_view, name="add_members"),
-
+    path('~members/add/', add_member_view, name="add_members"), 
 ]

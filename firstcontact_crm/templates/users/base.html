@@ -135,7 +135,12 @@
                       <a class="collapse-item" href="{% url 'account_email' %}">Update Email</a>
                       <a class="collapse-item" href="{% url 'account_change_password' %}">Update Password</a>
                       <h6 class="collapse-header">Alerts and Notifications</h6>
-                      <a class="collapse-item" href="{% url 'account_email' %}">Notifications</a>
+                      <a class="collapse-item" href="#">Notifications</a>
+                      <h6 class="collapse-header">Email</h6>
+                      <a class="collapse-item" href="#">Connect Email Account</a>
+                      <a class="collapse-item" href="#">Sync Contacts</a>
+                      <a class="collapse-item" href="#">Sync Calender</a>
+                      <a class="collapse-item" href="#">Email tracking</a>
                   </div>
               </div>
           </li>
@@ -162,6 +167,17 @@
                     aria-expanded="true" aria-controls="collapseFour">
                     <i class="fas fa-globe"></i>
                     <span>My Organisation</span>
+                    {% if request.user.is_organisation_default%}
+                    <!-- <a href="#" class="btn btn-warning btn-circle btn-sm"> -->
+                        <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
+                        
+                    <!-- </a> -->
+                  {% else %}  
+                    <!-- <a href="#" class="btn btn-success btn-circle btn-sm"> -->
+                        
+                        <i class=" fa fa-check-circle" style="font-size:11px;color:#10db3f"></i>
+                    <!-- </a> -->
+                  {% endif %} 
                 </a>
                 <div id="collapseFour" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
@@ -192,11 +208,66 @@
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Manage Team</h6>
                     <a class="collapse-item" href="{% url 'teams:list' %}">My Teams</a>
-                    <a class="collapse-item" href="{% url 'invitations:send-invite' %}">Assign agents</a>
+                    <a class="collapse-item" href="{% url 'teams:add_members' %}">Assign agents</a>
                 </div>
             </div>
         </li>
+          <!-- Divider -->
+          <hr class="sidebar-divider">
 
+          <!-- Heading -->
+          <div class="sidebar-heading">
+              Omni Channel Contact
+          </div>
+
+          <!-- Nav Item - Pages Collapse Menu -->
+          <li class="nav-item">
+              <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSCM"
+                  aria-expanded="true" aria-controls="collapseSCM">
+                  <i class="fas fa-address-book"></i>
+                  <span>Social Media</span>
+              </a>
+              <div id="collapseSCM" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                  <div class="bg-white py-2 collapse-inner rounded">
+                      <h6 class="collapse-header">Facebook</h6>
+                      <a class="collapse-item" href="#">Integrate</a>
+                      <a class="collapse-item" href="#">View Contacts</a>
+                      <a class="collapse-item" href="#">Comms history </a>
+                      <div class="collapse-divider"></div>
+                      <h6 class="collapse-header">Twitter</h6>
+                      <a class="collapse-item" href="#">Integrate</a>
+                      <a class="collapse-item" href="#">View Contacts</a>
+                      <a class="collapse-item" href="#">Comms history</a>
+                      <h6 class="collapse-header">Instagram</h6>
+                      <a class="collapse-item" href="#">Integrate</a>
+                      <a class="collapse-item" href="#">View Contacts</a>
+                      <a class="collapse-item" href="#">Comms history</a>
+                      <h6 class="collapse-header">LinkedIn</h6>
+                      <a class="collapse-item" href="#">Integrate</a>
+                      <a class="collapse-item" href="#">View Contacts</a>
+                      <a class="collapse-item" href="#">Comms history</a>
+                  </div>
+              </div>
+
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsewebsite"
+              aria-expanded="true" aria-controls="collapsewebsite">
+              <i class="fas fa-mail-bulk"></i>
+              <span>Website</span>
+          </a>
+          <div id="collapsewebsite" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+              <div class="bg-white py-2 collapse-inner rounded">
+                  <h6 class="collapse-header">Integration</h6>
+                  <a class="collapse-item" href="#">View List</a>
+                  <a class="collapse-item" href="#">Create</a>
+                  <h6 class="collapse-header">Web events</h6>
+                  <a class="collapse-item" href="#">Inbox</a>
+                  <a class="collapse-item" href="#">Sent</a>
+                  <a class="collapse-item" href="#">Schduled</a>
+                  <a class="collapse-item" href="#">Drafts</a>
+                  <a class="collapse-item" href="#">Trash</a>
+              </div>
+          </div>
+          </li>
 
           <!-- Divider -->
           <hr class="sidebar-divider">
@@ -215,27 +286,52 @@
               </a>
               <div id="collapseCRM" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
                   <div class="bg-white py-2 collapse-inner rounded">
-                      <h6 class="collapse-header">Leads:</h6>
+                      <h6 class="collapse-header">Contacts</h6>
                       <a class="collapse-item" href="#">View Contact List</a>
                       <a class="collapse-item" href="#">Add new contact</a>
                       <a class="collapse-item" href="#">Upload CSV </a>
                       <div class="collapse-divider"></div>
-                      <h6 class="collapse-header">Manage Leads:</h6>
+                      <h6 class="collapse-header">Manage Contacts</h6>
                       <a class="collapse-item" href="#">Assign Agent</a>
                       <a class="collapse-item" href="#">My Leads</a>
                       <a class="collapse-item" href="#">My Tasks</a>
+                      <h6 class="collapse-header">Lists</h6>
+                      <a class="collapse-item" href="#">My lists</a>
+                      <a class="collapse-item" href="#">Create new list</a>
+                      <a class="collapse-item" href="#">Import contacts</a>
                   </div>
               </div>
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseEmail"
               aria-expanded="true" aria-controls="collapseEmail">
               <i class="fas fa-mail-bulk"></i>
-              <span>Email Templates</span>
+              <span>Emails</span>
           </a>
           <div id="collapseEmail" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
               <div class="bg-white py-2 collapse-inner rounded">
                   <h6 class="collapse-header">Manage Templates:</h6>
                   <a class="collapse-item" href="#">View List</a>
                   <a class="collapse-item" href="#">Create</a>
+                  <h6 class="collapse-header">Emails</h6>
+                  <a class="collapse-item" href="#">Inbox</a>
+                  <a class="collapse-item" href="#">Sent</a>
+                  <a class="collapse-item" href="#">Schduled</a>
+                  <a class="collapse-item" href="#">Drafts</a>
+                  <a class="collapse-item" href="#">Trash</a>
+                  <h6 class="collapse-header">Team Inbox</h6>
+                  <a class="collapse-item" href="#">Inbox</a>
+                  <a class="collapse-item" href="#">Sent</a>
+                  <a class="collapse-item" href="#">Schduled</a>
+                  <a class="collapse-item" href="#">Drafts</a>
+                  <a class="collapse-item" href="#">Trash</a>
+                  <h6 class="collapse-header">Connect external ESPs</h6>
+                  <a class="collapse-item" href="#">Integration</a>
+                  <h6 class="collapse-header">Bulk Emails</h6>
+                  <a class="collapse-item" href="#">Scheduled</a>
+                  <a class="collapse-item" href="#">Drafts</a>
+                  <h6 class="collapse-header">Email Tracking</h6>
+                  <a class="collapse-item" href="#">Opens</a>
+                  <a class="collapse-item" href="#">Clicks</a>
+                  <a class="collapse-item" href="#">Bounces</a>
                   <div class="collapse-divider"></div>
                   <!-- <h6 class="collapse-header">Manage Leads:</h6>
                   <a class="collapse-item" href="#">Assign Agent</a>
@@ -244,7 +340,45 @@
               </div>
           </div>
           </li>
-
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+        <!-- Heading -->
+        <div class="sidebar-heading">
+            Automation
+        </div>
+        <!-- Nav Item - Marketing Automation -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMAUTO"
+                aria-expanded="true" aria-controls="collapseCRM">
+                <i class="fas fa-address-book"></i>
+                <span>Marketing Automation</span>
+            </a>
+            <div id="collapseMAUTO" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Segments</h6>
+                    <a class="collapse-item" href="#">View Segements</a>
+                    <a class="collapse-item" href="#">Add new Segment</a>
+                    <h6 class="collapse-header">Journey Builder</h6>
+                    <a class="collapse-item" href="#">Build from Templates</a>
+                    <a class="collapse-item" href="#">Create Custom Journey</a>
+                    <a class="collapse-item" href="#">Email templates</a>
+                    <h6 class="collapse-header">Campaigns</h6>
+                    <a class="collapse-item" href="#">View old campaigns</a>
+                    <a class="collapse-item" href="#">Create new campaign</a>
+                    <a class="collapse-item" href="#">Import contacts</a>
+                    <h6 class="collapse-header">Transactional Emails</h6>
+                    <a class="collapse-item" href="#">View old campaigns</a>
+                    <a class="collapse-item" href="#">Create new campaign</a>
+                    <a class="collapse-item" href="#">Import contacts</a>
+                </div>
+            </div>
+        </li>
+        <hr class="sidebar-divider">
+        <!-- Heading -->
+        <div class="sidebar-heading">
+            Analytics and Reports
+        </div>
+          
           <!-- Nav Item - Charts -->
           <li class="nav-item">
               <a class="nav-link" href="#">
@@ -261,7 +395,9 @@
 
           <!-- Divider -->
           <hr class="sidebar-divider d-none d-md-block">
-
+          <div class="sidebar-heading">
+            Smart Sense 
+          </div>
           <!-- Sidebar Toggler (Sidebar) -->
           <div class="text-center d-none d-md-inline">
               <button class="rounded-circle border-0" id="sidebarToggle"></button>
@@ -295,7 +431,7 @@
                   </button>
 
                   <!-- Topbar Search -->
-                  <form
+                  <!-- <form
                       class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                       <div class="input-group">
                           <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
@@ -306,19 +442,22 @@
                               </button>
                           </div>
                       </div>
-                  </form>
-
+                  </form> -->
+                  {% if user.userorganization %} 
+                        <span class = "d-lg-inline text-gray-600"> <strong>{% trans "Organisation : " %} <a class="btn btn-link d-lg-inline " href="{% url 'organisation:update' %}">{{ user.userorganization }}</a></strong></span> 
+                  {% endif %}
+                  <div class="topbar-divider d-none d-sm-block"></div>
                   <!-- Topbar Navbar -->
-                  <ul class="navbar-nav mr-auto">
+                  <ul class="navbar-nav mr-auto float-right">
 
                       <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                      <li class="nav-item dropdown no-arrow d-sm-none">
+                      <!-- <li class="nav-item dropdown no-arrow d-sm-none">
                           <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               <i class="fas fa-search fa-fw"></i>
-                          </a>
+                          </a> -->
                           <!-- Dropdown - Messages -->
-                          <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                          <!-- <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
                               aria-labelledby="searchDropdown">
                               <form class="form-inline mr-auto w-100 navbar-search">
                                   <div class="input-group">
@@ -333,7 +472,7 @@
                                   </div>
                               </form>
                           </div>
-                      </li>
+                      </li> -->
 
                       <!-- Nav Item - Alerts -->
                       <li class="nav-item dropdown no-arrow mx-1">

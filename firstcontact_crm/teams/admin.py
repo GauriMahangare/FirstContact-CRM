@@ -53,6 +53,9 @@ class TeamMembershipAdmin(admin.ModelAdmin):
         'role',
         'member_username',
         'member_email',
+        'team_organisation',
+        'member_organisation',
+        'users_in_same_org',
         'dateTimeModified',
         'dateTimeCreated',
     ]
