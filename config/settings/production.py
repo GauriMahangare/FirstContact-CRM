@@ -194,3 +194,13 @@ sentry_sdk.init(
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+# http://docs.celeryproject.org/en/latest/userguide/configuration.html#task-always-eager
+CELERY_TASK_ALWAYS_EAGER = False
+# http://docs.celeryproject.org/en/latest/userguide/configuration.html#task-eager-propagates
+CELERY_TASK_EAGER_PROPAGATES = True
+# Your stuff...
+# ------------------------------------------------------------------------------
+# Stripe
+STRIPE_PUBLIC_KEY="pk_test_51IHqbQFJjGPNRnAAwoHpztfF08VrSVvJBsLeDSU4We2yX6bBfBxE0YQpMKX2tjmKRwqKjAnOzWfFCKc85EDWJI7l007bxiDRUt"
+STRIPE_SECRET_KEY="sk_test_51IHqbQFJjGPNRnAAqbd6q21BpgKn7QVT74zpI337vBS3tu5W3BkXPR0Ayg7lE8avUK4IbIKlBDITRRusYCD2Q1WX00G8ivzKtG"
+STRIPE_WEBHOOK_SECRET="whsec_81Ky6iI05X2PtAAhMuDAsQEw95XYWRLl"
