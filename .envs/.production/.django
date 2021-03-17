@@ -3,7 +3,8 @@
 # DJANGO_READ_DOT_ENV_FILE=True
 DJANGO_SETTINGS_MODULE=config.settings.production
 DJANGO_SECRET_KEY=DjwF5cSXHtMvBradDIviFAFWACUesSwmrE9Va7TrztZ8It65vOy8OtS84FBxcxkJ
-DJANGO_ADMIN_URL=XYUIewh63f5qpBVypLx42kiyUr1gOrO9/
+#DJANGO_ADMIN_URL=XYUIewh63f5qpBVypLx42kiyUr1gOrO9/
+DJANGO_ADMIN_URL=admin/
 #DJANGO_ALLOWED_HOSTS=.firstcontactcrm.avanengineering.com
 DJANGO_ALLOWED_HOSTS=.glacial-waters-13236.herokuapp.com
 
