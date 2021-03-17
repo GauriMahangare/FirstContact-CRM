@@ -31,7 +31,7 @@ WEB_CONCURRENCY=4
 
 # Sentry
 # ------------------------------------------------------------------------------
-SENTRY_DSN=
+SENTRY_DSN=https://e522d325e1584cbdad393e5d5217074f@o520607.ingest.sentry.io/5631207
 
 
 # Redis
