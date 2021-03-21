@@ -194,7 +194,8 @@
       </div>
       <!-- Copyright Section-->
       <div class="copyright py-4 text-center text-white">
-        <div class="container"><small> Copyright © <a href = "https://www.avanengineering.com/" target="_blank">Avan Engineering Services Ltd </a>: 2021</small></div>
+        {% now "Y" as current_year %}
+        <div class="container"><small> Copyright © <a class="pr-0" href = "https://www.avanengineering.com/" target="_blank">Avan Engineering Services Ltd </a>: {{current_year}}</small></div>
       </div>  
   </footer>
 </html>

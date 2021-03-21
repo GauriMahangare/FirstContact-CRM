@@ -1,94 +1,74 @@
 {% extends "users/base.html" %}
-{% load static i18n compress%}
+{% load crispy_forms_tags %}
+{% load i18n compress %}
+{% load static %}
+{% load waffle_tags %}
 
-{% block head_title %}"View Profile"{% endblock %}
+{% block title %} User: {{ request.user.userorganization }} - View Profile {% endblock %}
 
 {% block content %}
-<div class="container">
+{% if object == request.user %}
+  {% if user.userorganization == request.user.userorganization %} 
 
-  <div class="row">
-    <div class="col-sm-12">
-      <h1>Your profile</h1>
-      <hr/>
-      <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary"><h4>Username : {{ request.user.username }}</h4></h6>
-        </div>
-        <div class="card-body">
-          {% if object.name %}
-            <p><b>Name : </b>{{ object.name }}</p>
-          {% endif %}
-        {% if request.user.is_organisation_default%}
-          <div class="px-3 py-3 bg-gradient-danger text-white">
-            <b> Nearly there..You must complete setup of your work organisation to enable access to the CRM.</b>
+    <div class="row">
+      <div class="col-sm-12">
+        <h1>Your profile</h1>
+        <hr/>
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary"><h4> {% trans 'Username :' %} {{ request.user.username }}</h4></h6>
           </div>
-          <br>
-          <a class="btn btn-primary" href="{% url 'organisation:create' %}" >Create Organisation</a>
-          <br>
-        {% else %}
-          {% if object.userorganization %}
-            <p><b>Organisation :</b> {{ object.userorganization }}</p>
-    
-          {% endif %}
-        {% endif %}
-        
-        <hr>
-        <p><b>Current Access: </b></p>
-        <ul>
-          {% if request.user.is_admin %}
-            <li>Organisation Administrator</li>
-            {% if object.is_team_manager %}
-              <li>Team Manager </li>
+          <div class="card-body">
+            {% if object.name %}
+              <p><b>{% trans 'Name : ' %} </b>{{ object.name }}</p>
             {% endif %}
-            {% if object.is_team_member %}
-              <li>Team Member</li>
-            {% endif %}
+          {% if request.user.is_organisation_default%}
+            <div class="px-3 py-3 bg-gradient-danger text-white">
+              <b> {% trans 'Nearly there..You must complete setup of your work organisation to enable access to the CRM.' %}</b>
+            </div>
+            <br>
+            <a class="btn btn-primary" href="{% url 'organisation:create' %}" >{% trans 'Create Organisation' %}</a>
+            <br>
           {% else %}
-            {% if request.user.is_team_manager %}
-                <li>Team Manager </li>
-                {% if object.is_team_member %}
-                <li>Team Member</li>
-                {% endif %}
-            {% else %}
-              {% if request.user.is_team_member %}
-                <li>Team Member</li>
-              {% endif %}
+            {% if object.userorganization %}
+              <p><b>{% trans 'Organisation' %} :</b> {{ object.userorganization }}</p>
+      
+            {% endif %}
           {% endif %}
-        {% endif %}
-        </ul>
-        {% if not request.user.is_organisation_default%}
-        <div class="px-3 py-3 bg-gradient-info text-white">
-          Who else is part of this organisation?
+          
+          <hr>
+          <p><b>{% trans 'Current Access: ' %}</b></p>
+          <ul>
+            {% if request.user.is_admin %}
+              <li>{% trans 'Organisation Administrator' %}</li>
+            {% else %}
+                {% if request.user.is_team_member %}
+                  <li>{% trans 'Team Member' %}</li>
+                {% endif %}
+            {% endif %}
+          </ul>
+          {% if not request.user.is_organisation_default%}
+            <div class="px-3 py-3 bg-gradient-info text-white">
+              Who else is part of this organisation?
+            </div>
+            <br>
+              <a class="btn btn-primary" href="#" >Add My Team</a>
+          {% endif %}
+          <br/>
+          <p><small>**Use Account Set up menu to update profile information</small></p>
         </div>
-        <br>
-          <a class="btn btn-primary" href="#" >Add My Team</a>
-        {%endif%}
-        <br/>
-        <p><small>**Use Account Set up menu to update profile information</small></p>
+      </div>
       </div>
     </div>
-    </div>
-  </div>
-<!-- Account page navigation-->
-<!-- <div class="container mt-4">
-     <nav class="nav nav-borders">
-        <a class="nav-link active ml-0" href="#">Profile</a>
-        <a class="nav-link" href="#">Billing</a>
-        <a class="nav-link" href="#">Security</a>
-        <a class="nav-link" href="#">Notifications</a>
-    </nav>
-    <hr class="mt-0 mb-4">
-</div> -->
-{% if object == request.user %}
-<!-- Action buttons -->
-<div class="row">
-
-  <div class="col-sm-12">
-    <!-- Your Stuff: Custom user template urls -->
-  </div>
-
-</div>
-<!-- End Action buttons -->
+  {% else %}
+    <h1>We're sorry</h1>
+    <hr/>
+    <p>The page you're looking for can't be found. </p>
+  {% endif %}
+{% else %}
+    <h1>We're sorry</h1>
+    <hr/>
+    <p>The page you're looking for can't be found. </p>
 {% endif %}
 
 {% endblock content %} 

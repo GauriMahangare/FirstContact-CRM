@@ -1,3 +1,5 @@
+
+from datetime import datetime
 from django.contrib.auth.models import AbstractUser
 from django.core import exceptions
 from django.db import models
@@ -7,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save, pre_save
-from allauth.account.signals import email_confirmed,user_signed_up
+from allauth.account.signals import email_confirmed,user_signed_up,user_logged_in
 from allauth.account.models import EmailAddress
 from django.core.exceptions import ObjectDoesNotExist
 from organisation.models import Organisation
@@ -117,6 +119,9 @@ def post_email_confirmed(request, email_address, *args, **kwargs):
 
         subscription.status = stripe_subscription["status"]  # trialing
         subscription.stripe_subscription_id = stripe_subscription["id"]
+        subscription.freeTrialEndDate = datetime.utcfromtimestamp(stripe_subscription['trial_end'])
+        subscription.nextPaymentDueDate = datetime.utcfromtimestamp(stripe_subscription['current_period_end'])
+
         subscription.save()
         user.stripe_customer_id = stripe_customer["id"]
         user.save()
@@ -166,8 +171,6 @@ def post_user_signed_up_checkinvitation(request, user,*args, **kwargs):
                         logger.critical('Error setting up verified email')
                 else:
                     logger.info('Invited users - email already verified.')
-
-
 
 
 

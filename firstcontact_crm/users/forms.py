@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
+from django import forms as normal_forms
 
 from organisation.models import Organisation
 
@@ -34,6 +35,8 @@ class UserCreationForm(admin_forms.UserCreationForm):
 
         raise ValidationError(self.error_messages["duplicate_username"])
 
+class CancelSubscriptionForm(normal_forms.Form):
+    hidden = normal_forms.HiddenInput()
 
 
 # class RegisterForm(forms.Form):

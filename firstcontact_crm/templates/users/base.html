@@ -157,7 +157,8 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Billing details:</h6>
-                        <a class="collapse-item" href="{% url 'payment:enroll' %}"> Subscription</a>
+                        <!-- <a class="collapse-item" href="{% url 'payment:enroll' %}"> Subscription</a> -->
+                        <a class="collapse-item" href="{% url 'users:subscription' user.username %}"> Subscription</a>
                         <a class="collapse-item" href="#">Invoices</a>
                     </div>
                 </div>
@@ -224,7 +225,7 @@
           <li class="nav-item">
               <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSCM"
                   aria-expanded="true" aria-controls="collapseSCM">
-                  <i class="fas fa-address-book"></i>
+                  <i class="fas fa-thumbs-up"></i>
                   <span>Social Media</span>
               </a>
               <div id="collapseSCM" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
@@ -251,7 +252,7 @@
 
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsewebsite"
               aria-expanded="true" aria-controls="collapsewebsite">
-              <i class="fas fa-mail-bulk"></i>
+              <i class="far fa-comments"></i>
               <span>Website</span>
           </a>
           <div id="collapsewebsite" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
@@ -444,7 +445,7 @@
                       </div>
                   </form> -->
                   {% if user.userorganization %} 
-                        <span class = "d-lg-inline text-gray-600"> <strong>{% trans "Organisation : " %} <a class="btn btn-link d-lg-inline " href="{% url 'organisation:update' %}">{{ user.userorganization }}</a></strong></span> 
+                        <span class = "d-lg-inline text-gray-600"> <strong>{% trans "Organisation : " %} <a class="btn btn-link d-lg-inline " href="{% url 'organisation:update' %}">{{ request.user.userorganization }}</a></strong></span> 
                   {% endif %}
                   <div class="topbar-divider d-none d-sm-block"></div>
                   <!-- Topbar Navbar -->
@@ -658,7 +659,8 @@
           <footer class="sticky-footer bg-white">
               <div class="container my-auto">
                     <div class="text-left my-auto">
-                        <span class="text-gray-600 text-xs">Copyright &copy; Avan Engineering Services Ltd 2021</span>
+                        {% now "Y" as current_year %}
+                        <span class="text-gray-600 text-xs">Copyright &copy; Avan Engineering Services Ltd {{current_year}}</span>
                     </div>
               </div>
           </footer>
@@ -695,7 +697,7 @@ aria-hidden="true">
             <form method="post" id="myForm" action="{% url 'account_logout' %}">
               {% csrf_token %}
               {% if redirect_field_value %}
-              <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
               {% endif %}   
               <button class="btn btn-danger" id="btnSubmit" type="submit">
                 <i class="loading-icon fa fa-spinner fa-spin hide"></i>

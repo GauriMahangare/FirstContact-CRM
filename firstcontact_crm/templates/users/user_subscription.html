@@ -1,0 +1,180 @@
+{% extends "users/base.html" %}
+{% load crispy_forms_tags %}
+{% load i18n compress %}
+{% load static %}
+{% load waffle_tags %}
+
+{% block title %} User: {{ object.username }} - Subscription {% endblock %}
+
+{% block content %}
+{% if object == request.user %}
+  {% if user.userorganization == request.user.userorganization %} 
+    {% if request.user.is_admin %}
+          <h1>{% trans 'Subscription - Billing' %} </h1>
+          
+        <hr>
+        <div class="row">
+          <div class="col-lg-4 mb-4">
+              <!-- Billing card 1-->
+              <div class="card h-100 border-left-lg border-left-warning">
+                  <div class="card-body">
+                      <div class="small text-muted">{% trans 'Current monthly bill' %}</div>
+                      <div class="h3">
+                        {% if currency == "gbp" %}
+                          £
+                        {% else %} 
+                          {% if currency == "eur" %} 
+                            €
+                          {% else %} 
+                            {% if currency == "usd" %} 
+                              $
+                            {% endif %}
+                          {% endif %}
+                        {% endif %} 
+                        {{ unit_amount }}</div>
+                      <br>
+                      <a href="#" class="btn btn-warning btn-icon-split ">
+                        <span class="icon text-white">
+                            <i class="fas fa-exchange-alt"></i>
+                        </span>
+                        <span class="text">{% trans 'Switch to yearly billing'  %}</span>
+                      </a>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-4 mb-4">
+              <!-- Billing card 2-->
+              <div class="card h-100 border-left-lg border-left-secondary">
+                  <div class="card-body">
+                      <div class="small text-muted">{% trans 'Next payment due'  %}</div>
+                      <div class="h3">{{current_period_end}}</div>
+                      <br>
+                      <a href="#" class="btn btn-secondary btn-icon-split ">
+                        <span class="icon text-white">
+                            <i class="fas fa-history"></i>
+                        </span>
+                        <span class="text">{% trans 'View payment History'  %}</span>
+                      </a>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-4 mb-4">
+              <!-- Billing card 3-->
+              <div class="card h-100 border-left-lg border-left-success">
+                  <div class="card-body">
+                      <div class="small text-muted">{% trans 'Current plan'  %}</div>
+                        <div class="h3 d-flex align-items-center">{{ user.subscription.pricing.name }}</div>
+                        <p>{% trans ' Created on:' %}  {{ user.subscription.dateTimeCreated}} </p>
+                        <div class="row d-inline-block pl-4">
+                          <a href="{% url 'payment:enroll' %}" class="btn btn-primary btn-icon-split ">
+                            <span class="icon text-white">
+                                <i class="fas fa-arrow-alt-circle-up"></i>
+                            </span>
+                            <span class="text">{% trans 'Upgrade Plan'  %}</span>
+                          </a>
+
+                          {% if user.subscription.status != "canceled" %}
+                            <a class=" small text-danger pl-4" href=" {% url 'users:cancel-subscription' request.user.username %}">
+                              {% trans 'Cancel Subscription'  %}
+                            </a>
+                          {% endif %}
+                        </div>
+                  </div>
+              </div>
+          </div>
+        </div>  
+        <div class="card card-header-actions mb-4">
+          <div class="card-header">
+              <h3>{% trans 'Billing status  - '  %} {{status}}</h3>
+          </div>
+          <div class="card-body">
+              <!-- Payment method 1-->
+              <div>
+                <p>Trial Start Date - {{trial_start}}</p>
+                <p id="datetocount">Trial End Date - {{trial_end}}</p>
+                {% now "d F Y" as today_date %}
+                {% if trial_end > today_date %}
+                  <div class="rounded bg-gradient-info text-white shadow p-5 text-center mb-5 bg-info">
+                    <p class="mb-0 font-weight-bold text-uppercase">Your trial will end in...</p>
+                      <span class="h1 font-weight-bold"><p id="trialendcounter" ></p></span>
+                    <ul class="list-inline">
+                        <li class="list-inline-item pt-2">
+                            <button id="btn-reset" type="button" class="btn btn-warning"><i class="glyphicon glyphicon-repeat"></i>Set payment Method</button>
+                        </li>
+                    </ul>
+                  </div>
+                {% else %}
+                  <div class="rounded bg-gradient-danger text-white shadow p-5 text-center mb-5 bg-info">
+                    <p class="mb-0 font-weight-bold text-uppercase">Your trial has ended.</p>
+                      <span class="h1 font-weight-bold"><p> Your trial has ended. Please set up payment method to continue to use CRM.</p></span>
+                    <!-- Call to actions -->
+                    <ul class="list-inline">
+                        <li class="list-inline-item pt-2">
+                            <button id="btn-reset" type="button" class="btn btn-warning"><i class="glyphicon glyphicon-repeat"></i>Set payment Method</button>
+                        </li>
+                    </ul>
+                  </div>
+                {% endif %}
+                <hr>
+                <p>billing_thresholds - {{billing_thresholds}}</p>
+                <p>cancel_at - {{cancel_at}}</p>
+                <p>cancel_at_period_end - {{cancel_at_period_end}}</p>
+                <p>canceled_at - {{canceled_at}}</p>
+                <hr>
+                <p>Collection Method - {{collection_method}}</p>
+                <p>Pricing Type - {{pricing_type}}</p>
+                <p>Current Billing Start Period -  {{current_period_start}}</p>
+                <p>Current Billing End Period - {{current_period_end}}</p>
+                <p>Days until due - {{days_until_due}}</p>
+                <p>Default Payment Method - {{default_payment_method}}</p>
+              </div>
+              <hr>
+          </div>
+      </div>
+    {% else %}
+      <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> Permission denied. Please contact your organisation administrator.</h3>  
+    {% endif %}
+  {% else %}
+    <h1>We're sorry</h1>
+    <hr/>
+    <p>The page you're looking for can't be found. </p>
+  {% endif %}
+{% else %}
+    <h1>We're sorry</h1>
+    <hr/>
+    <p>The page you're looking for can't be found. </p>
+{% endif %}
+<script>
+  // Set the date we're counting down to
+  var datetocount = document.getElementById("datetocount").innerHTML
+
+  var countDownDate = new Date(datetocount).getTime();
+  
+  // Update the count down every 1 second
+  var x = setInterval(function() {
+  
+    // Get today's date and time
+    var now = new Date().getTime();
+      
+    // Find the distance between now and the count down date
+    var distance = countDownDate - now;
+      
+    // Time calculations for days, hours, minutes and seconds
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      
+    // Output the result in an element with id="demo"
+    document.getElementById("trialendcounter").innerHTML = days + "d " + hours + "h "
+    + minutes + "m " + seconds + "s ";
+      
+    // If the count down is over, write some text 
+    if (distance < 0) {
+      clearInterval(x);
+      document.getElementById("trialendcounter").innerHTML = "EXPIRED";
+    }
+  }, 1000);
+  </script>
+{% endblock content %}
+

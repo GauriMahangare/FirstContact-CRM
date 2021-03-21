@@ -10,12 +10,14 @@ from django.contrib.auth import get_user_model
 from allauth.account.signals import email_confirmed
 import stripe
 from organisation.models import Organisation
+from datetime import datetime
+import pytz
 # Create your models here.
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 User = settings.AUTH_USER_MODEL
-
+utc=pytz.UTC
 class Pricing(models.Model):
 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -94,6 +96,16 @@ class Subscription(models.Model):
         'Status',
         max_length=100,
         blank=True,)
+    
+    nextPaymentDueDate = models.DateTimeField(
+        'Next Payment Due',
+        null=True,
+    )
+
+    freeTrialEndDate = models.DateTimeField(
+        'Free Trial End Date',
+        null=True,
+    )
 
     dateTimeModified = models.DateTimeField(
         'Last Modified',
@@ -109,14 +121,23 @@ class Subscription(models.Model):
     
     def get_absolute_url(self):
         return reverse('subscription-details', kwargs={'pk': self.organisation})
+    @property
+    def is_active(self):
+        return self.status == "active" or self.status == "trialing"
 
+    @property
+    def isTrialActive(self):
+        now = datetime.now()
+        nowDate = now.replace(tzinfo=utc)
+        trialEndDate = self.freeTrialEndDate.replace(tzinfo=utc)
+        if  trialEndDate > nowDate : 
+            return True
+        else:
+            return False
     class Meta:
         verbose_name = 'Subscription'
         verbose_name_plural = 'Subscriptions'
 
-    @property
-    def is_active(self):
-        return self.status == "active" or self.status == "trialing"
 
 def create_slug(instance,new_slug=None):
     # Remove spaces and replace it by -

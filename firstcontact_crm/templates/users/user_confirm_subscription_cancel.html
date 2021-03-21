@@ -1,0 +1,40 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load waffle_tags %}
+
+{% block head_title %} {{ user.username }} - Subscription Cancel Confirmation {% endblock head_title %}
+
+{% block inner %}
+{{object}}
+=========
+{{request.user}}
+
+{% if object == request.user %}
+    {% if request.user.is_admin %}
+    <h1>{% trans 'Cancel Subscription Confirmation '%}</h1>
+    <hr/>
+        </br >
+        <form id="myForm" method="post">{% csrf_token %} 
+            <h2>Are you sure?</h2>
+            <h5>Are you sure you want to cancel your current subscription - "{{subscription}}"? </h5>
+            <br>
+            <button class="btn btn-danger" type="submit" action=.>
+                <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                <span class="btn-txt">{% trans "Yes, I'm sure" %} &raquo;</span>
+            </button>
+            <a id="delete-team" class="btn btn-secondary ml-5" href="{% url 'users:subscription' request.user.username %}">{% trans "No, take me back" %} &raquo;</a>
+        </form> 
+
+    {% else %}
+        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> Permission denied. Please contact your organisation administrator.</h3>
+    {% endif %}
+{% else %}
+    <h1>We're sorry</h1>
+    <hr/>
+    <p>The page you're looking for can't be found. </p>
+{% endif %}
+
+{% endblock %}
