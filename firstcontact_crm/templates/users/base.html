@@ -39,6 +39,11 @@
     <link href="{% static 'css/project.css' %}" rel="stylesheet">
 
     {% endcompress %}
+
+    {% block page-css %}
+            <!-- Page level 3rd party CSS goes here -->
+    {% endblock page-css %}
+
     {% endblock %}
     
     <!-- Le javascript
@@ -51,6 +56,7 @@
     <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
         <!-- Your stuff: Third-party javascript libraries go here -->
+        <script src="https://js.stripe.com/v3/"></script> 
     <!-- <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>     -->
     <!-- Core plugin JavaScript-->
     <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>         
@@ -71,6 +77,10 @@
       <!-- <script src="{% static 'js/demo/chart-area-demo.js' %}"></script>
       <script src="{% static 'js/demo/chart-pie-demo.js' %}"></script> -->
     {% endcompress %}
+    {% block page-js %}
+    <!-- Page level 3rd party CSS goes here -->
+    {% endblock page-js %}
+
 {% endblock javascript %}
 </head>
 
@@ -158,7 +168,11 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Billing details:</h6>
                         <!-- <a class="collapse-item" href="{% url 'payment:enroll' %}"> Subscription</a> -->
-                        <a class="collapse-item" href="{% url 'users:subscription' user.username %}"> Subscription</a>
+                        {% if request.user.subscription.status == 'trialing' %}
+                            <a class="collapse-item" href="{% url 'payment:enroll' %}"> Subscription</a>
+                        {% else %}
+                            <a class="collapse-item" href="{% url 'users:subscription' user.username %}"> Subscription</a>
+                        {% endif %}    
                         <a class="collapse-item" href="#">Invoices</a>
                     </div>
                 </div>
@@ -712,6 +726,10 @@ aria-hidden="true">
 
 {% block inline_javascript %}
     <script src="{% static 'js/project.js' %}"></script>
+{% block pageend-js %}
+    <!-- Page level 3rd party JS goes here -->
+{% endblock pageend-js %}
+
 {% endblock inline_javascript %}
 
 

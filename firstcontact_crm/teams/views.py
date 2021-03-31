@@ -222,11 +222,7 @@ class TeamMembersView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,Lis
         print(slug_text)
         qs=Team.objects.filter(slug=slug_text)
         if qs.exists():
-            print("Team found")
             team= qs.first()
-            print(team)
-            print(team.pk)
-            print(team.name)
         else:
             return HttpResponse("<h1> Page not found. </h1>")
         team_qs = TeamMembership.objects.filter(team=team.pk).order_by('-dateTimeModified')

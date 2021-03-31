@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from allauth.account.signals import email_confirmed
 import stripe
 from organisation.models import Organisation
+#from feature.models import Flag
 from datetime import datetime
 import pytz
 # Create your models here.
@@ -53,14 +54,22 @@ class Pricing(models.Model):
         max_length=50,
         blank=True,
     )
-    # subscription = models.ForeignKey(
+    # features = models.ForeignKey(
     #     Flag,
     #     on_delete=models.CASCADE,
     #     blank=True,
     #     help_text=_('Features in this Price Tier.'),
     #     verbose_name=_('Features'),
     # )
-        
+    description = models.TextField(
+        'Description',
+        blank=True,
+        max_length=4000,
+    )
+    is_default = models.BooleanField(
+        default=False,
+        blank=True
+    )
     dateTimeModified = models.DateTimeField(
         'Last Modified',
         auto_now =True,
@@ -116,6 +125,7 @@ class Subscription(models.Model):
         'Created',
         auto_now_add =True,
     )
+
     def __str__(self):
         return self.user.email
     

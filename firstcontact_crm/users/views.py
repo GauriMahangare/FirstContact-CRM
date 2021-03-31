@@ -116,8 +116,10 @@ class UserSubscriptionView(LoginRequiredMixin, DetailView):
                 context['default_payment_method'] = customer_subscription['default_payment_method']
                 context['discount'] = customer_subscription['discount']
                 context['ended_at'] = customer_subscription['ended_at']
-                context['trial_start'] = datetime.utcfromtimestamp(customer_subscription['trial_start']).strftime('%d %B %Y')
-                context['trial_end'] = datetime.utcfromtimestamp(customer_subscription['trial_end']).strftime('%d %B %Y')
+                #context['trial_start'] = datetime.utcfromtimestamp(customer_subscription['trial_start']).strftime('%d %B %Y')
+                #context['trial_end'] = datetime.utcfromtimestamp(customer_subscription['trial_end']).strftime('%d %B %Y')
+                context['trial_start'] = user.date_joined
+                context['trial_end'] = user.subscription.freeTrialEndDate
                 context['status'] = customer_subscription['status']
                 # if (customer_subscription['status'] != "canceled"):
                 items  = customer_subscription['items']
@@ -139,7 +141,7 @@ class CancelSubscriptionView(LoginRequiredMixin,View):
     # form_class = CancelSubscriptionForm
 
     def get_success_url(self):
-        return reverse("users:detail", kwargs={"username": self.request.user.username})
+        return reverse("users:subscription", kwargs={"username": self.request.user.username})
     
     def get(self, request, *args, **kwargs):
         context={"subscription": self.request.user.subscription.pricing.name}

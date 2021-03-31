@@ -17,15 +17,17 @@
     <h1>{% trans 'Cancel Subscription Confirmation '%}</h1>
     <hr/>
         </br >
-        <form id="myForm" method="post">{% csrf_token %} 
-            <h2>Are you sure?</h2>
-            <h5>Are you sure you want to cancel your current subscription - "{{subscription}}"? </h5>
+        <form id="myForm" method="post">
+            {% csrf_token %} 
+            <h2>{% trans "Are you sure?" %}</h2>
+            <h5>{% trans "Are you sure you want to cancel your current subscription ? " %} - "{{subscription}}" </h5>
             <br>
-            <button class="btn btn-danger" type="submit" action=.>
+            <button id="cancel-subscription-btn" class="btn btn-danger" type="submit" action=.>
                 <i class="loading-icon fa fa-spinner fa-spin hide"></i>
                 <span class="btn-txt">{% trans "Yes, I'm sure" %} &raquo;</span>
             </button>
             <a id="delete-team" class="btn btn-secondary ml-5" href="{% url 'users:subscription' request.user.username %}">{% trans "No, take me back" %} &raquo;</a>
+            <div id="messages"></div>
         </form> 
 
     {% else %}
@@ -38,3 +40,62 @@
 {% endif %}
 
 {% endblock %}
+
+{% block pageend-js %}
+<script>
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    let priceId = "{{ pricing_tier.stripe_price_id }}"
+    let stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
+
+    const cancelSubscriptionBtn = document.querySelector('#cancel-subscription-btn');
+    cancelSubscriptionBtn.addEventListener('submit', async (e) => {
+      // Don't fully submit the form.
+      e.preventDefault();
+    
+      changeLoadingState(true);
+      setMessage("Cancelling... please wait.");
+      cancelSubscription();
+
+    }); 
+
+    function cancelSubscription() {
+        return fetch("{% url 'payment:cancel-subscription' %}", {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({
+            subscriptionId: subscriptionId,
+        }),
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(cancelSubscriptionResponse => {
+            setMessage("Subcription has been cancelled.");
+            window.location.href = "{% url 'users:subscription' request.user.username %}"
+        });
+    }
+
+    function changeLoadingState(isLoading) {
+        if (isLoading) {
+          document.querySelector('#button-text').classList.add('hidden');
+          document.querySelector('#spinner').classList.remove('hidden');
+          document.querySelector('#payment-form button').disabled = true;
+        } else {
+          document.querySelector('#button-text').classList.remove('hidden');
+          document.querySelector('#spinner').classList.add('hidden');
+          document.querySelector('#payment-form button').disabled = false;
+        }
+        }
+        
+        
+        // helper method for displaying a status message.
+        const setMessage = (message) => {
+            const messageDiv = document.querySelector('#messages');
+            messageDiv.innerHTML += "<br>" + message;
+        } 
+
+</script>
+{% endblock pageend-js %}

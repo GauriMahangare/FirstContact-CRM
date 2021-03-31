@@ -1,5 +1,5 @@
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib.auth.models import AbstractUser
 from django.core import exceptions
 from django.db import models
@@ -95,7 +95,7 @@ def post_email_confirmed(request, email_address, *args, **kwargs):
 
     user = User.objects.get(email=email_address.email)
     if  user.is_admin:
-        free_trial_pricing = get_object_or_404(Pricing, name='Individual')
+        free_trial_pricing = get_object_or_404(Pricing, name='FreeTrial')
 
         subscription = Subscription.objects.create(
             user=user, 
@@ -108,22 +108,26 @@ def post_email_confirmed(request, email_address, *args, **kwargs):
         except:
             logger.critical('Stripe Customer create error')
 
-        try: 
-            stripe_subscription = stripe.Subscription.create(
-            customer=stripe_customer["id"],
-            items=[{'price': free_trial_pricing.stripe_price_id}],
-            trial_period_days=7
-            )
-        except:
-            logger.critical('Stripe Customer subscription create error')       
+        # try: 
+        #     stripe_subscription = stripe.Subscription.create(
+        #     customer=stripe_customer["id"],
+        #     items=[{'price': free_trial_pricing.stripe_price_id}],
+        #     trial_period_days=7
+        #     )
+        # except:
+        #     logger.critical('Stripe Customer subscription create error')       
 
-        subscription.status = stripe_subscription["status"]  # trialing
-        subscription.stripe_subscription_id = stripe_subscription["id"]
-        subscription.freeTrialEndDate = datetime.utcfromtimestamp(stripe_subscription['trial_end'])
-        subscription.nextPaymentDueDate = datetime.utcfromtimestamp(stripe_subscription['current_period_end'])
+        # subscription.status = stripe_subscription["status"]  # trialing
+        # subscription.stripe_subscription_id = stripe_subscription["id"]
+        # subscription.freeTrialEndDate = datetime.utcfromtimestamp(stripe_subscription['trial_end'])
+        # subscription.nextPaymentDueDate = datetime.utcfromtimestamp(stripe_subscription['current_period_end'])
 
+        subscription.status = 'trialing'
+        subscription.freeTrialEndDate =  datetime.now() + timedelta(days = 7)
+        user.subscription.slug = user.username +"-"+ subscription.status
         subscription.save()
         user.stripe_customer_id = stripe_customer["id"]
+        
         user.save()
 
 def post_user_signed_up_checkinvitation(request, user,*args, **kwargs):
