@@ -24,7 +24,7 @@
             <span class="btn-txt">{% trans "Create Team" %} &raquo;</span>
         </button>
         <a id="create-team" class="btn-link ml-5" href="{% url 'teams:list' %}">{% trans "Cancel" %}</a>
-    </form>  
+    </form>
 {% else %}
     <h3>To manage Teams, please upgrade your subscription.</h3>
     <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}"> {% trans "Upgrade now" %}</a>

@@ -1,9 +1,14 @@
+
+from django.http import response
+from payment.models import Pricing,PaymentMethod,Subscription
+from typing import Any
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.forms.forms import BaseForm
-from django.http.response import HttpResponse
-from django.shortcuts import render
+from django.http.request import HttpRequest
+from django.http.response import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, RedirectView, UpdateView
@@ -91,19 +96,16 @@ class UserSubscriptionView(LoginRequiredMixin, DetailView):
     slug_field = "username"
     slug_url_kwarg = "username"
     template_name = "users/user_subscription.html"
+
     def get_context_data(self,**kwargs):
         context = super().get_context_data(**kwargs)
-        print (context)
-        print (context['user'])
         user = context['user']
-        print (user.subscription.stripe_subscription_id)
         if user.is_admin:
         # Sync with Stripe
             try:
                 customer_subscription = stripe.Subscription.retrieve(user.subscription.stripe_subscription_id)
             except:
-                logger.critical('Customer Subscription not found.')
-                print(user.subscription.stripe_subscription_id)
+                logger.warning('Customer Subscription not found.')
             else:
                 context['billing_thresholds'] = customer_subscription['billing_thresholds']
                 context['cancel_at'] = customer_subscription['cancel_at']
@@ -121,19 +123,26 @@ class UserSubscriptionView(LoginRequiredMixin, DetailView):
                 context['trial_start'] = user.date_joined
                 context['trial_end'] = user.subscription.freeTrialEndDate
                 context['status'] = customer_subscription['status']
+                stripe_price_id = customer_subscription["plan"]["id"]
+                pricing = Pricing.objects.get(stripe_price_id=stripe_price_id)
+                context['pricing_name'] = pricing.name
                 # if (customer_subscription['status'] != "canceled"):
-                items  = customer_subscription['items']
-                data_list = items['data']
-                data = data_list[0]
-                price = data['price']
-                print(context['current_period_end'])
-                print(context['current_period_start'])
-                context['pricing_type'] = price['type']
-                context['unit_amount'] = '%.2f' % (price['unit_amount']/100)
-                context['currency'] = price['currency']
-                
+                # items  = customer_subscription['items']
+                # data_list = items['data']
+                # data = data_list[0]
+                # price = data['price']
+                # context['pricing_type'] = price['type']
+                # context['unit_amount'] = '%.2f' % (price['unit_amount']/100)
+                # context['currency'] = price['currency']
+
+                pmt_method_qs = PaymentMethod.objects.filter(user=user)
+                context['pmt_method_qs'] = pmt_method_qs
+
         return context
 
+    def get(self,request, *args, **kwargs):
+        previous_url = self.request.META.get('HTTP_REFERER')
+        return super().get(request, *args, **kwargs)
 
 user_subscription_view = UserSubscriptionView.as_view()
 
@@ -142,52 +151,100 @@ class CancelSubscriptionView(LoginRequiredMixin,View):
 
     def get_success_url(self):
         return reverse("users:subscription", kwargs={"username": self.request.user.username})
-    
+
     def get(self, request, *args, **kwargs):
-        context={"subscription": self.request.user.subscription.pricing.name}
+        context={
+            "subscription": self.request.user.subscription.pricing.name,
+            "object":self.request.user,
+            "subscriptionId": self.request.user.subscription.stripe_subscription_id,
+            "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY,
+        }
         return render(request,'users/user_confirm_subscription_cancel.html',context)
 
-    def post(self, request, *args, **kwargs):
-        try:
-            print("*** in delete subscritption***")    
-            print(self.request.user.subscription.stripe_subscription_id)
-            # Cancel the subscription by deleting it
-            deletedSubscription = stripe.Subscription.delete(self.request.user.subscription.stripe_subscription_id)
-            # return jsonify(subscription=deletedSubscription)
-            print(deletedSubscription)
-            messages.success(self.request, "You have successfully cancelled your subscription")
-            return reverse("users:subscription", kwargs={"username": self.request.user.username})
-        except Exception as e:
-            logger.critical('Customer Subscription Deletion Error')
-            messages.error(self.request, "There was an error cancelling your subscription. Please try again later.")
-            return jsonify(error=str(e)), 403
+    # def post(self, request, *args, **kwargs):
+    #     try:
+    #         print("*** in delete subscritption***")
+    #         print(self.request.user.subscription.stripe_subscription_id)
+    #         # Cancel the subscription by deleting it
+    #         deletedSubscription = stripe.Subscription.delete(self.request.user.subscription.stripe_subscription_id)
+    #         # return jsonify(subscription=deletedSubscription)
+    #         print(deletedSubscription)
+    #         messages.success(self.request, "You have successfully cancelled your subscription")
+    #         return reverse("users:subscription", kwargs={"username": self.request.user.username})
+    #     except Exception as e:
+    #         logger.critical('Customer Subscription Deletion Error')
+    #         messages.error(self.request, "There was an error cancelling your subscription. Please try again later.")
+    #         return jsonify(error=str(e)), 403
 
 
 user_subscription_cancel_view = CancelSubscriptionView.as_view()
 
-class UpdateSubscriptionView(LoginRequiredMixin,View):
-    # form_class = CancelSubscriptionForm
-
-    def get_success_url(self):
-        return reverse("users:detail", kwargs={"username": self.request.user.username})
-    
-    # def get(self, request, *args, **kwargs):
-    #     context={"subscription": self.request.user.subscription.pricing.name}
-    #     return render(request,'users/user_confirm_subscription_cancel.html',context)
-
-    def post(self, request, *args, **kwargs):
+class PaymentMethodUpdateView(LoginRequiredMixin,SuccessMessageMixin,View):
+    def post(self, request, pk, *args, **kwargs):
+        #if waffle.flag_is_active(self.request, 'update_payment_method'):
+        payment_method_qs = PaymentMethod.objects.filter(user=request.user)
+        for pm in payment_method_qs:
+            pm.is_default = False
+            pm.save()
         try:
-            print("*** in delete subscritption***")    
-            print(self.request.user.subscription.stripe_subscription_id)
-            subscription = stripe.Subscription.retrieve(self.request.user.subscription.stripe_subscription_id)
-            stripe.Subscription.modify(self.request.user.subscription.stripe_subscription_id,
-                items=[{'price': 'price_1ISWBkFJjGPNRnAA2NzmnFUl'}],
+            payment_method = PaymentMethod.objects.get(pk=pk)
+            payment_method.is_default = True
+            payment_method.save()
+        except:
+            logger.critical('Payment Method Update error')
+            raise Http404 ("There was an error updating your payment method. If the error persists, please try again after sometime.")
+        else:
+            customer_id = request.user.stripe_customer_id
+            try:
+                stripe.Customer.modify(
+                customer_id,
+                invoice_settings={
+                    'default_payment_method': payment_method.stripe_payment_method_id,
+                },
             )
-            messages.success(self.request, "You have successfully updated your subscription")
-            return reverse("users:subscription", kwargs={"username": self.request.user.username})
-        except Exception as e :
-            logger.critical('Customer Subscription Update Error')
-            messages.error(self.request, "There was an error updating your subscription. Please try again later.")
-            return jsonify(error=str(e)), 403
+            except Exception as e:
+                print(str(e))
+                logger.critical('Stripe default payment method update error',exc_info=1)
+                return e
+            else:
+                messages.success(self.request, "Payment method has been set as default.")
+                # return reverse("users:subscription", kwargs={"username": self.request.user.username})
+                return HttpResponseRedirect('/users/~subscription/redirect/')
+        #else:
+        #    messages.error(self.request, "Please update your subscription to continue using this feature.")
+        #    return super(PaymentMethodUpdateView, self).form_valid(form)
 
-user_subscription_update_view = UpdateSubscriptionView.as_view()
+PaymentMethod_update_view = PaymentMethodUpdateView.as_view()
+
+class UserSubscriptionRedirectView(LoginRequiredMixin, RedirectView):
+
+    permanent = False
+
+    def get_redirect_url(self):
+        return reverse("users:subscription", kwargs={"username": self.request.user.username})
+
+user_subscription_redirect_view = UserSubscriptionRedirectView.as_view()
+
+class PaymentMethodAddView(LoginRequiredMixin,SuccessMessageMixin,View):
+    def post(self, request, pk, *args, **kwargs):
+        #if waffle.flag_is_active(self.request, 'update_payment_method'):
+        payment_method_qs = PaymentMethod.objects.filter(user=request.user)
+        for pm in payment_method_qs:
+            pm.is_default = False
+            pm.save()
+        try:
+            payment_method = PaymentMethod.objects.get(pk=pk)
+            payment_method.is_default = True
+            payment_method.save()
+        except:
+            logger.critical('Payment Method Update error')
+            raise Http404 ("There was an error updating your payment method. If the error persists, please try again after sometime.")
+        else:
+            messages.success(self.request, "Payment method has been set as default.")
+            # return reverse("users:subscription", kwargs={"username": self.request.user.username})
+            return HttpResponseRedirect('/users/~subscription/redirect/')
+        #else:
+        #    messages.error(self.request, "Please update your subscription to continue using this feature.")
+        #    return super(PaymentMethodUpdateView, self).form_valid(form)
+
+PaymentMethod_add_view = PaymentMethodAddView.as_view()

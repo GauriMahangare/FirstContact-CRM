@@ -14,21 +14,22 @@
         {% if request.user.is_admin %}
     
             <h1>Pricing Plan</h1>
-
-            <div class="card shadow mb-4">
-                <!-- Card Header - Accordion -->
-                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
-                    role="button" aria-expanded="true" aria-controls="collapseCardExample">
-                    <h6 class="m-0 font-weight-bold text-primary">Your current plan : {{ request.user.subscription.pricing.name}} </h6>
-                </a>
-                <!-- Card Content - Collapse -->
-
-                <div class="collapse show" id="collapseCardExample">
+            <hr>
+            <div class="accordion" id="accordionExample">
+                <div class="card">
+                    <div class="card-header" id="headingOne">
+                    <h2 class="mb-0">
+                        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Your current plan : {{ request.user.subscription.pricing.name}}
+                        </button>
+                    </h2>
+                    </div>
+                
+                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
                     <div class="card-body">
                         <p id="datetocount" class="hide" >{{ request.user.subscription.freeTrialEndDate|date:"d F Y" }}</p>
-                        {{request.user.subscription.isTrialActive}}
-                        {{request.user.subscription.status}}
-
+                        
+                        
                         {% if request.user.subscription.isTrialActive %}
                             <div class="rounded bg-gradient-info text-white shadow p-5 text-center mb-5 bg-info">
                                 <p class="mb-0 font-weight-bold text-uppercase">Your trial will end in...</p>
@@ -45,11 +46,38 @@
                             </div>
                         {% else %}
                             {% if request.user.subscription.status == "active" %}
-                                testestsfd
+                                <p class="card-text">Your Trail status - 
+                                    {% if request.user.subscription.isTrialActive %}
+                                        Active
+                                    {% else %}
+                                        Expired
+                                    {% endif %}    
+                                </p>
+                                <p class="card-text">Your subscription status - 
+                                    {% if request.user.subscription.status == "active" %}
+                                        Active
+                                    {% else %}
+                                        {% if request.user.subscription.status == "Canceled" %}
+                                            Canceled
+                                        {% else %}
+                                            {% if request.user.subscription.status == "incomplete" %}    
+                                                Incomplete
+                                            {% else %}
+                                                {% if request.user.subscription.status == "incomplete_expired" %} 
+                                                    Expired
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                </p>
+                                <p class="card-text"> Your Invoice Paid status - 
+                                </p>
+                                <a href="{% url 'users:subscription' user.username %}" class="card-link">Take me back, dont want to upgrade.</a>
+
                             {% else %}
                                 <div class="rounded bg-gradient-danger text-white shadow p-5 text-center mb-5 bg-info">
                                     <p class="mb-0 font-weight-bold text-uppercase">Your trial has ended.</p>
-                                    <span class="h1 font-weight-bold"><p> Your trial has ended. Please set up payment method to continue to use CRM.</p></span>
+                                    <span class="h1 font-weight-bold"><p> Your subscription has been reverted to Free for life plan. Please upgrade.</p></span>
                                     <!-- Call to actions -->
                                     <ul class="list-inline">
                                         <li class="list-inline-item pt-2">
@@ -61,11 +89,12 @@
                                 </div>
                             {% endif%}
                         {% endif %}
-                        <hr>
+                    </div>
                     </div>
                 </div>
             </div>
-
+        <br>
+        <br>
             <h3 id="subscription_plans">Here's what's included in each plan. Select the pricing plan that best suits you.</h3>
 
             <div class="row">
@@ -77,7 +106,7 @@
                             <div class="row no-gutters align-items-center">
                                 <div class="col mr-2">
                                     <div class="text-m font-weight-bold text-primary text-uppercase mb-1">
-                                        Free Plan
+                                        Free For Life
                                     </div>
                                         <div class="h5 mb-0 font-weight-bold text-gray-800">
                                             £0 for life
@@ -176,12 +205,14 @@
                                 </ul>
                             </div>
                             <div class="my-2"></div>
-                            <a href="{% url 'payment:checkout' 'Essential' %}" class="btn btn-info btn-icon-split">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-check"></i>
-                                </span>
-                                <span class="text">Select</span>
-                            </a>
+                            {% if request.user.subscription.pricing.name != "Essential"  %}
+                                <a href="{% url 'payment:checkout' 'Essential' %}" class="btn btn-info btn-icon-split">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span class="text">Select</span>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -212,16 +243,17 @@
                                 </ul>
                             </div>
                             <div class="my-2"></div>
-                            <a href="{% url 'payment:checkout' 'Enterprise' %}" class="btn btn-warning btn-icon-split">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-check"></i>
-                                </span>
-                                <span class="text">Select</span>
-                            </a>
+                            {% if request.user.subscription.pricing.name != "Enterprise"  %}
+                                <a href="{% url 'payment:checkout' 'Enterprise' %}" class="btn btn-warning btn-icon-split">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span class="text">Select</span>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-            </div>
         {% else %}
             <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> Permission denied. Please contact your organisation administrator.</h3>  
         {% endif %}

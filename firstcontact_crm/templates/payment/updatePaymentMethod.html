@@ -1,0 +1,53 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load waffle_tags %}
+
+{% block head_title %} {{ request.user.username }} - Card Details - Update {% endblock head_title %}
+{% block page-css %}
+{% endblock page-css %}
+
+{% block content %}
+{% flag "subscription_pmt_method_edit" %}
+  <h1>{% trans "Update Card Details " %}</h1>
+  <hr>
+  <div class="row divider-custom card-deck">
+    <div class="card mb-3" style="max-width: 100%;">
+      <div class="card-header "> {% trans "Update Card details" %} </div>
+      <div class="card-body">
+        <h5 class="card-title text-xl" id="name" > {{ request.user.email }}</h5>
+
+        <h3>{{obj.brand |title }} {% trans "ending with" %} {{obj.last4}}</h3>
+        <div class = "form-group">
+          <form method='POST' id="myForm" enctype="multipart/form-data">{% csrf_token %}
+
+            {{ form|crispy }}
+
+            <div class="form-group d-flex align-items-center justify-content-between mt-4 mb-0">
+                <button type='submit' class= "btn btn-primary">
+                  <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                  {% if submit_btn %}
+                    {{ submit_btn }}
+                  {% else %}
+                    <span class="btn-txt">{% trans "Update card details" %} &raquo;</span>
+                  {% endif %}
+                </button>
+                <a id="create-team" class="btn-link ml-5" href="{% url 'users:subscription' request.user %}">{% trans "Cancel" %}</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+    <h3>{% trans "To update the card details, please upgrade your subscription." %} </h3>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}"> {% trans "Upgrade now" %}</a>
+{% endflag %}
+{% endblock content %}
+
+{% block pageend-js %}
+
+{% endblock pageend-js %}
+

@@ -6,6 +6,8 @@ from firstcontact_crm.users.views import (
     user_update_view,
     user_subscription_view,
     user_subscription_cancel_view,
+    PaymentMethod_update_view,
+    user_subscription_redirect_view,
 )
 
 app_name = "users"
@@ -15,4 +17,6 @@ urlpatterns = [
     path("<str:username>/", view=user_detail_view, name="detail"),
     path("<str:username>/subscription/", view=user_subscription_view, name="subscription"),
     path("<str:username>/subscription/cancel/", user_subscription_cancel_view, name="cancel-subscription"),
+    path("~payment-method/update/<int:pk>", PaymentMethod_update_view, name="paymentMethod-update"),
+    path("~subscription/redirect/",view=user_subscription_redirect_view, name="subscription_redirect")
 ]

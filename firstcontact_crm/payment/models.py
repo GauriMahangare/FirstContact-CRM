@@ -1,17 +1,14 @@
-
+from datetime import datetime
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from django.db.models.signals import pre_save, post_save
-from django.contrib.auth.signals import user_logged_in
+from django.db.models.signals import pre_save
 from django.utils.text import slugify
 from django.shortcuts import reverse
 from django.contrib.auth import get_user_model
 from allauth.account.signals import email_confirmed
 import stripe
-from organisation.models import Organisation
 #from feature.models import Flag
-from datetime import datetime
 import pytz
 # Create your models here.
 
@@ -19,12 +16,23 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 User = settings.AUTH_USER_MODEL
 utc=pytz.UTC
+year_dropdown = []
+for y in range(datetime.now().year, (datetime.now().year + 11)):
+    year_dropdown.append((str(y), str(y)))
+
+month_dropdown = []
+current_month = datetime.now().month + 1
+
+for m in range(current_month, 13):
+    month_dropdown.append((str(m), str(m)))
+
 class Pricing(models.Model):
 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     slug = models.SlugField(null=True,unique=True)
     class PricingTierChoices(models.TextChoices):
         Free = 'FreeTrial', _('Free Trial')
+        FreeForLife = 'FreeForLife', _('Free For Life')
         Basic = 'Basic', _('Basic')
         Essential = 'Essential', _('Essential')
         Enterprise = 'Enterprise', _('Enterprise')
@@ -38,15 +46,15 @@ class Pricing(models.Model):
         choices=PricingTierChoices.choices,
         default=PricingTierChoices.Free,
     )  # Basic / Pro / Premium
-    
-    stripe_price_id = models.CharField(        
+
+    stripe_price_id = models.CharField(
         'Pricing Tier Stripe Id',
         max_length=100,
         blank=True,
     )
     price = models.DecimalField(
         'Price',
-        decimal_places=2, 
+        decimal_places=2,
         max_digits=5,
     )
     currency = models.CharField(
@@ -81,7 +89,7 @@ class Pricing(models.Model):
     )
     def __str__(self):
         return self.name
-    
+
     # def get_absolute_url(self):
     #     return reverse('pricing-details', kwargs={'pk': self.pk})
 
@@ -94,7 +102,7 @@ class Subscription(models.Model):
     slug = models.SlugField(null=True,unique=True)
 
     pricing = models.ForeignKey(Pricing, on_delete=models.CASCADE, related_name='subscriptions')
-    
+
     stripe_subscription_id = models.CharField(
         'Stripe subscription Id',
         max_length=50,
@@ -102,13 +110,24 @@ class Subscription(models.Model):
     )
 
     status = models.CharField(
-        'Status',
+        'Subscription Status',
         max_length=100,
         blank=True,)
-    
-    nextPaymentDueDate = models.DateTimeField(
-        'Next Payment Due',
+
+    period_start = models.DateTimeField(
+        'Period Start Date',
         null=True,
+    )
+
+    period_end = models.DateTimeField(
+        'Period End Date',
+        null=True,
+    )
+
+    payment_status = models.CharField(
+        'Payment Status',
+        max_length=50,
+        blank=True,
     )
 
     freeTrialEndDate = models.DateTimeField(
@@ -127,20 +146,21 @@ class Subscription(models.Model):
     )
 
     def __str__(self):
-        return self.user.email
-    
+        return self.pricing.name
+
     def get_absolute_url(self):
         return reverse('subscription-details', kwargs={'pk': self.organisation})
+
     @property
     def is_active(self):
-        return self.status == "active" or self.status == "trialing"
+        return self.status == "active"
 
     @property
     def isTrialActive(self):
         now = datetime.now()
         nowDate = now.replace(tzinfo=utc)
-        trialEndDate = self.freeTrialEndDate.replace(tzinfo=utc)
-        if  trialEndDate > nowDate : 
+        trialEndDate = self.freeTrialEndDate
+        if  trialEndDate > nowDate :
             return True
         else:
             return False
@@ -149,13 +169,102 @@ class Subscription(models.Model):
         verbose_name_plural = 'Subscriptions'
 
 
+class PaymentMethod(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
+
+    stripe_payment_method_id = models.CharField(
+        'Stripe payment Method Id',
+        max_length=50,
+        blank=True,
+    )
+
+    type = models.CharField(
+        'Type of card',
+        max_length=60,
+        blank=True,)
+
+    brand = models.CharField(
+        'Card Brand',
+        max_length=60,
+        blank=True,)
+
+    country = models.CharField(
+        'Card country',
+        max_length=60,
+        blank=True,)
+
+    class MonthChoice(models.TextChoices):
+        one = '01', _('1')
+        two = '02', _('2')
+        three = '03', _('3')
+        four = '04', _('4')
+        five = '05', _('5')
+        six = '06', _('6')
+        seven = '07', _('7')
+        eight = '08', _('8')
+        nine = '09', _('9')
+        ten = '10', _('10')
+        eleven = '11', _('11')
+        twelve = '12', _('12')
+
+    expiry_month = models.CharField(
+        'Card Expiry Month',
+        choices=month_dropdown,
+        max_length=2,
+        blank=True,)
+
+    expiry_year = models.CharField(
+        'Card Expiry Year',
+        choices=year_dropdown,
+        max_length=4,
+        blank=True,
+    )
+
+    last4 = models.CharField(
+        'Last 4 Digits',
+        max_length=4,
+        blank=True,)
+
+    fingerprint= models.CharField(
+        'Unique card finger print',
+        max_length=60,
+        blank=True,)
+
+    cardId= models.CharField(
+        'card Id',
+        max_length=60,
+        blank=True,)
+
+    is_default = models.BooleanField(default=True)
+
+    dateTimeModified = models.DateTimeField(
+        'Last Modified',
+        auto_now =True,
+    )
+
+    dateTimeCreated = models.DateTimeField(
+        'Created',
+        auto_now_add =True,
+    )
+    class Meta:
+        verbose_name = 'Payment Method'
+        verbose_name_plural = 'Payment Methods'
+
+    def __str__(self):
+        return self.brand
+
+    def get_absolute_url(self):
+        return reverse('subscription-details', kwargs={'pk': self.organisation})
+
+
 def create_slug(instance,new_slug=None):
     # Remove spaces and replace it by -
     slug = slugify(instance.name)
 
     if new_slug is not None:
         slug = new_slug
-        
+
     qs = Pricing.objects.filter(slug=slug).order_by("-id")
     exists = qs.exists()
     if exists:

@@ -126,21 +126,23 @@
                   aria-expanded="true" aria-controls="collapseTwo">
                   <i class="fas fa-fw fa-cog"></i>
                   <span>Account Setup</span>
-                  {% if request.user.is_profile_complete%}
-                    <!-- <a href="#" class="btn btn-warning btn-circle btn-sm"> -->
+                    {% if request.user.is_profile_complete%}
                         <i class=" fa fa-check-circle" style="font-size:11px;color:#10db3f"></i>
-                        
-                    <!-- </a> -->
-                  {% else %}  
-                    <!-- <a href="#" class="btn btn-success btn-circle btn-sm"> -->
+                    {% else %}  
                         <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
-                    <!-- </a> -->
-                  {% endif %}  
+                    {% endif %}  
               </a>
               <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                   <div class="bg-white py-2 collapse-inner rounded">
                       <h6 class="collapse-header">My Info</h6>
-                      <a class="collapse-item" href="{% url 'users:update' %}">Update Profile</a>
+                      <a class="collapse-item" href="{% url 'users:update' %}">
+                        <span>Update Profile</span>
+                        {% if request.user.is_profile_complete%}
+                            <i class=" fa fa-check-circle" style="font-size:11px;color:#10db3f"></i>
+                        {% else %}  
+                            <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
+                        {% endif %} 
+                      </a>
                       <h6 class="collapse-header">Manage Credentials</h6>
                       <a class="collapse-item" href="{% url 'account_email' %}">Update Email</a>
                       <a class="collapse-item" href="{% url 'account_change_password' %}">Update Password</a>
@@ -162,13 +164,27 @@
                     aria-expanded="true" aria-controls="collapseThree">
                     <i class="fa fa-credit-card"></i>
                     <span>Subscription</span>
+                    {% if request.user.subscription.isTrialActive %}
+                        <i class=" fa fa-exclamation-triangle" style="font-size:11px;color:#cec041"></i>
+                    {% else %}  
+                        {% if request.user.subscription.pricing.name == "FreeForLife" %}
+                            <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
+                        {% else %} 
+                            {% if request.user.subscription.is_active %}
+                                <i class=" fa fa-check-circle" style="font-size:11px;color:#10db3f"></i>
+                            {% else %}
+                            <!-- Trail has expired and there is no subscription -->
+                                <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
+                            {% endif %}   
+                        {% endif %}
+                    {% endif %}  
                 </a>
                 <div id="collapseThree" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Billing details:</h6>
                         <!-- <a class="collapse-item" href="{% url 'payment:enroll' %}"> Subscription</a> -->
-                        {% if request.user.subscription.status == 'trialing' %}
+                        {% if request.user.subscription.isTrialActive %}
                             <a class="collapse-item" href="{% url 'payment:enroll' %}"> Subscription</a>
                         {% else %}
                             <a class="collapse-item" href="{% url 'users:subscription' user.username %}"> Subscription</a>

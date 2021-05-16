@@ -11,29 +11,15 @@
 
 {% block content %}
 
-<h1>Subscribe</h1>
+<h1>Add new payment method</h1>
 <hr>
 <div class="row divider-custom card-deck">
-  <div class="card text-white bg-success mb-3" style="max-width: 50%;">
-    <div class="card-header "> Here's what is included : </div>
-    <div class="card-body">
-      <h5 class="card-title text-xl text-center"> {{ pricing_tier.name }} membership</h5>
-      <p class="text-3xl text-center text-white">
-        {% if pricing_tier.currency == "usd" %}
-        ${{ pricing_tier.price }}/mo
-        {% else %}
-        €{{ pricing_tier.price }}/mo
-        {% endif %}
-      </p>
-      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-    </div>
-  </div>
-  <div class="card mb-3" style="max-width: 50%;">
+  <div class="card mb-3" style="max-width: 100%;">
     <div class="card-header "> Enter Payment Details </div>
     <div class="card-body">
-      <h5 class="card-title text-xl text-center" id="name" > {{ request.user.email }}</h5>
+      <h5 class="card-title text-xl" id="name" > {{ request.user.email }}</h5>
 
-      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+      <p class="card-text">Provide details of new card.</p>
       <form id="payment-form">
         {% csrf_token %}
         {{ form|crispy }}
@@ -102,7 +88,7 @@
       e.preventDefault();
 
       changeLoadingState(true);
-      setMessage("Subscribing... please wait.");
+      setMessage("Adding payment method... please wait.");
 
       // Tokenize the payment method.
       //
@@ -128,7 +114,7 @@
         // create new payment method & create subscription
         createPaymentMethod({ card });
       }
-    });
+  });
 
     function createPaymentMethod({ card, isPaymentRetry, invoiceId }) {
     const customerId = "{{ request.user.stripe_customer_id }}";
@@ -277,10 +263,6 @@
         })
     );
     }
-
-
-
-
 
     function retrieveUpcomingInvoice(
     customerId,

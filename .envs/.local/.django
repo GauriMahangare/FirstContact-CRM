@@ -8,6 +8,7 @@ REDIS_URL=redis://redis:6379/0
 
 # Celery
 # ------------------------------------------------------------------------------
+CELERY_BROKER_URL=amqp://firstcontact_crm:password1@localhost:5672/test_crm
 
 # Flower
 CELERY_FLOWER_USER=FSQofEYcCpwZgmTaSEoEhNzYMlMGltbz

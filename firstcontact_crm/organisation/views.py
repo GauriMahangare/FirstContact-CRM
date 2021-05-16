@@ -44,25 +44,25 @@ class OrganisationUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView
 Organisation_update_view = OrganisationUpdateView.as_view()
 
 # class OrganisationCreateView(LoginRequiredMixin, WaffleFlagMixin,SuccessMessageMixin, generic.CreateView):
-    
+
 class OrganisationCreateView(LoginRequiredMixin,SuccessMessageMixin, generic.CreateView):
     template_name = "organisation/organisation_create_update.html"
     model = Organisation
     fields = ["work_org_name","work_address_line1","work_address_line2","work_address_line3","work_address_line4","work_address_postcode",]
     # success_message = _("Congratulations!!Organisation has been set; Now create your team and you are all set")
     #waffle_flag = "Create Organsation"
-   
+
 
     def get_success_url(self):
         return reverse("users:detail", kwargs={"username": self.request.user.username})
 
     def get_object(self):
         return self.request.user.userorganization
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
-    
+
 
     def form_valid(self, form):
         if waffle.flag_is_active(self.request, 'create_organisation'):
@@ -114,7 +114,7 @@ class OrganisationUserListView(LoginRequiredMixin,SuccessMessageMixin,ListView):
     model = Invitation
     template_name = 'organisation/user_list.html'
     paginate_by = 5
-    
+
 
     def get_context_data(self, **kwargs: Any):
         user_qs = Invitation.objects.filter(inviter_id=self.request.user.pk).order_by('-sent')
@@ -124,7 +124,7 @@ class OrganisationUserListView(LoginRequiredMixin,SuccessMessageMixin,ListView):
         paginator = Paginator(user_qs, self.paginate_by)
         page = self.request.GET.get('page')
 
-        
+
         try:
             user_list = paginator.page(page)
         except PageNotAnInteger:
@@ -138,11 +138,11 @@ class OrganisationUserListView(LoginRequiredMixin,SuccessMessageMixin,ListView):
         return context
 
 
-    
+
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return super().get(request, *args, **kwargs)
-        
-    
+
+
 Organisation_userList_view = OrganisationUserListView.as_view()
 
 class OrganisationUserReinviteView(LoginRequiredMixin,SuccessMessageMixin,View):
@@ -153,7 +153,7 @@ class OrganisationUserReinviteView(LoginRequiredMixin,SuccessMessageMixin,View):
             logger.info('Error deleting user invitation:User invitation does not exist.')
             messages.error(request, 'The user you are trying to invite has been already removed.')
             return redirect('/organisation/~userlist/')
-        if not user.accepted: 
+        if not user.accepted:
             email = user.email
             try:
                 user.delete()
@@ -197,26 +197,26 @@ class OrganisationUserdeleteView(LoginRequiredMixin,SuccessMessageMixin,View):
             logger.critical('Error deleting user.System error')
             return redirect('/organisation/~userlist/')
         logger.info('Invited user deleted')
-        if  accepted: 
+        if  accepted:
             try:
                 user=User.objects.get(email__exact=email)
             except:
                 logger.critical('Error deleting registered user.User does not exist.')
                 messages.error(request, 'The user you are trying to delete has been removed already.')
-                return redirect('/organisation/~userlist/')  
+                return redirect('/organisation/~userlist/')
             try:
                 user.delete()
             except:
                 messages.error(request, 'There was an error deleting the user. Please try after sometime')
                 logger.critical('Error deleting registered user.System error')
                 return redirect('/organisation/~userlist/')
-            logger.info('Registered user deleted')              
+            logger.info('Registered user deleted')
             messages.success(request, 'User has been deleted.')
             return redirect('/organisation/~userlist/')
         else:
             messages.success(request, 'User has been deleted.')
             return redirect('/organisation/~userlist/')
-        
+
 Organisation_userdelete_view = OrganisationUserdeleteView.as_view()
 
 

@@ -56,7 +56,7 @@ class User(AbstractUser):
         null=True,
         on_delete=models.SET_NULL,
     )
-   
+
 
     phone_number = models.CharField(
         'Phone number',
@@ -93,42 +93,65 @@ class User(AbstractUser):
 
 def post_email_confirmed(request, email_address, *args, **kwargs):
 
-    user = User.objects.get(email=email_address.email)
+    emailAddress=EmailAddress.objects.get(email=email_address.email)
+    user = User.objects.get(pk=emailAddress.user.pk)
+
     if  user.is_admin:
-        free_trial_pricing = get_object_or_404(Pricing, name='FreeTrial')
-
-        subscription = Subscription.objects.create(
-            user=user, 
-            pricing=free_trial_pricing
-        )
         try:
-            stripe_customer = stripe.Customer.create(
-            email=user.email
-            )
+            user_subs = Subscription.objects.get(user=user)
         except:
-            logger.critical('Stripe Customer create error')
+            logger.info('New admin user confirmed email.')
+            free_trial_pricing = get_object_or_404(Pricing, name='FreeTrial')
+            try:
+                subscription = Subscription.objects.create(
+                user=user,
+                pricing=free_trial_pricing
+                )
+            except:
+                logger.critical('user subscription creation error')
+            else:
+                logger.info('user subscription created successfully')
+                try:
+                    stripe_customer = stripe.Customer.create(
+                    email=user.email
+                    )
+                except:
+                    logger.critical('Stripe Customer create error')
+                else:
 
-        # try: 
-        #     stripe_subscription = stripe.Subscription.create(
-        #     customer=stripe_customer["id"],
-        #     items=[{'price': free_trial_pricing.stripe_price_id}],
-        #     trial_period_days=7
-        #     )
-        # except:
-        #     logger.critical('Stripe Customer subscription create error')       
+                # try:
+                #     stripe_subscription = stripe.Subscription.create(
+                #     customer=stripe_customer["id"],
+                #     items=[{'price': free_trial_pricing.stripe_price_id}],
+                #     trial_period_days=7
+                #     )
+                # except:
+                #     logger.critical('Stripe Customer subscription create error')
 
-        # subscription.status = stripe_subscription["status"]  # trialing
-        # subscription.stripe_subscription_id = stripe_subscription["id"]
-        # subscription.freeTrialEndDate = datetime.utcfromtimestamp(stripe_subscription['trial_end'])
-        # subscription.nextPaymentDueDate = datetime.utcfromtimestamp(stripe_subscription['current_period_end'])
+                # subscription.status = stripe_subscription["status"]  # trialing
+                # subscription.stripe_subscription_id = stripe_subscription["id"]
+                # subscription.freeTrialEndDate = datetime.utcfromtimestamp(stripe_subscription['trial_end'])
+                # subscription.nextPaymentDueDate = datetime.utcfromtimestamp(stripe_subscription['current_period_end'])
 
-        subscription.status = 'trialing'
-        subscription.freeTrialEndDate =  datetime.now() + timedelta(days = 7)
-        user.subscription.slug = user.username +"-"+ subscription.status
-        subscription.save()
-        user.stripe_customer_id = stripe_customer["id"]
-        
-        user.save()
+                #subscription.status = 'trialing'
+                    logger.info('Stripe Customer created successfully')
+                    subscription.freeTrialEndDate =  datetime.now() + timedelta(days = 7)
+                    user.subscription.slug = user.username +"-"+ subscription.pricing.name
+                    subscription.save()
+
+                    user.stripe_customer_id = stripe_customer["id"]
+                    user.save()
+        else:
+            logger.info('Existing admin user confirmed new email.')
+            try:
+                stripe.Customer.modify(
+                    user.stripe_customer_id,
+                    name=emailAddress.email,
+                )
+            except:
+                logger.critical('Stripe Customer email update error.')
+            else:
+                logger.info('Stripe Customer email updated successfully.')
 
 def post_user_signed_up_checkinvitation(request, user,*args, **kwargs):
     Invitation = get_invitation_model()
@@ -166,10 +189,10 @@ def post_user_signed_up_checkinvitation(request, user,*args, **kwargs):
                 except:
                     emailAddress = EmailAddress()
                     emailAddress.user = user.pk
-                    emailAddress.email = user.email 
+                    emailAddress.email = user.email
                     emailAddress.verified = True
                     emailAddress.primary = True
-                    try: 
+                    try:
                         emailAddress.save()
                     except:
                         logger.critical('Error setting up verified email')
