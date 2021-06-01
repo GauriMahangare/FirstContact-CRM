@@ -1,0 +1,33 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load waffle_tags %}
+
+{% block head_title %} {{ user.username }} - Lead_Create {% endblock head_title %}
+
+{% block inner %}
+{% flag "create_lead" %}
+    <h1>Create Lead</h1>
+    <hr/>
+    <h5>{% trans "Add new lead." %}</h5>
+    </br >
+    <form class="create_lead" id="myForm" enctype="multipart/form-data" method="post" action="{% url 'leads:create' %}">
+        {% csrf_token %}
+          {{ form|crispy }}
+          {% if redirect_field_value %}
+              <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+          {% endif %}
+        <button class="btn btn-primary" type="submit">
+            <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+            <span class="btn-txt">{% trans "Create Lead" %} &raquo;</span>
+        </button>
+        <a id="create-lead" class="btn-link ml-5" href="{% url 'leads:list' %}">{% trans "Cancel" %}</a>
+    </form>
+{% else %}
+    <h3>To manage Teams, please upgrade your subscription.</h3>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}"> {% trans "Upgrade now" %}</a>
+{% endflag %}
+
+{% endblock %}

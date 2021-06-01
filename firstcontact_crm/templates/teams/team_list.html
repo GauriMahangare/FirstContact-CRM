@@ -10,10 +10,10 @@
 
 {% block content %}
 {% flag "create_team" %}
-    
+
     <a id="create-team" class="btn btn-primary float-right" href="{% url 'teams:create' %}">{% trans "Add New Team" %}</a>
     <h1>Your Teams</h1>
-    <hr/>   
+    <hr/>
 
     <div class="List_team" id="List_team_form">
     {% if team_list %}
@@ -40,6 +40,7 @@
                         </thead>
                         <tbody id="myTable">
                             {% for team in team_list %}
+                            {{team}}
                             <tr>
                                 <td> <a href="{{ team.get_absolute_url }}">{{ team.name }}</a></td>
                                 <td> {{ team.description }}</td>
@@ -47,26 +48,26 @@
                                 <td> {{ team.dateTimeModified }}</td>
                                 <td> <a href="{% url 'teams:members' team.slug %}"<i class='fas fa-user-friends'></i>({{ team.count_of_members }})</a></td>
                                 <td> <a href="{% url 'teams:delete' team.slug %}" class="btn btn-danger btn-circle btn-sm"><i class="fas fa-trash"></i></a></td>
-                                
+
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
-                    {% if is_paginated %} 
+                    {% if is_paginated %}
                         <!-- <span class="page-current page-item">
                             Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
                         </span> -->
                         <nav aria-label="team-pagination">
                             <ul class="pagination justify-content-center">
                                 {% if page_obj.has_previous %}
-                                    <li class="page-item"> <a class="page-link" href="?page={{ page_obj.previous_page_number }}" >Previous</a></li> 
+                                    <li class="page-item"> <a class="page-link" href="?page={{ page_obj.previous_page_number }}" >Previous</a></li>
                                 {% else %}
-                                    <li class="page-item disabled"> <a class="page-link" href="#" >Previous</a></li> 
+                                    <li class="page-item disabled"> <a class="page-link" href="#" >Previous</a></li>
                                 {% endif %}
                                 {% if page_list %}
                                     {% for page_nbr in page_list %}
                                     <li class="page-item"><a class="page-link" href="?page={{page_nbr}}">{{page_nbr}}<span class="sr-only">(current)</span></a></li>
-                                    {% endfor %}    
+                                    {% endfor %}
                                 {%endif%}
                                 {% if page_obj.has_next %}
                                     <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" >Next</a></li>
@@ -75,16 +76,16 @@
                                 {% endif %}
                             </ul>
 
-                        </nav>               
+                        </nav>
                     {% endif %}
-                </div>    
+                </div>
             </div>
     {% else %}
         <h5>{% trans "You don't have any teams set up yet." %}</h5>
         </br >
     {%endif%}
 
-    </div>  
+    </div>
     <script>
         function sortTable() {
           var table, rows, switching, i, x, y, shouldSwitch;

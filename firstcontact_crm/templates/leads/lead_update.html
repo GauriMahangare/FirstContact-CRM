@@ -8,34 +8,27 @@
 
 {% block head_title %} {{ user.username }} - Lead Update {% endblock head_title %}
 
-{% block inner %}
-{% flag "detail_lead" %}
-    {{lead.organisation}}
-    {{user.userorganization}}
-    {% if lead.organisation == user.userorganization %}
-        <h1>{% trans "Lead details." %}</h1>
-        <hr/>
-        <h5>{% trans "Lead details." %}</h5>
-        </br >
+{% block content %}
+{% flag "update_lead" %}
 
-        {% thumbnail lead.profile_picture   "100x100" crop="center" as im %}
-            <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
-        {% empty %}
-            <p>No image</p>
-        {% endthumbnail %}
-        <hr>
-        <!-- <img src="{{ lead.profile_picture.url }}" class="img-responsive" style="width: 100%; float: left; margin-right: 10px;" /> -->
-        <hr>
+    {% if lead.organisation == user.userorganization %}
+        <div class=d-lg-inline>
+            <a id="update-lead" class="btn-link ml-5 float-right" href="{% url 'leads:list' %}">{% trans "Cancel" %}</a>
+            <h1>{% trans "Update Lead" %}</h1>
+        </div>
+
+        <hr/>
+        <h5>{% trans "Update Lead details." %}</h5>
+        </br >
         <form class="update_lead" id="myForm" method="post" action="{% url 'leads:update' lead.pk %}" enctype="multipart/form-data">
             {% csrf_token %}
-
-            {{ form|crispy }}
+            {% crispy form %}
             {% if redirect_field_value %}
                 <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
             {% endif %}
-
-            <a id="update-lead" class="btn-link ml-5" href="{% url 'leads:list' %}">{% trans "Back" %}</a>
         </form>
+        <br>
+        <br>
     {% else %}
         <h1>We're sorry</h1>
         <hr/>
@@ -50,4 +43,7 @@
     {% endif %}
 {% endflag %}
 
-{% endblock %}
+{% endblock content %}
+{% block pageend-js %}
+<script type="text/javascript" src="{% static 'vendor/bootstrap/js/bootstrap.js' %}">  </script>
+{% endblock pageend-js %}

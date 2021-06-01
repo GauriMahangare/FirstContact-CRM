@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 import json
 from django.http.response import Http404, HttpResponseRedirect
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -18,12 +18,12 @@ from pytz import utc
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from waffle.decorators import waffle_flag,flag_is_active
+from waffle.decorators import waffle_flag, flag_is_active
 from waffle.mixins import WaffleFlagMixin
 
 import stripe
 
-from payment.models import Subscription,Pricing,PaymentMethod
+from payment.models import Subscription, Pricing, PaymentMethod
 from payment.forms import PaymentMethodModelForm
 
 
@@ -33,7 +33,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 logger = logging.getLogger(__name__)
 
 
-class EnrollView(LoginRequiredMixin,SuccessMessageMixin,generic.TemplateView):
+class EnrollView(LoginRequiredMixin, SuccessMessageMixin, generic.TemplateView):
     template_name = "payment/enroll.html"
 
 
@@ -46,14 +46,15 @@ def CheckoutView(request, slug):
     subscription = request.user.subscription
     pricing = get_object_or_404(Pricing, slug=slug)
     context = {
-                "pricing_tier": pricing,
-                "current_subscription": current_pricing,
-                "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY
+        "pricing_tier": pricing,
+        "current_subscription": current_pricing,
+        "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY
     }
 
     if subscription.is_active:
         return render(request, "payment/change.html", context)
     return render(request, "payment/checkout.html", context)
+
 
 @login_required()
 def PaymentMethodAddCheckoutView(request, slug):
@@ -61,14 +62,15 @@ def PaymentMethodAddCheckoutView(request, slug):
     subscription = request.user.subscription
     pricing = get_object_or_404(Pricing, slug=slug)
     context = {
-                "pricing_tier": pricing,
-                "current_subscription": current_pricing,
-                "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY
+        "pricing_tier": pricing,
+        "current_subscription": current_pricing,
+        "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY
     }
     return render(request, "payment/addPaymentMethod.html", context)
 
+
 @login_required()
-def PaymentMethodUpdateView(request,pk):
+def PaymentMethodUpdateView(request, pk):
     context = {}
     try:
         pmt_mthd_obj = PaymentMethod.objects.get(pk=pk)
@@ -76,7 +78,7 @@ def PaymentMethodUpdateView(request,pk):
         logger.critical("Payment Method does not exists")
         raise Http404
     else:
-        form = PaymentMethodModelForm(request.POST or None , instance = pmt_mthd_obj)
+        form = PaymentMethodModelForm(request.POST or None, instance=pmt_mthd_obj)
         if form.is_valid():
             obj = form.save(commit=False)
             obj.user = request.user
@@ -88,24 +90,26 @@ def PaymentMethodUpdateView(request,pk):
                 stripe.PaymentMethod.modify(
                     pmt_mthd_obj.stripe_payment_method_id,
                     card={"exp_month": exp_mth_int,
-                          "exp_year" : exp_year_int
-                    }
+                          "exp_year": exp_year_int
+                          }
                 )
-            except:
+            except Exception as e:
+                print(str(e))
                 logger.critical("Stripe payment method update error for card")
             else:
                 logger.info("Stripe payment method update successful for card")
             # messages.success(self.request, "Payment method has been updated")
             # return reverse("users:subscription", kwargs={"username": self.request.user.username})
                 return HttpResponseRedirect('/users/~subscription/redirect/')
-        context={
-            "form":form,
-            "obj":pmt_mthd_obj
-            }
+        context = {
+            "form": form,
+            "obj": pmt_mthd_obj
+        }
         return render(request, "payment/updatePaymentMethod.html", context)
 
-### Stripe Webhook processing
-#@app.route('/stripe-webhook', methods=['POST'])
+# Stripe Webhook processing
+# @app.route('/stripe-webhook', methods=['POST'])
+
 
 @csrf_exempt
 def webhook_received(request):
@@ -145,15 +149,14 @@ def webhook_received(request):
         logger.info('Webhook Signature verified')
     except Exception as e:
         print(str(e))
-        logger.critical('Webhook signture could not be verified',exc_info=1)
+        logger.critical('Webhook signture could not be verified', exc_info=1)
         return e
 
     # Get the type of webhook event sent - used to check the status of PaymentIntents.
     event_type = event['type']
     event_id = event['id']
     data_object = data['object']
-    logger.info('Webhook Received - %s - %s',event_id,event_type)
-
+    logger.info('Webhook Received - %s - %s', event_id, event_type)
 
     if event_type == 'customer.updated':
         logger.info('Customer Updated')
@@ -178,7 +181,7 @@ def webhook_received(request):
         user.subscription.status = stripe_sub["status"]
         user.subscription.stripe_subscription_id = webhook_object["subscription"]
         user.subscription.pricing = pricing
-        user.subscription.slug = user.username +"-"+ pricing.name
+        user.subscription.slug = user.username + "-" + pricing.name
         now = datetime.now()
         #nowDate = now.replace(tzinfo=utc)
         user.subscription.freeTrialEndDate = now
@@ -188,43 +191,45 @@ def webhook_received(request):
         user.subscription.save()
 
         try:
-            pmt_methods=stripe.PaymentMethod.list(
-                        customer=user.stripe_customer_id,
-                        type="card",
+            pmt_methods = stripe.PaymentMethod.list(
+                customer=user.stripe_customer_id,
+                type="card",
             )
-        except:
-            logger.critical('Payment methods not found for %s' , user.pk )
+        except Exception as e:
+            print(str(e))
+            logger.critical('Payment methods not found for %s', user.pk)
         else:
-            logger.info('Successfully retrieved payment methods for %s' , user.pk)
-            pmt_method_data =  pmt_methods["data"]
+            logger.info('Successfully retrieved payment methods for %s', user.pk)
+            pmt_method_data = pmt_methods["data"]
 
             for method in pmt_method_data:
                 obj, created = PaymentMethod.objects.update_or_create(
-                        user = user,
-                        stripe_payment_method_id = method.id,
-                        defaults={
-                            'user' : user,
-                            'subscription' : user.subscription,
-                            'stripe_payment_method_id' : method.id,
-                            'type' : method.type,
-                            'brand' : method.card.brand,
-                            'country' : method.card.country,
-                            'expiry_month' : method.card.exp_month,
-                            'expiry_year' : method.card.exp_year,
-                            'last4': method.card.last4,
-                            'is_default' : False,
-                            'fingerprint' : method.card.fingerprint
-                        }
-                    )
+                    user=user,
+                    stripe_payment_method_id=method.id,
+                    defaults={
+                        'user': user,
+                        'subscription': user.subscription,
+                        'stripe_payment_method_id': method.id,
+                        'type': method.type,
+                        'brand': method.card.brand,
+                        'country': method.card.country,
+                        'expiry_month': method.card.exp_month,
+                        'expiry_year': method.card.exp_year,
+                        'last4': method.card.last4,
+                        'is_default': False,
+                        'fingerprint': method.card.fingerprint
+                    }
+                )
                 print(obj)
                 print(created)
                 if created:
                     try:
-                        pmt_mthd = PaymentMethod.objects.get(stripe_payment_method_id = method.id)
-                    except:
-                        logger.critical('Payment method not found for %s' , user.pk )
+                        pmt_mthd = PaymentMethod.objects.get(stripe_payment_method_id=method.id)
+                    except Exception as e:
+                        print(str(e))
+                        logger.critical('Payment method not found for %s', user.pk)
                     else:
-                        logger.info('Payment method found for %s' , user.pk )
+                        logger.info('Payment method found for %s', user.pk)
                         pmt_mthd.is_default = True
                         pmt_mthd.save()
 
@@ -235,44 +240,45 @@ def webhook_received(request):
         stripe_customer_id = webhook_object["customer"]
         user = User.objects.get(stripe_customer_id=stripe_customer_id)
         try:
-            pmt_methods=stripe.PaymentMethod.list(
-                        customer=user.stripe_customer_id,
-                        type="card",
+            pmt_methods = stripe.PaymentMethod.list(
+                customer=user.stripe_customer_id,
+                type="card",
             )
-        except:
-            logger.critical('Payment methods not found for %s' , user.pk )
+        except Exception as e:
+            print(str(e))
+            logger.critical('Payment methods not found for %s', user.pk)
         else:
-            logger.info('Successfully retrieved payment methods for %s' , user.pk)
-            pmt_method_data =  pmt_methods["data"]
+            logger.info('Successfully retrieved payment methods for %s', user.pk)
+            pmt_method_data = pmt_methods["data"]
 
             for method in pmt_method_data:
                 obj, created = PaymentMethod.objects.update_or_create(
-                        user = user,
-                        stripe_payment_method_id = method.id,
-                        defaults={
-                            'user' : user,
-                            'subscription' : user.subscription,
-                            'stripe_payment_method_id' : method.id,
-                            'type' : method.type,
-                            'brand' : method.card.brand,
-                            'country' : method.card.country,
-                            'expiry_month' : method.card.exp_month,
-                            'expiry_year' : method.card.exp_year,
-                            'last4': method.card.last4,
-                            'is_default' : False,
-                            'fingerprint' : method.card.fingerprint
-                        }
-                    )
+                    user=user,
+                    stripe_payment_method_id=method.id,
+                    defaults={
+                        'user': user,
+                        'subscription': user.subscription,
+                        'stripe_payment_method_id': method.id,
+                        'type': method.type,
+                        'brand': method.card.brand,
+                        'country': method.card.country,
+                        'expiry_month': method.card.exp_month,
+                        'expiry_year': method.card.exp_year,
+                        'last4': method.card.last4,
+                        'is_default': False,
+                        'fingerprint': method.card.fingerprint
+                    }
+                )
                 if created:
                     try:
-                        pmt_mthd = PaymentMethod.objects.get(stripe_payment_method_id = method.id)
-                    except:
-                        logger.critical('Payment method not found for %s' , user.pk )
+                        pmt_mthd = PaymentMethod.objects.get(stripe_payment_method_id=method.id)
+                    except Exception as e:
+                        print(str(e))
+                        logger.critical('Payment method not found for %s', user.pk)
                     else:
-                        logger.info('Payment method found for %s' , user.pk )
+                        logger.info('Payment method found for %s', user.pk)
                         pmt_mthd.is_default = True
                         pmt_mthd.save()
-
 
     if event_type == 'invoice.payment_failed':
         # If the payment fails or the customer does not have a valid payment method,
@@ -291,7 +297,7 @@ def webhook_received(request):
         stripe_customer_id = webhook_object["customer"]
         stripe_sub = stripe.Subscription.retrieve(webhook_object["id"])
         user = User.objects.get(stripe_customer_id=stripe_customer_id)
-        pricing = get_object_or_404(Pricing,name="FreeForLife")
+        pricing = get_object_or_404(Pricing, name="FreeForLife")
         user.subscription.pricing = pricing
         user.subscription.status = ""
         user.subscription.nextPaymentDueDate = ""
@@ -319,19 +325,19 @@ def webhook_received(request):
             pricing = Pricing.objects.get(stripe_price_id=stripe_price_id)
         except Exception as e:
             print(str(e))
-            logger.critical('Pricing Id {stripe_price_id} not found',exc_info=1)
+            logger.critical('Pricing Id {stripe_price_id} not found', exc_info=1)
         else:
             user.subscription.pricing = pricing
-            user.subscription.slug = user.username +"-"+ pricing.name
+            user.subscription.slug = user.username + "-" + pricing.name
             user.subscription.status = stripe_sub["status"]
             user.subscription.period_start = datetime.utcfromtimestamp(stripe_sub.current_period_start)
             user.subscription.period_end = datetime.utcfromtimestamp(stripe_sub.current_period_end)
             user.payment_status = webhook_object["status"]
             user.subscription.save()
 
-
-    #return jsonify({'status': 'success'})
+    # return jsonify({'status': 'success'})
     return HttpResponse()
+
 
 class CreateSubscriptionView(APIView):
     def post(self, request, *args, **kwargs):
@@ -369,6 +375,7 @@ class CreateSubscriptionView(APIView):
                 "error": {'message': str(e)}
             })
 
+
 class ChangeSubscriptionView(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -394,6 +401,7 @@ class ChangeSubscriptionView(APIView):
             return Response({
                 "error": {'message': str(e)}
             })
+
 
 class RetryInvoiceView(APIView):
     def post(self, request, *args, **kwargs):
@@ -427,6 +435,7 @@ class RetryInvoiceView(APIView):
                 "error": {'message': str(e)}
             })
 
+
 class CancelSubscription(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -438,9 +447,10 @@ class CancelSubscription(APIView):
             data.update(deletedSubscription)
             return Response(data)
         except Exception as e:
-              return Response({
+            return Response({
                 "error": {'message': str(e)}
             })
+
 
 class ReceiveUpcomingInvoice(APIView):
     def post(self, request, *args, **kwargs):
@@ -474,6 +484,8 @@ class ReceiveUpcomingInvoice(APIView):
             return Response({
                 "error": {'message': str(e)}
             })
+
+
 class RetrieveCustomerPaymentMethod(APIView):
     def post(self, request, *args, **kwargs):
         data = json.loads(request.data)
@@ -484,6 +496,25 @@ class RetrieveCustomerPaymentMethod(APIView):
             )
             data = {}
             data.update(paymentMethod)
+
+            return Response(data)
+        except Exception as e:
+
+            return Response({
+                "error": {'message': str(e)}
+            })
+
+
+@login_required()
+class RetrieveCustomerInvoices(APIView):
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.data)
+        customer_id = request.user.stripe_customer_id
+        try:
+            customerInvoiceList = stripe.Invoice.list(customer=customer_id)(
+            )
+            data = {}
+            data.update(customerInvoiceList)
 
             return Response(data)
         except Exception as e:

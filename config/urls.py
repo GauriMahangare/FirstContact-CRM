@@ -6,6 +6,12 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from rest_framework.authtoken.views import obtain_auth_token
 
+admin.site.site_header = 'FirstContact admin'
+admin.site.site_title = 'FirstContact admin'
+admin.site.site_url = 'http://firstcontact.com/'
+admin.site.index_title = 'FirstContact administration'
+admin.empty_value_display = '**Empty**'
+
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path(
@@ -19,6 +25,7 @@ urlpatterns = [
     ),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
+    #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # User management
     path("users/", include("firstcontact_crm.users.urls", namespace="users")),
@@ -29,6 +36,7 @@ urlpatterns = [
     path("payment/", include("firstcontact_crm.payment.urls", namespace="payment")),
     path("invitations/", include('invitations.urls', namespace='invitations')),
     path("teams/", include('teams.urls', namespace='teams')),
+    path("leads/", include('leads.urls', namespace='leads')),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -15,7 +15,7 @@
 
     <!-- <title></title> -->
 
-    
+
 
     <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}">
 
@@ -27,7 +27,7 @@
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
-    
+
 
     <!-- Your stuff: Third-party CSS libraries go here -->
     <!-- <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet"> -->
@@ -45,7 +45,7 @@
     {% endblock page-css %}
 
     {% endblock %}
-    
+
     <!-- Le javascript
     ================================================== -->
     {# Placed at the top of the document so pages load faster with defer #}
@@ -56,21 +56,21 @@
     <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
         <!-- Your stuff: Third-party javascript libraries go here -->
-        <script src="https://js.stripe.com/v3/"></script> 
+        <script src="https://js.stripe.com/v3/"></script>
     <!-- <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>     -->
     <!-- Core plugin JavaScript-->
-    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>         
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
         <!-- Page level plugins -->
     <!-- <script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script> -->
     <!-- Page level custom scripts -->
     <!-- <script src="{% static 'js/demo/datatables-demo.js' %}"></script>     -->
-    
+
     <!-- <script src="{% static 'js/sb-admin-2.min.js' %}"></script> -->
     <!-- Custom scripts for all pages-->
     {% compress js %}
-      
-      
+
+
       <!-- Page level plugins -->
 
       <!-- Page level custom scripts -->
@@ -88,7 +88,7 @@
 
   <!-- Page Wrapper -->
   <div id="wrapper">
-    
+
 
 
       <!-- Sidebar -->
@@ -128,9 +128,9 @@
                   <span>Account Setup</span>
                     {% if request.user.is_profile_complete%}
                         <i class=" fa fa-check-circle" style="font-size:11px;color:#10db3f"></i>
-                    {% else %}  
+                    {% else %}
                         <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
-                    {% endif %}  
+                    {% endif %}
               </a>
               <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                   <div class="bg-white py-2 collapse-inner rounded">
@@ -139,9 +139,9 @@
                         <span>Update Profile</span>
                         {% if request.user.is_profile_complete%}
                             <i class=" fa fa-check-circle" style="font-size:11px;color:#10db3f"></i>
-                        {% else %}  
+                        {% else %}
                             <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
-                        {% endif %} 
+                        {% endif %}
                       </a>
                       <h6 class="collapse-header">Manage Credentials</h6>
                       <a class="collapse-item" href="{% url 'account_email' %}">Update Email</a>
@@ -166,18 +166,18 @@
                     <span>Subscription</span>
                     {% if request.user.subscription.isTrialActive %}
                         <i class=" fa fa-exclamation-triangle" style="font-size:11px;color:#cec041"></i>
-                    {% else %}  
+                    {% else %}
                         {% if request.user.subscription.pricing.name == "FreeForLife" %}
                             <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
-                        {% else %} 
+                        {% else %}
                             {% if request.user.subscription.is_active %}
                                 <i class=" fa fa-check-circle" style="font-size:11px;color:#10db3f"></i>
                             {% else %}
                             <!-- Trail has expired and there is no subscription -->
                                 <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
-                            {% endif %}   
+                            {% endif %}
                         {% endif %}
-                    {% endif %}  
+                    {% endif %}
                 </a>
                 <div id="collapseThree" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
@@ -188,7 +188,7 @@
                             <a class="collapse-item" href="{% url 'payment:enroll' %}"> Subscription</a>
                         {% else %}
                             <a class="collapse-item" href="{% url 'users:subscription' user.username %}"> Subscription</a>
-                        {% endif %}    
+                        {% endif %}
                         <a class="collapse-item" href="#">Invoices</a>
                     </div>
                 </div>
@@ -201,19 +201,19 @@
                     {% if request.user.is_organisation_default%}
                     <!-- <a href="#" class="btn btn-warning btn-circle btn-sm"> -->
                         <i class="fa fa-exclamation-triangle" style="font-size:11px;color:#ec3322"></i>
-                        
+
                     <!-- </a> -->
-                  {% else %}  
+                  {% else %}
                     <!-- <a href="#" class="btn btn-success btn-circle btn-sm"> -->
-                        
+
                         <i class=" fa fa-check-circle" style="font-size:11px;color:#10db3f"></i>
                     <!-- </a> -->
-                  {% endif %} 
+                  {% endif %}
                 </a>
                 <div id="collapseFour" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        
+
                         {% if request.user.is_organisation_default%}
                             <a class="collapse-item" href="{% url 'organisation:create' %}" >Create Organisation</a>
                         {% else %}
@@ -224,7 +224,7 @@
                         <a class="collapse-item" href="{% url 'invitations:send-invite' %}">Invite Users</a>
                     </div>
                 </div>
-            </li> 
+            </li>
         {% endif %}
         <!-- {% if not request.user.is_organisation_default%} -->
         <!-- Nav Item - Utilities Collapse Menu -->
@@ -322,8 +322,8 @@
                       <a class="collapse-item" href="#">Add new contact</a>
                       <a class="collapse-item" href="#">Upload CSV </a>
                       <div class="collapse-divider"></div>
-                      <h6 class="collapse-header">Manage Contacts</h6>
-                      <a class="collapse-item" href="#">Assign Agent</a>
+                      <h6 class="collapse-header">Leads</h6>
+                      <a class="collapse-item" href="{% url 'leads:list' %}">All Leads</a>
                       <a class="collapse-item" href="#">My Leads</a>
                       <a class="collapse-item" href="#">My Tasks</a>
                       <h6 class="collapse-header">Lists</h6>
@@ -409,7 +409,7 @@
         <div class="sidebar-heading">
             Analytics and Reports
         </div>
-          
+
           <!-- Nav Item - Charts -->
           <li class="nav-item">
               <a class="nav-link" href="#">
@@ -427,7 +427,7 @@
           <!-- Divider -->
           <hr class="sidebar-divider d-none d-md-block">
           <div class="sidebar-heading">
-            Smart Sense 
+            Smart Sense
           </div>
           <!-- Sidebar Toggler (Sidebar) -->
           <div class="text-center d-none d-md-inline">
@@ -442,14 +442,14 @@
                 <a class="btn btn-success btn-sm" href="{% url 'payment:enroll' %}">Upgrade now</a>
             </div>
         {% endif %}
-          
+
       </ul>
       <!-- End of Sidebar -->
 
       <!-- Content Wrapper -->
-    
+
       <div id="content-wrapper" class="d-flex flex-column">
-    
+
           <!-- Main Content -->
           <div id="content">
 
@@ -474,8 +474,8 @@
                           </div>
                       </div>
                   </form> -->
-                  {% if user.userorganization %} 
-                        <span class = "d-lg-inline text-gray-600"> <strong>{% trans "Organisation : " %} <a class="btn btn-link d-lg-inline " href="{% url 'organisation:update' %}">{{ request.user.userorganization }}</a></strong></span> 
+                  {% if user.userorganization %}
+                        <span class = "d-lg-inline text-gray-600"> <strong>{% trans "Organisation : " %} <a class="btn btn-link d-lg-inline " href="{% url 'organisation:update' %}">{{ request.user.userorganization }}</a></strong></span>
                   {% endif %}
                   <div class="topbar-divider d-none d-sm-block"></div>
                   <!-- Topbar Navbar -->
@@ -649,7 +649,7 @@
                               </a>
                               <div class="dropdown-divider"></div>
                               <a class="dropdown-item" href="{% url 'account_logout' %}" data-toggle="modal" data-target="#logoutModal">
-                              
+
                                   <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                   Logout
                               </a>
@@ -663,7 +663,7 @@
 
               <!-- Begin Page Content -->
               <div class="container-fluid">
-                
+
                 {% if messages %}
                     {% for message in messages %}
                         <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
@@ -677,7 +677,7 @@
                         {% endblock %}
                     </div>
                     </div>
-                {% endblock content %}  
+                {% endblock content %}
 
               </div>
               <!-- /.container-fluid -->
@@ -695,7 +695,7 @@
               </div>
           </footer>
           <!-- End of Footer -->
- 
+
     </div>
       <!-- End of Content Wrapper -->
 
@@ -728,7 +728,7 @@ aria-hidden="true">
               {% csrf_token %}
               {% if redirect_field_value %}
                 <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
-              {% endif %}   
+              {% endif %}
               <button class="btn btn-danger" id="btnSubmit" type="submit">
                 <i class="loading-icon fa fa-spinner fa-spin hide"></i>
                 <span class="btn-txt">{% trans "Sign Out" %} &raquo;</span>

@@ -83,6 +83,7 @@ THIRD_PARTY_APPS = [
     "stripe",
     "waffle",
     "invitations",
+    "sorl.thumbnail",
 ]
 
 LOCAL_APPS = [
@@ -92,6 +93,8 @@ LOCAL_APPS = [
     "payment.apps.PaymentConfig",
     "feature.apps.FeatureConfig",
     "teams.apps.TeamsConfig",
+    "leads.apps.LeadsConfig",
+
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -115,7 +118,7 @@ LOGIN_REDIRECT_URL = "users:redirect"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 LOGIN_URL = "account_login"
 ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 3
-ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400 # 1 day in seconds
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400  # 1 day in seconds
 # PASSWORDS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#password-hashers
@@ -278,15 +281,15 @@ LOGGING = {
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Celery
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if USE_TZ:
     # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-timezone
     CELERY_TIMEZONE = TIME_ZONE
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-broker_url
-CELERY_BROKER_URL = env("CELERY_BROKER_URL",default="amqp://firstcontact_crm:password1@localhost:5672/test_crm")
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="amqp://firstcontact_crm:password1@localhost:5672/test_crm")
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-result_backend
 #CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-CELERY_RESULT_BACKEND ='django-db'
+CELERY_RESULT_BACKEND = 'django-db'
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-accept_content
 CELERY_ACCEPT_CONTENT = ["json"]
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-task_serializer
@@ -345,12 +348,12 @@ CORS_URLS_REGEX = r"^/api/.*$"
 WAFFLE_FLAG_MODEL = 'feature.Flag'
 
 # Invitation Email Setup
-INVITATION_EXPIRY = '2' # 2 days from the date of sent.
+INVITATION_EXPIRY = '2'  # 2 days from the date of sent.
 INVITATION_ONLY = True
 ACCEPT_INVITE_AFTER_SIGNUP = True
 ALLOW_JSON_INVITES = True
 INVITATIONS_GONE_ON_ACCEPT_ERROR = False
-INVITATIONS_SIGNUP_REDIRECT="/accounts/signup/"
-INVITATIONS_LOGIN_REDIRECT="users:redirect"
-INVITATIONS_EMAIL_MAX_LENGTH=60
-#INVITATIONS_INVITATION_MODEL='invitations.Invitation'
+INVITATIONS_SIGNUP_REDIRECT = "/accounts/signup/"
+INVITATIONS_LOGIN_REDIRECT = "users:redirect"
+INVITATIONS_EMAIL_MAX_LENGTH = 60
+# INVITATIONS_INVITATION_MODEL='invitations.Invitation'

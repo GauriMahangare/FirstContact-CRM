@@ -16,7 +16,7 @@ from django.shortcuts import render, redirect, reverse
 from django.views.generic.base import RedirectView
 from .models import Team, TeamMembership
 from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView,RedirectView
+from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView, RedirectView
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Count, Q
 from django.contrib.auth import get_user_model
@@ -35,13 +35,15 @@ User = get_user_model()
 
 # Create your views here.
 
+
 def get_teams(user):
     teams_qs = Team.objects.filter(organisation=user.userorganization)
     if teams_qs.exists():
         return teams_qs
     return None
 
-class SearchView(LoginRequiredMixin,SuccessMessageMixin,View):
+
+class SearchView(LoginRequiredMixin, SuccessMessageMixin, View):
     def get(self, request, *args, **kwargs):
         queryset = Team.objects.all()
         query = request.GET.get('q')
@@ -55,13 +57,14 @@ class SearchView(LoginRequiredMixin,SuccessMessageMixin,View):
         }
         return render(request, 'search_results.html', context)
 
+
 Team_search_view = SearchView.as_view()
 
-class TeamListView(LoginRequiredMixin,SuccessMessageMixin,ListView):
+
+class TeamListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
     model = Team
     template_name = 'teams/team_list.html'
     paginate_by = 5
-    
 
     def get_context_data(self, **kwargs: Any):
         team_qs = Team.objects.filter(organisation=self.request.user.userorganization).order_by('-dateTimeModified')
@@ -69,7 +72,6 @@ class TeamListView(LoginRequiredMixin,SuccessMessageMixin,ListView):
         paginator = Paginator(team_qs, self.paginate_by)
         page = self.request.GET.get('page')
 
-        
         try:
             team_list = paginator.page(page)
         except PageNotAnInteger:
@@ -82,27 +84,26 @@ class TeamListView(LoginRequiredMixin,SuccessMessageMixin,ListView):
         context['page_list'] = paginator.page_range
         return context
 
-
-    
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return super().get(request, *args, **kwargs)
-        
-    
+
+
 Team_list_view = TeamListView.as_view()
 
-class TeamUpdateView(LoginRequiredMixin, SuccessMessageMixin,UpdateView):
+
+class TeamUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     template_name = "teams/team_update.html"
     model = Team
-    fields = ["name","description",]
+    fields = ["name", "description", ]
     success_message = _("Information successfully updated.")
     waffle_flag = 'create_team'
     slug_field = 'slug'  # The name of the field on the model that contains the slug
-    slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
- 
+    slug_url_kwarg = 'slug_text'  # The name of the URLConf keyword argument that contains the slug
+
     def get_context_data(self, **kwargs):
         kwargs['team'] = self.get_object()
         return super().get_context_data(**kwargs)
-    
+
     # def get_queryset(self):
     #     slug_text = self.kwargs['slug_text']
     #     qs=Team.objects.filter(slug=slug_text)
@@ -113,21 +114,23 @@ class TeamUpdateView(LoginRequiredMixin, SuccessMessageMixin,UpdateView):
 
     # def get_object(self, queryset: Optional[models.query.QuerySet]) -> models.Model:
     #     return super().get_object(queryset=queryset)
-    
+
     def form_valid(self, form):
         if waffle.flag_is_active(self.request, 'create_team'):
             team = form.save(commit=False)
             team.created_by = self.request.user
-            if  not team.name:
+            if not team.name:
                 messages.error(self.request, "Team name is required")
                 return super(TeamUpdateView, self).form_valid(form)
-            
+
             else:
                 try:
                     team.save()
-                except:
+                except Exception as e:
+                    print(str(e))
                     logger.critical('Team Update error')
-                    raise Http404 ("There was an error updating your Team. If the error persists, please try again after sometime.")
+                    raise Http404(
+                        "There was an error updating your Team. If the error persists, please try again after sometime.")
                 messages.success(self.request, "Information has been updated.")
                 return redirect('/teams/~redirect/')
             #     return redirect(reverse("team-list", kwargs={
@@ -137,23 +140,25 @@ class TeamUpdateView(LoginRequiredMixin, SuccessMessageMixin,UpdateView):
             messages.error(self.request, "Please update your subscription to continue using this feature.")
             return super(TeamUpdateView, self).form_valid(form)
 
+
 Team_update_view = TeamUpdateView.as_view()
 
 
-class TeamDetailView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,DetailView):
+class TeamDetailView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, DetailView):
     model = Team
     template_name = 'teams/team_detail.html'
     context_object_name = 'team'
     waffle_flag = 'create_team'
     slug_field = 'slug'  # The name of the field on the model that contains the slug
-    slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
+    slug_url_kwarg = 'slug_text'  # The name of the URLConf keyword argument that contains the slug
 
-    
+
 Team_detail_view = TeamDetailView.as_view()
-    
-class TeamCreateView(LoginRequiredMixin,SuccessMessageMixin,CreateView):
+
+
+class TeamCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Team
-    fields = ["name","description",]
+    fields = ["name", "description", ]
     template_name = 'teams/team_create.html'
 
     def get_context_data(self, **kwargs):
@@ -165,25 +170,30 @@ class TeamCreateView(LoginRequiredMixin,SuccessMessageMixin,CreateView):
             team = form.save(commit=False)
             team.created_by = self.request.user
             team.organisation = self.request.user.userorganization
-            if  not team.name:
+            if not team.name:
                 messages.error(self.request, "Team name is required")
                 return super(TeamCreateView, self).form_valid(form)
-            
+
             else:
                 try:
                     team.save()
-                except:
+                except Exception as e:
+                    print(str(e))
                     logger.critical('Team Create error')
-                    raise Http404 ("There was an error creating your Team. If the error persists, please try again after sometime.")
+                    raise Http404(
+                        "There was an error creating your Team. If the error persists, please try again after sometime.")
                 # Update user data so that org cannot be created any more by this user
-            
-                messages.success(self.request, "Congratulations!! Team has been set; Now assign team members to this team")
+
+                messages.success(
+                    self.request, "Congratulations!! Team has been set; Now assign team members to this team")
                 return redirect('/teams/~redirect/')
         else:
             messages.error(self.request, "Please update your subscription to continue using this feature.")
-            return super(TeamCreateView, self).form_valid(form)    
+            return super(TeamCreateView, self).form_valid(form)
+
 
 Team_create_view = TeamCreateView.as_view()
+
 
 class TeamRedirectView(LoginRequiredMixin, RedirectView):
 
@@ -192,9 +202,11 @@ class TeamRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self):
         return reverse("teams:list",)
 
+
 Team_redirect_view = TeamRedirectView.as_view()
 
-class TeamDeleteView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,DeleteView):
+
+class TeamDeleteView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, DeleteView):
     model = Team
     success_url = '/teams/~redirect/'
     template_name = 'teams/team_confirm_delete.html'
@@ -203,26 +215,26 @@ class TeamDeleteView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,Dele
     warning_message = _("Team has been deleted.")
     waffle_flag = "create_team"
     slug_field = 'slug'  # The name of the field on the model that contains the slug
-    slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
+    slug_url_kwarg = 'slug_text'  # The name of the URLConf keyword argument that contains the slug
 
 
 Team_delete_view = TeamDeleteView.as_view()
 
-class TeamMembersView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,ListView):
+
+class TeamMembersView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, ListView):
     model = TeamMembership
     waffle_flag = 'create_team'
     template_name = 'teams/team_members_list.html'
     paginate_by = 5
     slug_field = 'slug'  # The name of the field on the model that contains the slug
-    slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
-    
-        
+    slug_url_kwarg = 'slug_text'  # The name of the URLConf keyword argument that contains the slug
+
     def get_context_data(self, **kwargs: Any):
         slug_text = self.kwargs['slug_text']
         print(slug_text)
-        qs=Team.objects.filter(slug=slug_text)
+        qs = Team.objects.filter(slug=slug_text)
         if qs.exists():
-            team= qs.first()
+            team = qs.first()
         else:
             return HttpResponse("<h1> Page not found. </h1>")
         team_qs = TeamMembership.objects.filter(team=team.pk).order_by('-dateTimeModified')
@@ -230,7 +242,6 @@ class TeamMembersView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,Lis
         paginator = Paginator(team_qs, self.paginate_by)
         page = self.request.GET.get('page')
 
-        
         try:
             team_list = paginator.page(page)
         except PageNotAnInteger:
@@ -245,15 +256,14 @@ class TeamMembersView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,Lis
         context['slug_text'] = slug_text
         return context
 
-
-    
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return super().get(request, *args, **kwargs)
+
 
 Team_members_view = TeamMembersView.as_view()
 
 
-class TeamMemberDeleteView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixin,DeleteView):
+class TeamMemberDeleteView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, DeleteView):
     model = TeamMembership
     success_url = '/teams/~redirect/'
     template_name = 'teams/team_membership_confirm_delete.html'
@@ -261,7 +271,7 @@ class TeamMemberDeleteView(LoginRequiredMixin,SuccessMessageMixin,WaffleFlagMixi
     warning_message = _("Membership has been removed.")
     waffle_flag = "create_team"
     slug_field = 'slug'  # The name of the field on the model that contains the slug
-    slug_url_kwarg = 'slug_text' # The name of the URLConf keyword argument that contains the slug
+    slug_url_kwarg = 'slug_text'  # The name of the URLConf keyword argument that contains the slug
 
 
 Team_members_delete_view = TeamMemberDeleteView.as_view()
@@ -323,40 +333,40 @@ Team_members_delete_view = TeamMemberDeleteView.as_view()
 #                 logger.critical('Membership create error')
 #                 raise Http404 ("There was an error adding the user to the team. If the error persists, please try again after sometime.")
 #                 # Update user data so that org cannot be created any more by this user
-            
+
 #             messages.success(self.request, "User has been added to the team.")
 #             return redirect('/teams/~redirect/')
 #         else:
 #             messages.error(self.request, "Please update your subscription to continue using this feature.")
-#             return super(TeamCreateView, self).form_valid(form)    
+#             return super(TeamCreateView, self).form_valid(form)
 
 # Team_membership_add_view = TeammembershipCreateView.as_view()
 
-def add_member_view(request,*args, **kwargs):
+def add_member_view(request, *args, **kwargs):
     user = get_object_or_404(User, id=request.user.pk)
     organisation = user.userorganization
-    team_qs = Team.objects.filter(organisation = organisation )
+    team_qs = Team.objects.filter(organisation=organisation)
     if team_qs.exists():
         team_defined = True
     else:
         team_defined = False
-    user_qs = User.objects.filter(userorganization = organisation)
+    user_qs = User.objects.filter(userorganization=organisation)
     if user_qs.exists():
         user_defined = True
     else:
         user_defined = False
-    context={}
+    context = {}
     if request.POST:
-        form = MembershipForm(organisation,request.POST)
+        form = MembershipForm(organisation, request.POST)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/teams/~redirect/')
     else:
         form = MembershipForm(organisation)
-    
-    context={   "form":form,
-                "user_defined" : user_defined,
-                "team_defined" : team_defined
-            }
-    
-    return render(request,'teams/team_membership_add.html', context)
+
+    context = {"form": form,
+               "user_defined": user_defined,
+               "team_defined": team_defined
+               }
+
+    return render(request, 'teams/team_membership_add.html', context)

@@ -9,7 +9,7 @@
 
 {% block inner %}
 {% flag "create_team" %}
-    <h1>Add team memebers</h1>
+    <h1>Add team members</h1>
     <hr/>
     {% if team_defined and user_defined %}
         <h5>{% trans "Assign members to your teams." %}</h5>
@@ -25,8 +25,8 @@
                 <span class="btn-txt">{% trans "Assign Team" %} &raquo;</span>
             </button>
             <a id="create-team" class="btn-link ml-5" href="{% url 'teams:list' %}">{% trans "Cancel" %}</a>
-        </form>  
-    {% else %} 
+        </form>
+    {% else %}
         {% if not team_defined %}
             <h6> {% trans "You do not have any team defined. Please add a team." %}</h6>
             <a id="create-team" class="btn btn-primary" href="{% url 'teams:create' %}">{% trans "Create Team" %}</a>
