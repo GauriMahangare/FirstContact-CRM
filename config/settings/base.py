@@ -84,6 +84,7 @@ THIRD_PARTY_APPS = [
     "waffle",
     "invitations",
     "sorl.thumbnail",
+    "django_filters",
 ]
 
 LOCAL_APPS = [

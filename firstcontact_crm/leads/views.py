@@ -1,5 +1,6 @@
 
 from datetime import date, datetime, timedelta
+from leads.filters import LeadFilter
 
 from leads.forms import LeadModelForm
 from django import forms
@@ -47,128 +48,34 @@ def get_leads(user):
     return None
 
 
-class SearchView(LoginRequiredMixin, SuccessMessageMixin, View):
-    def get(self, request, *args, **kwargs):
-        queryset = Lead.objects.filter(organisation=self.request.user.userorganization).order_by('-dateTimeModified')
-        query = request.GET.get('q')
-        if query:
-            queryset = queryset.filter(
-                Q(user=query) |
-                Q(overview__icontains=query)
-            ).distinct()
-        context = {
-            'queryset': queryset,
-            'categories': Category.objects.all()
-        }
-        return render(request, 'search_results.html', context)
-
-
-Lead_search_view = SearchView.as_view()
-
-
-def is_valid_queryparam(param):
-    return param != '' and param is not None
-
-
-def input_filter(request):
-    print(request)
-    qs = Lead.objects.filter(organisation=request.user.userorganization).order_by('-dateTimeModified')
-    categories = Category.objects.all()
-    assigned_to_team_query = request.GET.get('assigned_to_team')
-    source_exact_query = request.GET.get('source_exact')
-    work_organisation_query = request.GET.get('work_organisation')
-    lead_rating_query = request.GET.get('lead_rating')
-    close_reason_query = request.GET.get('close_reason')
-
-    view_count_min = request.GET.get('view_count_min')
-    view_count_max = request.GET.get('view_count_max')
-    date_min = request.GET.get('add_date_min')
-    date_max = request.GET.get('add_date_max')
-    category = request.GET.get('category')
-    reviewed = request.GET.get('reviewed')
-    not_reviewed = request.GET.get('notReviewed')
-
-    if is_valid_queryparam(assigned_to_team_query):
-        qs = qs.filter(team__icontains=assigned_to_team_query)
-
-    elif is_valid_queryparam(source_exact_query):
-        qs = qs.filter(source=source_exact_query)
-
-    elif is_valid_queryparam(work_organisation_query):
-        qs = qs.filter(Q(work_org_name__icontains=work_organisation_query)
-                       ).distinct()
-    elif is_valid_queryparam(lead_rating_query):
-        qs = qs.filter(Q(lead_Ratings__icontains=lead_rating_query)
-                       ).distinct()
-    elif is_valid_queryparam(close_reason_query):
-        qs = qs.filter(Q(closeReason__icontains=close_reason_query)
-                       ).distinct()
-
-    if is_valid_queryparam(view_count_min):
-        qs = qs.filter(views__gte=view_count_min)
-
-    if is_valid_queryparam(view_count_max):
-        qs = qs.filter(views__lt=view_count_max)
-
-    if is_valid_queryparam(date_min):
-        qs = qs.filter(dateTimeCreated__gte=date_min)
-
-    if is_valid_queryparam(date_max):
-        qs = qs.filter(dateTimeCreated__lt=date_max)
-
-    if is_valid_queryparam(category) and category != 'Choose...':
-        qs = qs.filter(status__id=category)
-
-    if reviewed == 'on':
-        now = datetime.now()
-        seven_days_ago = now - timedelta(weeks=1)
-        qs = qs.filter(dateTimeModified__gte=seven_days_ago)
-
-    elif not_reviewed == 'on':
-        now = datetime.now()
-        seven_days_ago = now - timedelta(weeks=1)
-        qs = qs.filter(dateTimeModified__lt=seven_days_ago)
-
-    return qs
-
-
-def infinite_filter(request):
-    limit = request.GET.get('limit')
-    offset = request.GET.get('offset')
-    return Lead.objects.all()[int(offset): int(offset) + int(limit)]
-
-
-def is_there_more_data(request):
-    offset = request.GET.get('offset')
-    if int(offset) > Lead.objects.all().count():
-        return False
-    return True
-
-
 class LeadListView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, ListView):
     model = Lead
     template_name = 'leads/lead_list.html'
-    paginate_by = 25
+    paginate_by = 5
     # context_object_name = 'lead'
     waffle_flag = 'detail_lead'
 
     def get_context_data(self, **kwargs: Any):
-        lead_qs = input_filter(self.request)
+        queryset = Lead.objects.filter(organisation=self.request.user.userorganization).order_by('-dateTimeModified')
+        queryset_filtered = LeadFilter(self.request.GET, request=self.request, queryset=queryset)
         context = super().get_context_data(**kwargs)
-        paginator = Paginator(lead_qs, self.paginate_by)
+        paginator = Paginator(queryset_filtered.qs, self.paginate_by)
         page = self.request.GET.get('page')
 
         try:
             lead_list = paginator.page(page)
+            print(lead_list)
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
             lead_list = paginator.page(1)
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             lead_list = paginator.page(paginator.num_pages)
+
         context['lead_list'] = lead_list
         context['page_list'] = paginator.page_range
         context['categories'] = Category.objects.all()
+        context['filter'] = queryset_filtered
         return context
 
 

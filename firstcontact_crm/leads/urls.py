@@ -7,7 +7,6 @@ from leads.views import (
     Lead_update_view,
     Lead_create_view,
     Lead_list_view,
-    Lead_search_view,
     Lead_detail_view,
     multi_lead_delete_view,
 )
@@ -20,7 +19,6 @@ urlpatterns = [
     path("confirm-delete", view=multi_lead_delete_view, name="deleteconfirm"),
     # url(r'^confirm-delete$', multi_lead_delete_view, name='deleteconfirm', kwargs={"leads_tobe_deleted": None}),
     path("~list/", view=Lead_list_view, name="list"),
-    path("~search/", view=Lead_search_view, name="search"),
     path("~detail/<uuid:pk>", view=Lead_detail_view, name="detail"),
     path("~redirect/", view=Lead_redirect_view, name="redirect"),
 ]

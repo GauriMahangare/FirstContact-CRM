@@ -136,9 +136,8 @@ class LeadModelForm(forms.ModelForm):
         users_in_org = User.objects.none()
         if instance:
             users_in_org = User.objects.filter(userorganization_id=instance.organisation_id)
-            print(users_in_org)
-        self.fields['assigned_to'].queryset = users_in_org
 
+        self.fields['assigned_to'].queryset = users_in_org
         self.helper = FormHelper()
         self.helper.layout = Layout(
             TabHolder(

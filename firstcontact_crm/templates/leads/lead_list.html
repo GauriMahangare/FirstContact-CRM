@@ -5,138 +5,48 @@
 {% load crispy_forms_tags %}
 {% load waffle_tags %}
 
-{% block head_title %} {{ user.username }} - Team_List {% endblock head_title %}
+
+{% block head_title %} {{ user.username }} - Lead List {% endblock head_title %}
 
 
 {% block content %}
 {% flag "detail_lead" %}
-
-    <a id="create-lead" class="btn btn-primary float-right" href="{% url 'leads:create' %}">{% trans "Add New Lead" %}</a>
     <h1>Your Leads</h1>
     <hr/>
     <p>
+        <a id="create-lead" class="btn btn-primary float-right" href="{% url 'leads:create' %}">{% trans "Add New Lead" %}</a>
         <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-          Filter Leads
+          Advanced Filter
         </a>
+        <a class="btn-link ml-2" href="{% url 'leads:list' %}">Clear all filters</a>
     </p>
+
     <div class="collapse" id="collapseExample">
         <div class="card card-body">
-            <div class="List_lead" id="List_lead_form">
+            <form method="GET" action=".">
+                {{filter.form|crispy}}
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
 
-                <form method="GET" action=".">
-                  <div class="form-row">
-                      <div class="form-group col-12">
-                          <div class="input-group">
-                              <input class="form-control py-2 border-right-0 border" type="search" name="assigned_to" placeholder="Assigned to Team..." />
-                              <span class="input-group-append">
-                                  <div class="input-group-text bg-transparent">
-                                      <i class="fa fa-search"></i>
-                                  </div>
-                              </span>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="form-row">
-                      <div class="form-group col-12">
-                          <div class="input-group">
-                              <input class="form-control py-2 border-right-0 border" type="search" name="source_exact" placeholder="Source exact..." />
-                              <span class="input-group-append">
-                                  <div class="input-group-text bg-transparent">
-                                      <i class="fa fa-search"></i>
-                                  </div>
-                              </span>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="form-row">
-                      <div class="form-group col-12">
-                          <div class="input-group">
-                              <input class="form-control py-2 border-right-0 border" type="search" name="work_organisation" placeholder="Work organisation name..." />
-                              <span class="input-group-append">
-                                  <div class="input-group-text bg-transparent">
-                                      <i class="fa fa-search"></i>
-                                  </div>
-                              </span>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group col-12">
-                        <div class="input-group">
-                            <input class="form-control py-2 border-right-0 border" type="search" name="lead_rating" placeholder="Lead Rating..." />
-                            <span class="input-group-append">
-                                <div class="input-group-text bg-transparent">
-                                    <i class="fa fa-search"></i>
-                                </div>
-                            </span>
-                        </div>
-                    </div>
-                 </div>
-                 <div class="form-row">
-                    <div class="form-group col-12">
-                        <div class="input-group">
-                            <input class="form-control py-2 border-right-0 border" type="search" name="close_reason" placeholder="Close Reason ..." />
-                            <span class="input-group-append">
-                                <div class="input-group-text bg-transparent">
-                                    <i class="fa fa-search"></i>
-                                </div>
-                            </span>
-                        </div>
-                    </div>
-                 </div>
-                  <div class="form-row">
-                    <div class="form-group col-md-2 col-lg-2">
-                      <label for="viewCountMin">Minimum View Count</label>
-                      <input type="number" min=0 class="form-control" id="viewCountMin" placeholder="0" name="view_count_min">
-                    </div>
-                    <div class="form-group col-md-2 col-lg-2">
-                      <label for="viewCountMax">Maximum View Count</label>
-                      <input type="number" min=0 class="form-control" id="viewCountMax" placeholder="10000?" name="view_count_max">
-                    </div>
-                    <div class="form-group col-md-2 col-lg-2">
-                      <label for="AddedDateMin">Added date minimum</label>
-                      <input type="date" class="form-control" id="AddedDateMin" name="add_date_min">
-                    </div>
-                    <div class="form-group col-md-2 col-lg-2">
-                      <label for="AddedDateMax">Added date maximum</label>
-                      <input type="date" class="form-control" id="AddedDateMax" name="add_date_max">
-                    </div>
-                    <div class="form-group col-md-4">
-                      <label for="category">Category</label>
-                      <select id="category" class="form-control" name="category">
-                        <option selected>Choose...</option>
-                        {% for cat in categories %}
-                        <option value="{{ cat }}">{{ cat }}</option>
-                        {% endfor %}
-                      </select>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="reviewed" name="reviewed">
-                      <label class="form-check-label" for="reviewed">
-                        Reviewed in last 7 Days
-                      </label>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="notReviewed" name="notReviewed">
-                      <label class="form-check-label" for="notReviewed">
-                        Not reviewed in last 7 Days
-                      </label>
-                    </div>
-                  </div>
-                  <button type="submit" class="btn btn-primary">Search</button>
-                </form>
-            </div>
         </div>
     </div>
-<br>
-<hr>
     {% if lead_list %}
         <div class="card shadow mb-4">
             <div class="card-header py-3 d-lg-inline ">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Actions
+                    </button>
+                    <div class="dropdown-menu">
+                        <button type="submit" id= "delete_btn" class="btn-link ">Delete Selected Leads</button>
+                      <a class="dropdown-item" href="#">Update Selected</a>
+                      <a class="dropdown-item" href="#">Deduplicate Leads</a>
+                      <a class="dropdown-item" href="#">Add Selected to Campaign</a>
+                      <a class="dropdown-item" href="#">Send email to Selected</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="#">Download Selected</a>
+                    </div>
+                </div>
                 <div class=" col-xs-2 float-right" >
                     <input id="myInput" class="form-control m-0" type="text" placeholder="Search..">
                 </div>
@@ -145,7 +55,6 @@
             </div>
             <div class="card-body">
 
-                <button type="submit" id= "delete_btn" class="btn btn-warning">Delete Selected Leads</button>
                 <div class="table-responsive ">
                     <table class="table table-sortable" id="myTable" width="100%" cellspacing="0">
                         <thead>
@@ -162,7 +71,7 @@
                         </thead>
                         <tbody id="myTable">
                             {% csrf_token %}
-                            {% for lead in lead_list %}
+                            {% for lead in lead_list.object_list %}
                             <tr>
                                 <td> <input type="checkbox" name="lead_id" value="{{lead.id}}" id="delete_lead"  ></td>
                                 <td> {{ lead.team }}</td>
@@ -176,23 +85,33 @@
                         </tbody>
                     </table>
                     {% if is_paginated %}
-                        <!-- <span class="page-current page-item">
-                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                        </span> -->
                         <nav aria-label="lead-pagination">
                             <ul class="pagination justify-content-center">
                                 {% if page_obj.has_previous %}
-                                    <li class="page-item"> <a class="page-link" href="?page={{ page_obj.previous_page_number }}" >Previous</a></li>
+
+                                    {% if "team"  in request.get_full_path %}
+                                        <li class="page-item"> <a class="page-link" href="{{ request.get_full_path }}&page={{ page_obj.previous_page_number }}" >Previous</a></li>
+                                    {% else %}
+                                        <li class="page-item"> <a class="page-link" href="?page={{ page_obj.previous_page_number }}" >Previous</a></li>
+                                    {% endif %}
                                 {% else %}
                                     <li class="page-item disabled"> <a class="page-link" href="#" >Previous</a></li>
                                 {% endif %}
                                 {% if page_list %}
                                     {% for page_nbr in page_list %}
-                                    <li class="page-item"><a class="page-link" href="?page={{page_nbr}}">{{page_nbr}}<span class="sr-only">(current)</span></a></li>
+                                        {% if "team"  in request.get_full_path %}
+                                            <li class="page-item"><a class="page-link" href="{{ request.get_full_path }}&page={{page_nbr}}">{{page_nbr}}<span class="sr-only">(current)</span></a></li>
+                                        {% else %}
+                                        <li class="page-item"><a class="page-link" href="?page={{page_nbr}}">{{page_nbr}}<span class="sr-only">(current)</span></a></li>
+                                        {% endif %}
                                     {% endfor %}
                                 {%endif%}
                                 {% if page_obj.has_next %}
-                                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" >Next</a></li>
+                                    {% if "team"  in request.get_full_path %}
+                                        <li class="page-item"><a class="page-link" href="{{ request.get_full_path }}&page={{ page_obj.next_page_number }}" >Next</a></li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" >Next</a></li>
+                                    {%endif%}
                                 {% else %}
                                     <li class="page-item disabled"><a class="page-link " href="#" >Next</a></li>
                                 {% endif %}
@@ -203,7 +122,7 @@
                 </div>
             </div>
     {% else %}
-        <h5>{% trans "You don't have any leads set up yet." %}</h5>
+        <h5>{% trans "Either you don't have any leads set up yet or there are no leads matching your seach criteria. Please try again by changing the search criteria." %}</h5>
         </br >
     {%endif%}
 
@@ -308,6 +227,7 @@
 
             })
         });
+
     </script>
 {% else %}
     {% if request.user.is_admin %}

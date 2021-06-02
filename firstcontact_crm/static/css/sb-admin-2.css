@@ -2116,7 +2116,7 @@ select.form-control:focus::-ms-value {
 
 .form-control-sm {
   /* height: calc(1.5em + 0.5rem + 2px); */
-  height: calc(1.5em + 0.75rem);
+  height: calc(1.5em + 1.1rem);
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
   line-height: 1.5;
@@ -4832,7 +4832,6 @@ input[type="button"].btn-block {
 .navbar-dark .navbar-text a:focus {
   color: #fff;
 }
-
 
 .card {
   position: relative;
