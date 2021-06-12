@@ -13,12 +13,25 @@
 {% flag "detail_lead" %}
     <h1>Your Leads</h1>
     <hr/>
+
     <p>
-        <a id="create-lead" class="btn btn-primary float-right" href="{% url 'leads:create' %}">{% trans "Add New Lead" %}</a>
-        <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-          Advanced Filter
+        <!-- <a id="create-lead" class="btn btn-primary float-right" href="{% url 'leads:create' %}">{% trans "Add New Lead" %}</a> -->
+        {% if "team"  in request.get_full_path  or "page"  in request.get_full_path %}
+            <a href="{% url 'leads:create' %}?{{request.META.QUERY_STRING}}" class="btn btn-danger btn-circle float-right" data-bs-toggle="popover" title="Add new lead"><i class="material-icons"  style="font-size:18px">person_add</i></a>
+        {% else %}
+            <a href="{% url 'leads:create' %}" class="btn btn-danger btn-circle float-right" data-bs-toggle="popover" title="Add new lead"><i class="material-icons" style="font-size:18px">person_add</i></a>
+        {% endif %}
+        <a href="#collapseExample" data-toggle="collapse" role="button" class="btn btn-info btn-icon-split" data-bs-toggle="popover" title="Click to do advanced search"aria-expanded="false" aria-controls="collapseExample">
+            <span class="icon text-white-50">
+                <i class="fas fa-search"></i>
+            </span>
+            <span class="text">Advance Search</span>
         </a>
-        <a class="btn-link ml-2" href="{% url 'leads:list' %}">Clear all filters</a>
+        <!-- <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+          Advanced Filter
+        </a> -->
+        <a class="btn-link-secondary ml-2" href="{% url 'leads:list' %}"><i class="material-icons" style="font-size:18px">clear</i>Clear filters</a>
+
     </p>
 
     <div class="collapse" id="collapseExample">
@@ -33,40 +46,59 @@
     {% if lead_list %}
         <div class="card shadow mb-4">
             <div class="card-header py-3 d-lg-inline ">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Actions
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="#">Actions <i class="material-icons" style="font-size:1.5rem">chevron_right</i></a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                      <span class="navbar-toggler-icon"></span>
                     </button>
-                    <div class="dropdown-menu">
-                        <button type="submit" id= "delete_btn" class="btn-link ">Delete Selected Leads</button>
-                      <a class="dropdown-item" href="#">Update Selected</a>
-                      <a class="dropdown-item" href="#">Deduplicate Leads</a>
-                      <a class="dropdown-item" href="#">Add Selected to Campaign</a>
-                      <a class="dropdown-item" href="#">Send email to Selected</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="#">Download Selected</a>
-                    </div>
-                </div>
-                <div class=" col-xs-2 float-right" >
-                    <input id="myInput" class="form-control m-0" type="text" placeholder="Search..">
-                </div>
-                <!-- <h6 class="m-0 font-weight-bold text-primary">{% trans "Create leads" %}</h6> -->
 
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                      <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+
+                          <a class="nav-link" id="delete_btn" href="#">Delete Selected <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="#">Deduplicate</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Add to Campaign</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Send email to Selected</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Upload Leads
+                          </a>
+                          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                          </div>
+                        </li>
+                      </ul>
+                      <form class="form-inline my-2 my-lg-0">
+                        <input id="myInput" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                      </form>
+                    </div>
+                </nav>
             </div>
             <div class="card-body">
-
-                <div class="table-responsive ">
-                    <table class="table table-sortable" id="myTable" width="100%" cellspacing="0">
+                <div class="table-responsive">
+                    <table class="table table-sortable table-hover" id="myTable" width="100%" cellspacing="0">
                         <thead>
                             <tr id="{{lead.id}}">
-                                <!-- <th><div>Name <div class="container"><i class='fas fa-caret-up'></i> <i class='fas fa-caret-down'></i></div></div></th> -->
                                 <td><input type='checkbox' id='selectAll'" ></td>
-                                <th class="asc" onclick="sortTable()">Team </th>
                                 <th class="asc" onclick="sortTable()">Assigned To </th>
-                                <th class="asc" onclick="sortTable()">Lead Source </th>
                                 <th class="asc" onclick="sortTable()">Lead Status </th>
                                 <th>Email </th>
                                 <th>Mobile Number </th>
+                                <th>First Name </th>
+                                <th>Last Name </th>
+                                <th>Edit</th>
+                                <th>Notes</th>
                             </tr>
                         </thead>
                         <tbody id="myTable">
@@ -74,12 +106,33 @@
                             {% for lead in lead_list.object_list %}
                             <tr>
                                 <td> <input type="checkbox" name="lead_id" value="{{lead.id}}" id="delete_lead"  ></td>
-                                <td> {{ lead.team }}</td>
                                 <td> {{ lead.assigned_to }}</td>
-                                <td> {{ lead.source }}</td>
                                 <td> {{ lead.status }}</td>
-                                <td> <a href="{{ lead.get_absolute_url }}">{{ lead.email }}</a></td>
+                                <td>
+                                    {% if "team"  in request.get_full_path  or "page"  in request.get_full_path %}
+                                        <a href="{{ lead.get_absolute_url }}?{{request.META.QUERY_STRING}}">{{ lead.email }}</a>
+                                    {% else %}
+                                        <a href="{{ lead.get_absolute_url }}">{{ lead.email }}</a>
+                                    {% endif %}
+                                </td>
                                 <td> {{ lead.mobile_number }}</td>
+                                <td> {{ lead.first_name }}</td>
+                                <td> {{ lead.last_name }}</td>
+                                <td>
+                                    {% if "team"  in request.get_full_path  or "page"  in request.get_full_path %}
+                                        <a href="{% url 'leads:update' lead.pk %}?{{request.META.QUERY_STRING}}" class="btn btn-warning btn-circle" data-bs-toggle="popover" title="Update lead"><i class='fas fa-edit' style='font-size:18px'></i></a>
+                                    {% else %}
+                                        <a href="{% url 'leads:update' lead.pk %}" class="btn btn-warning btn-circle" data-bs-toggle="popover" title="Update lead"><i class='fas fa-edit' style='font-size:18px'></i></a>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if "team"  in request.get_full_path  or "page"  in request.get_full_path %}
+                                        <a href="{% url 'leads:listnote' lead.pk %}?{{request.META.QUERY_STRING}}" class="btn btn-info btn-circle" data-bs-toggle="popover" title="Manage notes"><i class='fas fa-book-open' style='font-size:18px'></i></a>
+                                    {% else %}
+                                        <a href="{% url 'leads:listnote' lead.pk %}" class="btn btn-info btn-circle" data-bs-toggle="popover" title="Manage notes"><i class='fas fa-book-open' style='font-size:18px'></i></a>
+                                    {% endif %}
+                                </td>
+
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -220,13 +273,36 @@
                 console.log(finalURL)
                 window.location.href = finalURL
 
-                for (var i = 0; i < selectedRows.length; i++) {
-                    $(selectedRows[i]).parent().parent().remove();
-
-                };
+                //for (var i = 0; i < selectedRows.length; i++) {
+                //    $(selectedRows[i]).parent().parent().remove();
+                //
+                //};
 
             })
         });
+
+        $('#addNoteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget) // Button that triggered the modal
+            var lead = button.data('whatever') // Extract info from data-* attributes
+            //split the content based on |
+            var leadid = lead.split("|")[0];
+            var leadname = lead.split("|")[1];
+            // remove spaces from the UUID
+            var leadid = leadid.replace(/\s/g, '');
+
+            //extracting url parameters -
+            const params = new URLSearchParams(location.search);
+            console.log(params)
+
+            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            var modal = $(this)
+            modal.find('.modal-title').text('Add new note for ' + leadname)
+            //Set value of lead id to hidden field.
+            $("#id_lead").attr("value", leadid);
+            $("#id_urlparameters").attr("value", params);
+
+        })
 
     </script>
 {% else %}
@@ -238,4 +314,8 @@
     {% endif %}
 {% endflag %}
 
+
+
 {% endblock content %}
+
+

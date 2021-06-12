@@ -1,8 +1,11 @@
 
 from datetime import date, datetime, timedelta
+from django.http import request
+
+from django.views.generic.edit import FormView
 from leads.filters import LeadFilter
 
-from leads.forms import LeadModelForm
+from leads.forms import LeadModelForm, NoteModelForm
 from django import forms
 from typing import Any, Optional, Type
 import logging
@@ -33,19 +36,12 @@ from django.core.paginator import PageNotAnInteger
 from waffle.mixins import WaffleFlagMixin
 from django.http import Http404
 from organisation.models import Organisation
-from .models import Category, Lead
+from .models import Category, Lead, Note
 # from .forms import LeadMembershipForm
 
 # Create your views here.
 logger = logging.getLogger(__name__)
 User = get_user_model()
-
-
-def get_leads(user):
-    leads_qs = Lead.objects.filter(organisation=user.userorganization).order_by('-dateTimeModified')
-    if leads_qs.exists():
-        return leads_qs
-    return None
 
 
 class LeadListView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, ListView):
@@ -64,7 +60,6 @@ class LeadListView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, Lis
 
         try:
             lead_list = paginator.page(page)
-            print(lead_list)
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
             lead_list = paginator.page(1)
@@ -90,7 +85,7 @@ class LeadUpdateView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, U
     waffle_flag = 'update_lead'
 
     def get_success_url(self):
-        return reverse("leads:list")
+        return reverse("leads:detail", args=[self.object.id])
 
 
 Lead_update_view = LeadUpdateView.as_view()
@@ -99,8 +94,8 @@ Lead_update_view = LeadUpdateView.as_view()
 class LeadDetailView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, DetailView):
     model = Lead
     template_name = 'leads/lead_detail.html'
-    context_object_name = 'lead'
     waffle_flag = 'detail_lead'
+
     # slug_field = 'slug'  # The name of the field on the model that contains the slug
     # slug_url_kwarg = 'slug_text'  # The name of the URLConf keyword argument that contains the slug
 
@@ -120,7 +115,7 @@ class LeadCreateView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, C
         return context
 
     def form_valid(self, form):
-        if waffle.flag_is_active(self.request, 'create_team'):
+        if waffle.flag_is_active(self.request, 'create_lead'):
             lead = form.save(commit=False)
             lead.created_by = self.request.user
             if not lead.assigned_to:
@@ -202,3 +197,121 @@ def multi_lead_delete_view(request, *args, **kwargs):
     context['leads_tobe_deleted_email'] = leads_tobe_deleted_email_list
     context['leads_tobe_deleted_count'] = len(leads_tobe_deleted_list)
     return render(request, "leads/lead_confirm_delete.html", context)
+
+##########################################################################
+#########                           Note Views                   #########
+##########################################################################
+
+
+class NoteCreateView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, CreateView):
+    success_message = _("Note added successfully.")
+    form_class = NoteModelForm
+    waffle_flag = 'create_note'
+    model = Note
+
+    def get_success_url(self):
+        leadid = self.request.POST.get('create_note_lead')
+        urlparameters = self.request.POST.get('urlparameters')
+        return (reverse("leads:listnote", args=[leadid]) + '?' + urlparameters)
+
+    def form_valid(self, form):
+        if waffle.flag_is_active(self.request, 'create_note'):
+            form.instance.created_by = self.request.user
+            leadid = self.request.POST.get('create_note_lead')
+            urlparameters = self.request.POST.get('urlparameters')
+            try:
+                lead = Lead.objects.get(pk=leadid)
+            except Exception as e:
+                print(str(e))
+                logger.critical('Note Create error - Lead not found')
+                messages.error(self.request, "There is an error on the form.")
+                return redirect(reverse("leads:listnote", args=[leadid]) + '?' + urlparameters)
+            else:
+                form.instance.lead = lead
+                return super().form_valid(form)
+        else:
+            messages.error(self.request, "Please update your subscription to continue using this feature.")
+            return super(NoteCreateView, self).form_valid(form)
+
+
+Note_create_view = NoteCreateView.as_view()
+
+
+class NoteUpdateView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, UpdateView):
+    model = Note
+    form_class = NoteModelForm
+    success_message = _("Note has been updated successfully.")
+    waffle_flag = 'update_note'
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        leadid = self.request.POST.get('update_leadid')
+        urlparameters = self.request.POST.get('urlparameters')
+        return (reverse("leads:listnote", args=[leadid]) + '?' + urlparameters)
+
+
+Note_update_view = NoteUpdateView.as_view()
+
+
+class NoteRedirectView(LoginRequiredMixin, RedirectView):
+
+    permanent = False
+
+    def get_redirect_url(self):
+        return reverse("leads:listnotes",)
+
+
+Note_redirect_view = NoteRedirectView.as_view()
+
+
+class NoteDeleteView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, DeleteView):
+    model = Note
+    success_message = _("Note has been deleted.")
+    waffle_flag = "delete_note"
+
+    def get_success_url(self) -> str:
+        leadid = self.request.POST.get('delete_note_lead')
+        urlparameters = self.request.POST.get('urlparameters')
+        return (reverse("leads:listnote", args=[leadid]) + '?' + urlparameters)
+
+    def delete(self, request, *args, **kwargs):
+        messages.warning(self.request, self.success_message)
+        return super(NoteDeleteView, self).delete(request, *args, **kwargs)
+
+
+Note_delete_view = NoteDeleteView.as_view()
+
+
+class NoteListView(LoginRequiredMixin, SuccessMessageMixin, WaffleFlagMixin, ListView):
+    model = Note
+    template_name = 'notes/note_list.html'
+    paginate_by = 5
+    waffle_flag = "detail_note"
+
+    def get_context_data(self, **kwargs: Any):
+        lead_id = self.kwargs['pk']
+        lead_qs = Lead.objects.get(id=lead_id)
+        note_qs = Note.objects.filter(lead=lead_id).order_by('-dateTimeModified')
+        context = super(NoteListView, self).get_context_data(**kwargs)
+        paginator = Paginator(note_qs, self.paginate_by)
+        page = self.request.GET.get('page')
+
+        try:
+            note_list = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            note_list = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            note_list = paginator.page(paginator.num_pages)
+        context['note_list'] = note_list
+        context['page_list'] = paginator.page_range
+        context['lead'] = lead_qs
+        context['notecreateform'] = NoteModelForm(None)
+        return context
+
+
+Note_list_view = NoteListView.as_view()

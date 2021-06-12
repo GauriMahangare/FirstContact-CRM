@@ -13,6 +13,7 @@
     <hr/>
     <h5>{% trans "Add new lead." %}</h5>
     </br >
+    {{ view.kwargs.leadid }}
     <form class="create_lead" id="myForm" enctype="multipart/form-data" method="post" action="{% url 'leads:create' %}">
         {% csrf_token %}
           {{ form|crispy }}
@@ -23,10 +24,10 @@
             <i class="loading-icon fa fa-spinner fa-spin hide"></i>
             <span class="btn-txt">{% trans "Create Lead" %} &raquo;</span>
         </button>
-        <a id="create-lead" class="btn-link ml-5" href="{% url 'leads:list' %}">{% trans "Cancel" %}</a>
+        <a id="create-lead" class="btn-link ml-5" href="{% url 'leads:list' %}?{{request.META.QUERY_STRING}}">{% trans "Cancel" %}</a>
     </form>
 {% else %}
-    <h3>To manage Teams, please upgrade your subscription.</h3>
+    <h3>To create leads, please upgrade your subscription.</h3>
     <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}"> {% trans "Upgrade now" %}</a>
 {% endflag %}
 

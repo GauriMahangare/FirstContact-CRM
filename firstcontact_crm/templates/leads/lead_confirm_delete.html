@@ -5,7 +5,7 @@
 {% load crispy_forms_tags %}
 {% load waffle_tags %}
 
-{% block head_title %} {{ user.username }} - Lead Delete {% endblock head_title %}
+{% block head_title %} {{ user.username }} - Lead Confirm Delete {% endblock head_title %}
 
 {% block content %}
 {% flag "delete_lead" %}
@@ -36,9 +36,8 @@
                 <i class="loading-icon fa fa-spinner fa-spin hide"></i>
                 <span class="btn-txt">{% trans "Yes, I'm sure" %} &raquo;</span>
             </button>
-            <a id="delete-team" class="btn btn-secondary ml-5" href="{% url 'leads:list' %}">{% trans "No, take me back" %} &raquo;</a>
+            <a id="delete-team" class="btn btn-secondary ml-5" href="{{ request.META.HTTP_REFERER }}">{% trans "No, take me back" %} &raquo;</a>
         </form>
-
 {% else %}
     {% if request.user.is_admin %}
         <h3>To manage Leads, please upgrade your subscription.</h3>

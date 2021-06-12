@@ -9,10 +9,16 @@ from leads.views import (
     Lead_list_view,
     Lead_detail_view,
     multi_lead_delete_view,
+    #################
+    Note_create_view,
+    Note_update_view,
+    Note_delete_view,
+    Note_list_view,
 )
 
 app_name = "leads"
 urlpatterns = [
+    # Lead URLS
     path("~update/<uuid:pk>", view=Lead_update_view, name="update"),
     path("~create/", view=Lead_create_view, name="create"),
     #path("~delete/<uuid:pk>", view=Lead_delete_view, name="delete"),
@@ -21,4 +27,12 @@ urlpatterns = [
     path("~list/", view=Lead_list_view, name="list"),
     path("~detail/<uuid:pk>", view=Lead_detail_view, name="detail"),
     path("~redirect/", view=Lead_redirect_view, name="redirect"),
+
+    # Note URLS
+
+    path("~note/create/>", view=Note_create_view, name="createnote",),
+    #path("~note/detail/<int:pk>", view=Note_detail_view, name="detailnote", ),
+    path("~note/update/<int:pk>", view=Note_update_view, name="updatenote",),
+    path("~note/delete/<int:pk>", view=Note_delete_view, name="deletenote", ),
+    path("~note/list/<uuid:pk>", view=Note_list_view, name="listnote"),
 ]

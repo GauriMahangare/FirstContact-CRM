@@ -6,36 +6,321 @@
 {% load waffle_tags %}
 {% load thumbnail %}
 
-{% block head_title %} {{ user.username }} - Lead Update {% endblock head_title %}
+{% block head_title %} {{ user.username }} - Lead detail {% endblock head_title %}
 
-{% block inner %}
+{% block content %}
 {% flag "detail_lead" %}
-    {{lead.organisation}}
-    {{user.userorganization}}
+
     {% if lead.organisation == user.userorganization %}
-        <h1>{% trans "Lead details." %}</h1>
-        <hr/>
-        <h5>{% trans "Lead details." %}</h5>
-        </br >
-
-        {% thumbnail lead.profile_picture   "100x100" crop="center" as im %}
-            <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
-        {% empty %}
-            <p>No image</p>
-        {% endthumbnail %}
-        <hr>
-        <!-- <img src="{{ lead.profile_picture.url }}" class="img-responsive" style="width: 100%; float: left; margin-right: 10px;" /> -->
-        <hr>
-        <form class="update_lead" id="myForm" method="post" action="{% url 'leads:update' lead.pk %}" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            {{ form|crispy }}
-            {% if redirect_field_value %}
-                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#"><h1>{% trans "Lead Detail" %} </h1></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a href="{% url 'leads:update' lead.pk %}" class="btn btn-warning btn-circle"><i class='fas fa-edit' style='font-size:20px'></i></a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'leads:update' lead.pk %}" class="btn btn-info btn-circle"><i class="material-icons" style="font-size:24px">note_add</i></a>
+            </li>
+          </ul>
+          <span class="navbar-text">
+            {% if "team"  in request.get_full_path  or "page"  in request.get_full_path %}
+                <a id="detail-lead" class="btn-link ml-5" href="{% url 'leads:list'%}?{{request.META.QUERY_STRING}}">{% trans "Back to Lead List" %}</a></li>
+            {% else %}
+                <a id="detail-lead" class="btn-link ml-5" href="{% url 'leads:list'%}">{% trans "Lead List" %}</a></li>
             {% endif %}
 
-            <a id="update-lead" class="btn-link ml-5" href="{% url 'leads:list' %}">{% trans "Back" %}</a>
-        </form>
+          </span>
+        </div>
+    </nav>
+    <br>
+    <div class="card">
+        <div class="card-header" id="headingOne">
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="true">{% trans "Profile Information" %} </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-company-tab" data-toggle="pill" href="#pills-company" role="tab" aria-controls="pills-company" aria-selected="false">{% trans "Company Data" %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">{% trans "Contact Information" %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-manage-tab" data-toggle="pill" href="#pills-manage" role="tab" aria-controls="pills-manage" aria-selected="false">{% trans "Manage Lead" %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-addinfo-tab" data-toggle="pill" href="#pills-addinfo" role="tab" aria-controls="pills-addinfo" aria-selected="false">{% trans "Additional Information" %}</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                    <div class="row">
+                        <div class="col-sm-3">
+                          <div class="card">
+                            <div class="text-center">
+                                {% thumbnail lead.profile_picture   "200x200" crop="center" as im %}
+                                    <img  class="card-img-top" src="{{ im.url }}" alt="Profile Image" width="{{ im.width }}" height="{{ im.height }}">
+                                {% empty %}
+                                    <p>{% trans "No image" %}</p>
+                                {% endthumbnail %}
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text"><a href="{{ MEDIA_URL }}{{ lead.profile_picture }}">{{ lead.profile_picture }}</a></p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-9">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{% trans "Personal Information" %}</h5>
+                                    <form>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-2">
+                                                <label for="inputtitle">{% trans "Title" %}</label>
+                                                <input type="text" class="form-control" id="inputtitle" value="{{lead.title}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="inputfname">{% trans "First Name" %}</label>
+                                                <input type="text" class="form-control" id="inputfname" value="{{lead.first_name}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="inputlname">{% trans "Last Name" %}</label>
+                                                <input type="text" class="form-control" id="inputlname" value="{{lead.last_name}}" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label for="inputdob">{% trans "Date of Birth" %}</label>
+                                                <input type="text" class="form-control" id="inputdob" value="{{lead.date_of_birth}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                <label for="inputage">{% trans "Age" %}</label>
+                                                <input type="text" class="form-control" id="inputage" value="{{lead.age}}" readonly>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-company" role="tabpanel" aria-labelledby="pills-company-tab">
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{% trans "Work Information" %}</h5>
+                                    <form>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-12">
+                                                <label for="inputorg">{% trans "Company Name" %}</label>
+                                                <input type="text" class="form-control" id="inputorg" value="{{lead.work_org_name}}" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="inputwaddress1">{% trans "Address Line 1" %}</label>
+                                                <input type="text" class="form-control" id="inputwaddress1" value="{{lead.work_address1}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="inputwaddress2">{% trans "Address Line 2" %}</label>
+                                                <input type="text" class="form-control" id="inputwaddress2" value="{{lead.work_address2}}" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="inputwaddress3">{% trans "Address Line 3" %}</label>
+                                                <input type="text" class="form-control" id="inputwaddress3" value="{{lead.work_address3}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="inputwaddress4">{% trans "Address Line 4" %}</label>
+                                                <input type="text" class="form-control" id="inputwaddress4" value="{{lead.work_address4}}" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-3">
+                                                <label for="inputwork_address_city">{% trans "City" %}</label>
+                                                <input type="text" class="form-control" id="inputwork_address_city" value="{{lead.work_address_city}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label for="inputwork_address_state_county">{% trans "State/County" %}</label>
+                                                <input type="text" class="form-control" id="inputwork_address_state_county" value="{{lead.work_address_state_county}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label for="inputwork_address_postcode">{% trans "Postcode/Zipcode" %}</label>
+                                                <input type="text" class="form-control" id="inputwork_address_postcode" value="{{lead.work_address_postcode}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label for="inputwork_address_country">{% trans "Country" %}</label>
+                                                <input type="text" class="form-control" id="inputwork_address_country" value="{{lead.work_address_country}}" readonly>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-3">
+                                                <label for="inputwork_Role">{% trans "Work Role" %}</label>
+                                                <input type="text" class="form-control" id="inputwork_Role" value="{{lead.work_Role}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-9">
+                                                <label for="inputwebsite">{% trans "Website" %}</label>
+                                                <input type="text" class="form-control" id="inputwebsite" value="{{lead.website}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="inputindustry">{% trans "Industry" %}</label>
+                                                <input type="text" class="form-control" id="inputindustry" value="{{lead.industry}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="inputannual_revenue">{% trans "Annual Revenue" %}</label>
+                                                <input type="text" class="form-control" id="inputannual_revenue" value="{{lead.annual_revenue}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="inputnbr_of_employees">{% trans "Number of Employees" %}</label>
+                                                <input type="text" class="form-control" id="inputnbr_of_employees" value="{{lead.nbr_of_employees}}" readonly>
+                                            </div>
+                                        </div>
+                                    </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{% trans "Contact Information" %}</h5>
+                                <form>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-8">
+                                            <label for="inputemail">{% trans "Email" %}</label>
+                                            <input type="text" class="form-control" id="inputemail" value="{{lead.email}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="inputemailOptIn" {% if lead.emailOptIn %} checked{% endif %} disabled>
+                                                <label class="form-check-label" for="inputemailOptIn"> {% trans "Email Marketing Opt In" %}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="inputphone_number">{% trans "Phone Number" %}</label>
+                                            <input type="text" class="form-control" id="inputwphone_number" value="{{lead.phone_number}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="inputmobile_number">{% trans "Mobile Number" %}</label>
+                                            <input type="text" class="form-control" id="inputmobile_number" value="{{lead.mobile_number}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="inputpreferred_contact_preference">{% trans "Contact Method Preference" %}</label>
+                                            <input type="text" class="form-control" id="inputpreferred_contact_preference" value="{{lead.preferred_contact_preference}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="inputpreferred_contact_time">{% trans "Contact Time Preference" %}</label>
+                                            <input type="text" class="form-control" id="inputpreferred_contact_time" value="{{lead.preferred_contact_time}}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-9">
+                                            <label for="inputsecondary_email">{% trans "Secondary Email" %}</label>
+                                            <input type="text" class="form-control" id="inputsecondary_email" value="{{lead.secondary_email}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-9">
+                                            <label for="inputsocial_media_1">{% trans "Social Media Profile Link 1 " %}</label>
+                                            <input type="text" class="form-control" id="inputsocial_media_1" value="{{lead.social_media_1}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-9">
+                                            <label for="inputsocial_media_2">{% trans "Social Media Profile Link 2" %}</label>
+                                            <input type="text" class="form-control" id="inputsocial_media_2" value="{{lead.social_media_2}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-9">
+                                            <label for="inputsocial_media_3">{% trans "Social Media Profile Link 3" %}</label>
+                                            <input type="text" class="form-control" id="inputsocial_media_3" value="{{lead.social_media_3}}" readonly>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-manage" role="tabpanel" aria-labelledby="pills-manage-tab">
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="float-lg-right">
+                                    {% trans "Last Updated By: " %} <strong>{{lead.created_by}}</strong> on {{lead.dateTimeModified}}
+                                </div>
+                                <h5 class="card-title">Lead Status</h5>
+                                <form>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-4">
+                                            <label for="inputteam">{% trans "Assigned to Team" %}</label>
+                                            <input type="text" class="form-control" id="inputteam" value="{{lead.team}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="inputassigned_to">{% trans "Assigned Agent" %}</label>
+                                            <input type="text" class="form-control" id="inputassigned_to" value="{{lead.assigned_to}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="inputstatus">{% trans "Status" %}</label>
+                                            <input type="text" class="form-control" id="inputstatus" value="{{lead.status}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="inputsource">{% trans "Source" %}</label>
+                                            <input type="text" class="form-control" id="inputsource" value="{{lead.source}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="inputlead_Ratings">{% trans "Lead Rating" %}</label>
+                                            <input type="text" class="form-control" id="inputlead_Ratings" value="{{lead.lead_Ratings}}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-12">
+                                            <label for="inputdescription">{% trans "Description" %}</label>
+                                            <input type="text" class="form-control" id="inputdescription" value="{{lead.description}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-12">
+                                            <label for="inputcloseReason">{% trans "Close Reason" %}</label>
+                                            <input type="text" class="form-control" id="inputcloseReason" value="{{lead.closeReason}}" readonly>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-addinfo" role="tabpanel" aria-labelledby="pills-addinfo-tab">
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">External referrences</h5>
+                                <form>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-12">
+                                            <label for="inputexternal_ref1">{% trans "External Reference 1 " %}</label>
+                                            <input type="text" class="form-control" id="inputexternal_ref1" value="{{lead.external_ref1}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-12">
+                                            <label for="inputexternal_ref2">{% trans "External Reference 2 " %}</label>
+                                            <input type="text" class="form-control" id="inputexternal_ref2" value="{{lead.external_ref2}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-12">
+                                            <label for="inputexternal_ref3">{% trans "External Reference 3 " %}</label>
+                                            <input type="text" class="form-control" id="inputexternal_ref3" value="{{lead.external_ref3}}" readonly>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     {% else %}
         <h1>We're sorry</h1>
         <hr/>
@@ -50,4 +335,7 @@
     {% endif %}
 {% endflag %}
 
-{% endblock %}
+{% endblock content %}
+{% block pageend-js %}
+<script type="text/javascript" src="{% static 'vendor/bootstrap/js/bootstrap.js' %}">  </script>
+{% endblock pageend-js %}

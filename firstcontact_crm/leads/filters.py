@@ -3,7 +3,7 @@ from django import forms
 from django.db import models
 from django.forms.widgets import CheckboxSelectMultiple
 import django_filters
-from leads.models import Lead, Category
+from .models import Lead, Category
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -25,10 +25,18 @@ class LeadFilter(django_filters.FilterSet):
         queryset=users_of_same_org,
         widget=CheckboxSelectMultiple(attrs={'class': 'related-widget-wrapper', }),
         to_field_name="pk",
-        label="User Name",
+        label="Assigned to users",
         label_suffix="",
 
     )
+
+    annual_revenue = django_filters.NumberFilter()
+    annual_revenue__gt = django_filters.NumberFilter(field_name='annual_revenue', lookup_expr='gt')
+    annual_revenue__lt = django_filters.NumberFilter(field_name='annual_revenue', lookup_expr='lt')
+
+    nbr_of_employees = django_filters.NumberFilter()
+    nbr_of_employees__gt = django_filters.NumberFilter(field_name='nbr_of_employees', lookup_expr='gt')
+    nbr_of_employees__lt = django_filters.NumberFilter(field_name='nbr_of_employees', lookup_expr='lt')
 
     status = django_filters.ModelMultipleChoiceFilter(
         queryset=Category.objects.all(),
@@ -73,6 +81,11 @@ class LeadFilter(django_filters.FilterSet):
             'source',
             'work_org_name',
             'work_Role',
+            'industry',
+            'annual_revenue__gt',
+            'annual_revenue__lt',
+            'nbr_of_employees__gt',
+            'nbr_of_employees__lt',
             'preferred_contact_preference',
             'status',
             'lead_Ratings',

@@ -1,4 +1,4 @@
-from leads.models import Category, Lead
+from leads.models import Category, Lead, Note, Industry
 from django.contrib import admin
 from leads.forms import LeadModelForm
 
@@ -23,13 +23,36 @@ class CategoryAdmin(admin.ModelAdmin):
         'status',
         'description',
         'created_by',
-
     ]
-    form = LeadModelForm
+
     #prepopulated_fields = {'slug': ('work_org_name',)}
 
 
 admin.site.register(Category, CategoryAdmin)
+
+
+class IndustryAdmin(admin.ModelAdmin):
+    date_hierarchy = 'dateTimeModified'
+
+    # to filter the resultes by users, content types and action flags
+    list_filter = [
+        'title',
+        'created_by',
+    ]
+
+    # when searching the user will be able to search in both object_repr and change_message
+    search_fields = [
+        'title',
+    ]
+
+    list_display = [
+        'title',
+        'description',
+        'created_by',
+    ]
+
+
+admin.site.register(Industry, IndustryAdmin)
 
 
 class LeadAdmin(admin.ModelAdmin):
@@ -65,7 +88,35 @@ class LeadAdmin(admin.ModelAdmin):
         'status',
         'closeReason',
     ]
+    form = LeadModelForm
     #prepopulated_fields = {'slug': ('work_org_name',)}
 
 
 admin.site.register(Lead, LeadAdmin)
+
+
+class NoteAdmin(admin.ModelAdmin):
+    date_hierarchy = 'dateTimeModified'
+
+    # to filter the resultes by users, content types and action flags
+    list_filter = [
+        'dateTimeModified',
+        'dateTimeCreated',
+    ]
+
+    # when searching the user will be able to search in both object_repr and change_message
+    search_fields = [
+        'title',
+        'notes',
+
+    ]
+
+    list_display = [
+        'lead',
+        'title',
+        'created_by'
+    ]
+    #prepopulated_fields = {'slug': ('work_org_name',)}
+
+
+admin.site.register(Note, NoteAdmin)

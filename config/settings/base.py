@@ -85,6 +85,7 @@ THIRD_PARTY_APPS = [
     "invitations",
     "sorl.thumbnail",
     "django_filters",
+    "import_export",
 ]
 
 LOCAL_APPS = [

@@ -12,22 +12,22 @@
 {% flag "update_lead" %}
 
     {% if lead.organisation == user.userorganization %}
-        <div class=d-lg-inline>
-            <a id="update-lead" class="btn-link ml-5 float-right" href="{% url 'leads:list' %}">{% trans "Cancel" %}</a>
-            <h1>{% trans "Update Lead" %}</h1>
+    <div class=d-lg-inline>
+        <a id="update-lead"class="btn-link ml-5 float-right" href="{{ request.META.HTTP_REFERER }}">{% trans "Cancel" %}</a></li>
+        <h1>{% trans "Update Lead" %}</h1>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form class="update_lead" id="myForm" method="post" action="{% url 'leads:update' lead.pk %}" enctype="multipart/form-data">
+                <!-- {% csrf_token %} -->
+                {% crispy form %}
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
+                <a id="create-team" class="btn-link ml-5" href="{% url 'leads:detail' lead.pk %}">{% trans "Cancel" %}</a>
+            </form>
         </div>
-
-        <hr/>
-        <h5>{% trans "Update Lead details." %}</h5>
-        </br >
-        <form class="update_lead" id="myForm" method="post" action="{% url 'leads:update' lead.pk %}" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% crispy form %}
-            {% if redirect_field_value %}
-                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-            {% endif %}
-        </form>
-        <br>
+    </div>
         <br>
     {% else %}
         <h1>We're sorry</h1>

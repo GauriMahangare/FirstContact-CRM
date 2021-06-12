@@ -1,0 +1,419 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load waffle_tags %}
+
+{% block head_title %} {{ user.username }} - NoteList {% endblock head_title %}
+
+
+{% block content %}
+{% flag "detail_note" %}
+    <a id="detail-note-back" class="float-right" href="{% url 'leads:list' %}?{{request.META.QUERY_STRING}}" >{% trans "Back to Lead List" %}</a>
+    <h1>Manage Notes</h1>
+    <hr/>
+
+    <div class="List_note" id="List_note_form">
+        <div class="card">
+            <div class="card-header">
+                <button type="button" id="add_note" class="btn btn-info btn-circle float-md-right" data-toggle="modal" data-bs-toggle="popover" title="Add note" data-bs-placement="top" value="{{lead.id}}" data-target="#addNoteModal" data-whatever="{{lead.id}} | {{lead.first_name}} {{lead.last_name}}">
+                    <i class="material-icons" style="font-size:24px">note_add</i>
+                </button>
+                <h5 class="card-title">Summary for <span class="text-capitalize">{{lead.title}} {{lead.first_name}} {{lead.last_name}}</span></h5>
+                <p>Lead status : {{lead.status}}</p>
+                <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                    View more
+                </a>
+            </div>
+            <div class="collapse" id="collapseExample">
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tbody>
+                        <tr>
+                            <td><span class="font-weight-bold">Work organisation:</span> {{lead.work_org_name}}</td>
+                            <td><span class="font-weight-bold">Job Role: </span> {{lead.work_Role}}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="font-weight-bold">Mobile Number : </span>{{lead.mobile_number}}</td>
+                            <td><span class="font-weight-bold">Email : </span>{{lead.email}}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="font-weight-bold">Preferred Contact method: </span>{{lead.preferred_contact_preference}}</td>
+                            <td><span class="font-weight-bold">Preferred contact time : </span>{{lead.preferred_contact_time}}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="font-weight-bold">Email opt in </span>{{lead.emailOptIn}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <a href="{% url 'leads:update' lead.id %}" class="btn btn-primary">Update Lead</a>
+                </div>
+            </div>
+        </div>
+    {% if note_list %}
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-lg-inline ">
+                <div class=" col-xs-2 float-right" >
+                    <input id="myInput" class="form-control m-0" type="text" placeholder="Search..">
+                </div>
+                <h6 class="m-0 font-weight-bold text-primary">{% trans "Update/Delete/Add notes." %}</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sortable table-hover" id="myTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th class="asc" onclick="sortTable()">Title </th>
+                                <th class="asc" onclick="sortTable()">Note </th>
+
+                                <th class="asc" onclick="sortTable()">Created By </th>
+                                <th class="asc" onclick="sortTable()">Changed DateTime </th>
+                                <th>Attachments </th>
+                                <th>Update </th>
+                                <th>Delete </th>
+                            </tr>
+                        </thead>
+                        <tbody id="myTable">
+                            {% for note in note_list %}
+                            <tr>
+                                <td class="text-break"> {{ note.title }}</td>
+                                <td class="text-break"> {{ note.notes }}</td>
+                                <td> {{ note.created_by }}</td>
+                                <td> {{ note.dateTimeModified }}</td>
+
+                                <td>
+                                    {% if note.file %}
+                                        <a href="{{MEDIA_URL}}{{note.file}}" download><i class='fas fa-download'></i></a>
+                                    {% else %}
+                                        No Attachment
+                                    {% endif %}
+                                </td>
+                                <td class="text-break">
+                                    <button type="button" id="id_btn_update_note" class="btn btn-warning btn-circle btn-sm" data-toggle="modal" data-bs-toggle="popover" title="Update note" data-bs-placement="top" value="{{note.id}}" data-target="#updateNoteModal" data-whatever="{{lead.id}}|{{note.id}}|{{note.title}}|{{note.notes}}|{{note.file}}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                                <td class="text-break">
+                                    <button type="button" id="id_btn_delete_note" class="btn btn-danger btn-circle btn-sm" data-toggle="modal" data-bs-toggle="popover" title="delete note" data-bs-placement="top" value="{{note.id}}" data-target="#deleteNoteModal" data-whatever="{{lead.id}}|{{note.id}}|{{note.title}}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if is_paginated %}
+                        <!-- <span class="page-current page-item">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                        </span> -->
+                        <nav aria-label="note-pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    {% if "team"  in request.get_full_path %}
+                                        <li class="page-item"> <a class="page-link" href="{{ request.get_full_path }}&page={{ page_obj.previous_page_number }}" >Previous</a></li>
+                                    {% else %}
+                                        <li class="page-item"> <a class="page-link" href="?page={{ page_obj.previous_page_number }}" >Previous</a></li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled"> <a class="page-link" href="#" >Previous</a></li>
+                                {% endif %}
+                                {% if page_list %}
+                                    {% for page_nbr in page_list %}
+                                        {% if "team"  in request.get_full_path %}
+                                            <li class="page-item"><a class="page-link" href="{{ request.get_full_path }}&page={{page_nbr}}">{{page_nbr}}<span class="sr-only">(current)</span></a></li>
+                                        {% else %}
+                                            <li class="page-item"><a class="page-link" href="?page={{page_nbr}}">{{page_nbr}}<span class="sr-only">(current)</span></a></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {%endif%}
+                                {% if page_obj.has_next %}
+                                    {% if "team"  in request.get_full_path %}
+                                        <li class="page-item"><a class="page-link" href="{{ request.get_full_path }}&page={{ page_obj.next_page_number }}" >Next</a></li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" >Next</a></li>
+                                    {%endif%}
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link " href="#" >Next</a></li>
+                                {% endif %}
+                            </ul>
+
+                        </nav>
+                    {% endif %}
+                </div>
+            </div>
+            {% flag "update_note" %}
+                <div class="modal fade" id="updateNoteModal" tabindex="-1" role="dialog" aria-labelledby="updateNoteModal" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="updateNoteModalLongTitle">Update Note</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <form class="form_update_note" id="myForm" enctype="multipart/form-data" method="post" action="">
+                                <div class="modal-body">
+                                    {% csrf_token %}
+                                    {{notecreateform|crispy }}
+                                </div>
+                                <input type="hidden" id="id_update_urlparameters" name="urlparameters" value="">
+                                <input type="hidden" id="id_update_noteid" name="update_noteid" value="">
+                                <input type="hidden" id="id_update_leadid" name="update_leadid" value="">
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                                        <span class="btn-txt">{% trans "Update Note" %} &raquo;</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                {% if request.user.is_admin %}
+                    <h3>To update notes, please upgrade your subscription.</h3>
+                    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+                {% else %}
+                    <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade.</h3>
+                {% endif %}
+            {% endflag %}
+    {% else %}
+        <br>
+        <br>
+        <h5>{% trans "There are no notes available on this lead." %}</h5>
+    {%endif%}
+{% else %}
+    {% if request.user.is_admin %}
+        <h3>To view notes, please upgrade your subscription.</h3>
+        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+    {% else %}
+        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade.</h3>
+    {% endif %}
+{% endflag %}
+{% flag "create_note" %}
+    <div class="modal fade" id="addNoteModal" tabindex="-1" role="dialog" aria-labelledby="addNoteModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addNoteModalLongTitle">Add note</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="create_note" id="myForm" enctype="multipart/form-data" method="post" action="{% url 'leads:createnote' %}">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        {{notecreateform|crispy }}
+                    </div>
+                    <input type="hidden" id="id_add_urlparameters" name="urlparameters" value="">
+                    <input type="hidden" id="id_create_note_lead" name="create_note_lead" value="">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                            <span class="btn-txt">{% trans "Add note" %} &raquo;</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% else %}
+    {% if request.user.is_admin %}
+        <h3>To create notes, please upgrade your subscription.</h3>
+        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+    {% else %}
+        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade.</h3>
+    {% endif %}
+{% endflag %}
+{% flag "delete_note" %}
+    <div class="modal fade" id="deleteNoteModal" tabindex="-1" role="dialog" aria-labelledby="deleteNoteModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteNoteModalLongTitle">Delete note </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="form_delete_note" id="myForm" enctype="multipart/form-data" method="post" action="">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <h4>Are you sure you want to delete the note?</h4>
+                    </div>
+                    <input type="hidden" id="id_delete_urlparameters" name="urlparameters" value="">
+                    <input type="hidden" id="id_delete_note_lead" name="delete_note_lead" value="">
+                    <input type="hidden" id="id_delete_note_id" name="delete_note_id" value="">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button class="btn btn-danger" type="submit">
+                            <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                            <span class="btn-txt">{% trans "Delete" %} &raquo;</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% else %}
+    {% if request.user.is_admin %}
+        <h3>To delete notes, please upgrade your subscription.</h3>
+        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+    {% else %}
+        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade.</h3>
+    {% endif %}
+{% endflag %}
+<script>
+        function sortTable() {
+          var table, rows, switching, i, x, y, shouldSwitch;
+          table = document.getElementById("myTable");
+          switching = true;
+          /*Make a loop that will continue until
+          no switching has been done:*/
+          while (switching) {
+            //start by saying: no switching is done:
+            switching = false;
+            rows = table.rows;
+            /*Loop through all table rows (except the
+            first, which contains table headers):*/
+            for (i = 1; i < (rows.length - 1); i++) {
+              //start by saying there should be no switching:
+              shouldSwitch = false;
+              /*Get the two elements you want to compare,
+              one from current row and one from the next:*/
+              x = rows[i].getElementsByTagName("TD")[0];
+              y = rows[i + 1].getElementsByTagName("TD")[0];
+              //check if the two rows should switch place:
+              if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                //if so, mark as a switch and break the loop:
+                shouldSwitch = true;
+                break;
+              }
+            }
+            if (shouldSwitch) {
+              /*If a switch has been marked, make the switch
+              and mark that a switch has been done:*/
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+            }
+          }
+        }
+
+        $('#addNoteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget) // Button that triggered the modal
+            var lead = button.data('whatever') // Extract info from data-* attributes
+            //split the content based on |
+            var leadid = lead.split("|")[0];
+            var leadname = lead.split("|")[1];
+
+            // remove spaces from the UUID
+            var leadid = leadid.replace(/\s/g, '');
+
+
+            //extracting url parameters -
+            const params = new URLSearchParams(location.search);
+
+
+            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            var modal = $(this)
+            modal.find('.modal-title').text('Create note for ' + leadname)
+            //Set value of lead id to hidden field.
+            $("#id_create_note_lead").attr("value", leadid);
+            $("#id_add_urlparameters").attr("value", params);
+
+        })
+
+
+
+        $('#updateNoteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget) // Button that triggered the modal
+            var lead = button.data('whatever') // Extract info from data-* attributes
+
+            //split the content based on |
+            var leadid = lead.split("|")[0];
+            var noteid = lead.split("|")[1];
+            var notetitle = lead.split("|")[2];
+            var notenotes = lead.split("|")[3];
+            var notefile = lead.split("|")[4];
+
+            // remove spaces from the UUID
+            var leadid = leadid.replace(/\s/g, '');
+            var noteid = noteid.replace(/\s/g, '');
+
+            //extracting url parameters -
+            const params = new URLSearchParams(location.search);
+
+            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            //var modal = $(this)
+            //modal.find('.modal-title').text('Add new note for ' + leadname)
+
+            //Set value of lead id to hidden field.
+            $("#id_update_leadid").attr("value", leadid);
+            $("#id_update_noteid").attr("value", noteid);
+            $("#id_update_urlparameters").attr("value", params);
+
+            //Pre poulate the form with existing information
+            var note_title = updateNoteModal.querySelector('#id_title')
+            note_title.value = notetitle
+
+            var note_notes = updateNoteModal.querySelector('#id_notes')
+            note_notes.value = notenotes
+
+            //var note_file = updateNoteModal.querySelector('#id_file')
+            //note_file.value = notefile
+
+            //create action URL  leads/~note/update?
+
+            actionURL = "/leads/~note/update/"+ noteid + "?" + params
+            console.log(actionURL)
+            $(".form_update_note").attr("action", actionURL);
+
+        })
+
+        $('#deleteNoteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget) // Button that triggered the modal
+            var lead = button.data('whatever') // Extract info from data-* attributes
+
+            console.log(lead)
+            //split the content based on |
+            var leadid = lead.split("|")[0];
+            var noteid = lead.split("|")[1];
+            var notetitle = lead.split("|")[2];
+
+            console.log(leadid)
+            console.log(noteid)
+
+            // remove spaces from the UUID
+            var leadid = leadid.replace(/\s/g, '');
+            var noteid = noteid.replace(/\s/g, '');
+
+            //extracting url parameters -
+            const params = new URLSearchParams(location.search);
+
+            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+
+            var modal = $(this)
+            modal.find('.modal-title').text('Delete note ' + notetitle)
+
+            //Set value of lead id to hidden field.
+            $("#id_delete_note_lead").attr("value", leadid);
+            $("#id_delete_note_id").attr("value", noteid);
+            $("#id_delete_urlparameters").attr("value", params);
+
+
+
+            //create action URL leads/~note/update?
+
+            actionURL = "/leads/~note/delete/"+ noteid + "?" + params
+            $(".form_delete_note").attr("action", actionURL);
+
+        })
+
+    </script>
+{% endblock content %}

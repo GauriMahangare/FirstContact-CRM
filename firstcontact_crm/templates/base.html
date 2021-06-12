@@ -52,6 +52,7 @@
      <!-- Google fonts-->
      <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
      <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
       <!-- place project specific Javascript in this file -->
       {% compress js %}
@@ -94,7 +95,7 @@
             </li>
             {% endif %}
           </ul>
-          
+
           <ul class="navbar-nav float-right">
             {% if request.user.is_authenticated %}
             <li class="nav-item ">
@@ -115,8 +116,8 @@
             </li>
           </ul>
 
-          
-          
+
+
           <!-- Navbar Search-->
           <!-- <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
             <div class="input-group">
@@ -169,7 +170,7 @@
                     Hertfordshire, WD23 3AQ ,
                       <br />
                     United Kingdom.
-                 
+
                   </p>
               </div>
               <!-- Footer Social Icons-->
@@ -190,12 +191,12 @@
               </div>
           </div>
 
-  
+
       </div>
       <!-- Copyright Section-->
       <div class="copyright py-4 text-center text-white">
         {% now "Y" as current_year %}
         <div class="container"><small> Copyright © <a class="pr-0" href = "https://www.avanengineering.com/" target="_blank">Avan Engineering Services Ltd </a>: {{current_year}}</small></div>
-      </div>  
+      </div>
   </footer>
 </html>
