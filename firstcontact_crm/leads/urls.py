@@ -9,6 +9,8 @@ from leads.views import (
     Lead_list_view,
     Lead_detail_view,
     multi_lead_delete_view,
+    LeadExportCSVView,
+    LeadExportJSONView,
     #################
     Note_create_view,
     Note_update_view,
@@ -27,6 +29,8 @@ urlpatterns = [
     path("~list/", view=Lead_list_view, name="list"),
     path("~detail/<uuid:pk>", view=Lead_detail_view, name="detail"),
     path("~redirect/", view=Lead_redirect_view, name="redirect"),
+    path("~export-csv/", view=LeadExportCSVView, name="export-csv"),
+    path("~export-json/", view=LeadExportJSONView, name="export-json"),
 
     # Note URLS
 

@@ -65,8 +65,9 @@ CELERY_TASK_ALWAYS_EAGER = False
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#task-eager-propagates
 CELERY_TASK_EAGER_PROPAGATES = True
 # Your stuff...
+CELERY_BROKER_URL = "amqp://firstcontact_crm:password1@localhost:5672/test_crm"
 # ------------------------------------------------------------------------------
 # Stripe
-STRIPE_PUBLIC_KEY="pk_test_51IHqbQFJjGPNRnAAwoHpztfF08VrSVvJBsLeDSU4We2yX6bBfBxE0YQpMKX2tjmKRwqKjAnOzWfFCKc85EDWJI7l007bxiDRUt"
-STRIPE_SECRET_KEY="sk_test_51IHqbQFJjGPNRnAAqbd6q21BpgKn7QVT74zpI337vBS3tu5W3BkXPR0Ayg7lE8avUK4IbIKlBDITRRusYCD2Q1WX00G8ivzKtG"
-STRIPE_WEBHOOK_SECRET="whsec_wXrSpERbhpdJZpua9URsDYuxZO0m9lnA"
+STRIPE_PUBLIC_KEY = "pk_test_51IHqbQFJjGPNRnAAwoHpztfF08VrSVvJBsLeDSU4We2yX6bBfBxE0YQpMKX2tjmKRwqKjAnOzWfFCKc85EDWJI7l007bxiDRUt"
+STRIPE_SECRET_KEY = "sk_test_51IHqbQFJjGPNRnAAqbd6q21BpgKn7QVT74zpI337vBS3tu5W3BkXPR0Ayg7lE8avUK4IbIKlBDITRRusYCD2Q1WX00G8ivzKtG"
+STRIPE_WEBHOOK_SECRET = "whsec_wXrSpERbhpdJZpua9URsDYuxZO0m9lnA"

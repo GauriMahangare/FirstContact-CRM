@@ -74,8 +74,8 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "django_celery_beat",
     "django_celery_results",
+    "django_celery_beat",
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
@@ -85,6 +85,7 @@ THIRD_PARTY_APPS = [
     "invitations",
     "sorl.thumbnail",
     "django_filters",
+    "import_export_celery",
     "import_export",
 ]
 
@@ -96,7 +97,6 @@ LOCAL_APPS = [
     "feature.apps.FeatureConfig",
     "teams.apps.TeamsConfig",
     "leads.apps.LeadsConfig",
-
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -157,6 +157,7 @@ MIDDLEWARE = [
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "waffle.middleware.WaffleMiddleware",
+    "author.middlewares.AuthorDefaultBackendMiddleware",
 ]
 
 # STATIC
@@ -292,6 +293,7 @@ CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="amqp://firstcontact_crm:pa
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-result_backend
 #CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-accept_content
 CELERY_ACCEPT_CONTENT = ["json"]
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-task_serializer
@@ -306,6 +308,22 @@ CELERY_TASK_TIME_LIMIT = 5 * 60
 CELERY_TASK_SOFT_TIME_LIMIT = 60
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#beat-scheduler
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+# https://github.com/auto-mat/django-import-export-celery
+IMPORT_EXPORT_CELERY_INIT_MODULE = "FIRSTCONTACT_CRM.config.celery_app"
+
+
+def leadresource():  # Optional
+    from firstcontact_crm.leads.resources import LeadResource
+    return LeadResource
+
+
+IMPORT_EXPORT_CELERY_MODELS = {
+    "Leads": {
+        "app_label": "leads",
+        "model_name": "Lead",
+        "resource": leadresource,  # Optional
+    }
+}
 # ------------------------------------------------------------------------------
 # django-allauth
 # ------------------------------------------------------------------------------
@@ -326,6 +344,8 @@ ACCOUNT_ADAPTER = 'invitations.models.InvitationsAdapter'
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_ADAPTER = "firstcontact_crm.users.adapters.SocialAccountAdapter"
 # django-compressor
+COMPRESS_ROOT = STATIC_ROOT
+COMPRESS_URL = STATIC_URL
 # ------------------------------------------------------------------------------
 # https://django-compressor.readthedocs.io/en/latest/quickstart/#installation
 INSTALLED_APPS += ["compressor"]
@@ -359,3 +379,8 @@ INVITATIONS_SIGNUP_REDIRECT = "/accounts/signup/"
 INVITATIONS_LOGIN_REDIRECT = "users:redirect"
 INVITATIONS_EMAIL_MAX_LENGTH = 60
 # INVITATIONS_INVITATION_MODEL='invitations.Invitation'
+
+# IMPORT EXPORT
+IMPORT_EXPORT_USE_TRANSACTIONS = False
+IMPORT_EXPORT_SKIP_ADMIN_LOG = False
+IMPORT_EXPORT_CHUNK_SIZE = 50

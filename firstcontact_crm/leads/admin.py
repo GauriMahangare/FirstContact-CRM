@@ -1,9 +1,15 @@
-from leads.models import Category, Lead, Note, Industry
+
+
 from django.contrib import admin
+from import_export import resources
+from import_export.admin import ImportExportMixin, ImportExportModelAdmin
+from import_export_celery.admin_actions import create_export_job_action
 from leads.forms import LeadModelForm
+from leads.models import Lead, Note, Industry, Category
+from leads.resources import LeadResource
+
 
 # Register your models here.
-
 
 class CategoryAdmin(admin.ModelAdmin):
     date_hierarchy = 'dateTimeModified'
@@ -54,8 +60,11 @@ class IndustryAdmin(admin.ModelAdmin):
 
 admin.site.register(Industry, IndustryAdmin)
 
+##################Creating import-export resource#######################
 
-class LeadAdmin(admin.ModelAdmin):
+
+class LeadAdmin(ImportExportMixin, admin.ModelAdmin):
+    resource_class = LeadResource
     date_hierarchy = 'dateTimeModified'
 
     # to filter the resultes by users, content types and action flags
@@ -89,6 +98,9 @@ class LeadAdmin(admin.ModelAdmin):
         'closeReason',
     ]
     form = LeadModelForm
+
+    actions = (create_export_job_action,)  # Celery import export
+
     #prepopulated_fields = {'slug': ('work_org_name',)}
 
 

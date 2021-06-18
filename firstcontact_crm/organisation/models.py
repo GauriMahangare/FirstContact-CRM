@@ -11,16 +11,17 @@ from django.utils.text import slugify
 # Create your models here.
 User = settings.AUTH_USER_MODEL
 
-class Organisation(models.Model):
-    created_by = models.ForeignKey(User,null=True,on_delete=models.SET_NULL)
 
-    slug = models.SlugField(null=True,unique=True)
+class Organisation(models.Model):
+    created_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+
+    slug = models.SlugField(null=True, unique=True)
 
     work_org_name = models.CharField('Work organisation',
-        max_length=300,
-        default='',
-        help_text='Required: Organisation Name'
-    )
+                                     max_length=300,
+                                     default='',
+                                     help_text='Required: Organisation Name'
+                                     )
     work_address_line1 = models.CharField(
         'Address Line 1',
         max_length=60,
@@ -54,15 +55,13 @@ class Organisation(models.Model):
 
     dateTimeModified = models.DateTimeField(
         'Last Modified',
-        auto_now =True,
+        auto_now=True,
     )
 
     dateTimeCreated = models.DateTimeField(
         'Created',
-        auto_now_add =True,
+        auto_now_add=True,
     )
-
-
 
     def __str__(self):
         return f"{self.work_org_name}"
@@ -74,26 +73,28 @@ class Organisation(models.Model):
         verbose_name = 'Organisation'
         verbose_name_plural = 'Organisations'
 
-def create_slug(instance,new_slug=None):
+
+def create_slug(instance, new_slug=None):
     # Remove spaces and replace it by -
     slug = slugify(instance.work_org_name)
 
     if new_slug is not None:
         slug = new_slug
-        
+
     qs = Organisation.objects.filter(slug=slug).order_by("-id")
     exists = qs.exists()
     if exists:
-        new_slug = "%s-%s" %(slug,qs.first().id)
-        return create_slug(instance, new_slug=new_slug )
+        new_slug = "%s-%s" % (slug, qs.first().id)
+        return create_slug(instance, new_slug=new_slug)
     return slug
 
 
-def pre_save_organisation_create_slug(sender,instance,*args, **kwargs):
+def pre_save_organisation_create_slug(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = create_slug(instance)
 
-pre_save.connect(pre_save_organisation_create_slug,sender=Organisation)
+
+pre_save.connect(pre_save_organisation_create_slug, sender=Organisation)
 
 # def get_queryset(self):
 #         return User.objects.filter(user=1)

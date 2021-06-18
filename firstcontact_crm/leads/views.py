@@ -1,25 +1,19 @@
 
-from datetime import date, datetime, timedelta
-from django.http import request
-
+import datetime
+from django.http import request, HttpResponse, response
 from django.views.generic.edit import FormView
-from leads.filters import LeadFilter
 
-from leads.forms import LeadModelForm, NoteModelForm
 from django import forms
 from typing import Any, Optional, Type
 import logging
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.forms import forms
-from django.forms.models import BaseModelForm
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.views import generic
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
-
 import waffle
 from django.urls import reverse
 from django.shortcuts import render, redirect, reverse
@@ -36,6 +30,9 @@ from django.core.paginator import PageNotAnInteger
 from waffle.mixins import WaffleFlagMixin
 from django.http import Http404
 from organisation.models import Organisation
+from leads.filters import LeadFilter
+from leads.forms import LeadModelForm, NoteModelForm
+from leads.resources import LeadResource
 from .models import Category, Lead, Note
 # from .forms import LeadMembershipForm
 
@@ -197,6 +194,27 @@ def multi_lead_delete_view(request, *args, **kwargs):
     context['leads_tobe_deleted_email'] = leads_tobe_deleted_email_list
     context['leads_tobe_deleted_count'] = len(leads_tobe_deleted_list)
     return render(request, "leads/lead_confirm_delete.html", context)
+
+
+@login_required
+def LeadExportCSVView(request):
+    lead_resource = LeadResource()
+    dataset = lead_resource.export()
+    timenow = datetime.datetime.now()
+    response = HttpResponse(dataset.csv, content_type='text/csv')
+    response['content-Disposition'] = 'attachment;filename="Leads.csv"'
+    return response
+
+
+@login_required
+def LeadExportJSONView(request):
+    lead_resource = LeadResource()
+    dataset = lead_resource.export()
+    timenow = datetime.datetime.now()
+    response = HttpResponse(dataset.json, content_type='application/json')
+    response['content-Disposition'] = 'attachment;filename="Leads.json"'
+    return response
+
 
 ##########################################################################
 #########                           Note Views                   #########

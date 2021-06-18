@@ -1,3 +1,4 @@
+from import_export import resources
 from django.db import models
 from datetime import date
 import uuid
@@ -9,6 +10,8 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from organisation.models import Organisation
 from teams.models import Team
+
+# from leads.admin import LeadResource
 from django.urls import reverse
 from django.template.loader import render_to_string
 
@@ -46,7 +49,6 @@ class Category(models.Model):
     status = models.CharField(
         'status',
         max_length=200,
-        blank=True,
     )
     description = models.TextField(
         'Description',
@@ -74,7 +76,7 @@ class Industry(models.Model):
     created_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
     title = models.CharField(
-        'status',
+        'Title',
         max_length=200,
         blank=True,
     )
@@ -276,8 +278,8 @@ class Lead(models.Model):
     )
 
     class ContactTimePreferenceChoices(models.TextChoices):
-        Morning = 'Morning', _('Morning(before 9AM)')
-        Work = 'WorkHours', _('Work Hours(Between 9AM and 5PM)')
+        Morning = 'MORNING', _('Morning(before 9AM)')
+        Work = 'WORKHOURS', _('Work Hours(Between 9AM and 5PM)')
         Evening = 'EVENING', _('Evening (Between 5PM to 8PM)')
     preferred_contact_time = models.CharField(
         'Preferred Contact Time',
@@ -315,7 +317,7 @@ class Lead(models.Model):
     )
 
     status = models.ForeignKey(
-        Category,
+        "Category",
         related_name="leads_Status",
         null=True,
         blank=True,
@@ -365,8 +367,6 @@ class Lead(models.Model):
         auto_now_add=True,
     )
 
-    # objects = LeadManager()
-
     def __str__(self):
         return f"{self.first_name} {self.last_name} {self.status}"
 
@@ -376,6 +376,15 @@ class Lead(models.Model):
 
     def get_absolute_url(self):
         return reverse('leads:detail', args=[self.pk])
+
+    # Celery based import export
+
+    @classmethod
+    def export_resource_classes(cls):
+        from leads.resources import LeadResource
+        return {
+            "leads": ("Leads resource", LeadResource),
+        }
 
 
 def lead_note_attachment_directory_path(instance, filename):
