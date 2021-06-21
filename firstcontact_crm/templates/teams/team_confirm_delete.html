@@ -5,36 +5,37 @@
 {% load crispy_forms_tags %}
 {% load waffle_tags %}
 
-{% block head_title %} {{ user.username }} - Team_delete {% endblock head_title %}
+{% block head_title %} {{ user.username }} - Team Confirm Delete {% endblock head_title %}
 
 {% block inner %}
 {% flag "create_team" %}
-    {% if team.organisation == user.userorganization %}  
-        <h1>Delete Team</h1>
+    {% if team.organisation == user.userorganization %}
+        <h1>{% trans "Delete Team" %}</h1>
         <hr/>
         <h5>{% trans "Delete team details." %}</h5>
         </br >
-        <form id="myForm" method="post">{% csrf_token %} 
-            <h2>Are you sure?</h2>
-            <h5>Are you sure you want to delete the Team "{{team.name}}"? </h5>
+        <form id="myForm" method="post">{% csrf_token %}
+            <h2>{% trans "Are you sure?" %}</h2>
+            <br>
+            <h5>{% trans "Are you sure you want to delete the Team - {{team.name}}? " %}</h5>
             <br>
             <button class="btn btn-danger" type="submit">
                 <i class="loading-icon fa fa-spinner fa-spin hide"></i>
                 <span class="btn-txt">{% trans "Yes, I'm sure" %} &raquo;</span>
             </button>
             <a id="delete-team" class="btn btn-secondary ml-5" href="{% url 'teams:list' %}">{% trans "No, take me back" %} &raquo;</a>
-        </form> 
+        </form>
     {% else %}
-        <h1>We're sorry</h1>
+        <h1>{% trans "We're sorry" %}</h1>
         <hr/>
-        <p>The page you're looking for can't be found. </p>
+        <p>{% trans "The page you're looking for can't be found." %} </p>
     {% endif %}
 {% else %}
     {% if request.user.is_admin %}
-        <h3>To manage Teams, please upgrade your subscription.</h3>
-        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+        <h3>{% trans "To manage Teams, please upgrade your subscription." %}</h3>
+        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">{% trans "Upgrade now" %}</a>
     {% else %}
-        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade.</h3>
+        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans " The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade." %}</h3>
     {% endif %}
-{% endflag %} 
+{% endflag %}
 {% endblock %}

@@ -4,28 +4,28 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 {% load waffle_tags %}
-{% block head_title %} {{ user.username }} - Team_List {% endblock head_title %}
+{% block head_title %} {{ user.username }} - Team detail {% endblock head_title %}
 
 
 {% block content %}
-{% flag "create_team" %}
-    {% if object.organisation == user.userorganization %}  
-        <h1>Team Detail View</h1>
+{% flag "detail_team" %}
+    {% if object.organisation == user.userorganization %}
+        <h1>{% trans "Team Detail View" %}</h1>
         <hr>
-        Organisation : {{ object.organisation }}
+        {% trans "Organisation :" %} {{ object.organisation }}
         <br>
-        Team : {{ object.name }}
+        {% trans "Team : " %}{{ object.name }}
     {% else %}
-        <h1>We're sorry</h1>
+        <h1>{% trans "We're sorry" %}</h1>
         <hr/>
-        <p>The page you're looking for can't be found. </p>
+        <p>{% trans "The page you're looking for can't be found." %} </p>
     {% endif %}
 {% else %}
     {% if request.user.is_admin %}
-        <h3>To manage Teams, please upgrade your subscription.</h3>
-        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+        <h3>{% trans "To manage Teams, please upgrade your subscription." %}</h3>
+        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">{% trans "Upgrade now" %}</a>
     {% else %}
-        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade.</h3>
+        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans " The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade." %}</h3>
     {% endif %}
 {% endflag %}
 {% endblock content %}

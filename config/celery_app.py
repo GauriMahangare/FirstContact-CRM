@@ -1,18 +1,13 @@
 import os
-import django
-
 from celery import Celery
-from django.conf import settings
-
-from celery import task
 
 # celery = Celery('tasks', broker='amqp://guest@localhost//')  # !
 # set the default Django settings module for the 'celery' program.
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
-print(settings.INSTALLED_APPS)
-django.setup()
+os.environ.setdefault("FORKED_BY_MULTIPROCESSING", "1")
+
 
 app = Celery("firstcontact_crm")
 
@@ -28,4 +23,4 @@ app.autodiscover_tasks()
 
 @app.task(bind=True)
 def debug_task(self):
-    print(f'Request: {self.request!r}')
+    print(f"Request: {self.request!r}")

@@ -20,10 +20,11 @@
         <div class="collapse navbar-collapse" id="navbarText">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a href="{% url 'leads:update' lead.pk %}" class="btn btn-warning btn-circle"><i class='fas fa-edit' style='font-size:20px'></i></a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'leads:update' lead.pk %}" class="btn btn-info btn-circle"><i class="material-icons" style="font-size:24px">note_add</i></a>
+                {% if "team"  in request.get_full_path  or "page"  in request.get_full_path %}
+                    <a href="{% url 'leads:update' lead.pk %}?{{request.META.QUERY_STRING}}" class="btn btn-warning btn-circle" title="Update Lead"><i class='fas fa-edit' style='font-size:20px'></i></a>
+                {% else %}
+                    <a href="{% url 'leads:update' lead.pk %}" class="btn btn-warning btn-circle"><i class='fas fa-edit' style='font-size:20px'></i></a>
+                {% endif %}
             </li>
           </ul>
           <span class="navbar-text">
@@ -297,7 +298,7 @@
                     <div class="col-sm-12">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">External referrences</h5>
+                                <h5 class="card-title">{% trans "External referrences" %}</h5>
                                 <form>
                                     <div class="form-row">
                                         <div class="form-group col-md-12">

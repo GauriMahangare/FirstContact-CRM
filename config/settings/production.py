@@ -15,7 +15,9 @@ from .base import env
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["glacial-waters-13236.herokuapp.com"])
+ALLOWED_HOSTS = env.list(
+    "DJANGO_ALLOWED_HOSTS", default=["glacial-waters-13236.herokuapp.com"]
+)
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -86,17 +88,16 @@ TEMPLATES[-1]["OPTIONS"]["loaders"] = [  # type: ignore[index] # noqa F405
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
 DEFAULT_FROM_EMAIL = env(
-    "DJANGO_DEFAULT_FROM_EMAIL", default="firstcontact_crm <noreply@firstcontactcrm.avanengineering.com>"
+    "DJANGO_DEFAULT_FROM_EMAIL",
+    default="firstcontact_crm <noreply@firstcontactcrm.avanengineering.com>",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-#SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
+# SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
-EMAIL_SUBJECT_PREFIX = env(
-    "DJANGO_EMAIL_SUBJECT_PREFIX", default="[firstcontact_crm]"
-)
+EMAIL_SUBJECT_PREFIX = env("DJANGO_EMAIL_SUBJECT_PREFIX", default="[firstcontact_crm]")
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = 'LocalEmails/app-messages'
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_FILE_PATH = "LocalEmails/app-messages"
 
 # ADMIN
 # ------------------------------------------------------------------------------
@@ -110,12 +111,12 @@ INSTALLED_APPS += ["anymail"]  # noqa F405
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 # https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
 # https://anymail.readthedocs.io/en/stable/esps/mailgun/
-#EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
-#ANYMAIL = {
-#    "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
-#    "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
-#    "MAILGUN_API_URL": env("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
-#}
+EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+ANYMAIL = {
+    "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
+    "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
+    "MAILGUN_API_URL": env("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
+}
 
 # django-compressor
 # ------------------------------------------------------------------------------
@@ -184,7 +185,12 @@ sentry_logging = LoggingIntegration(
     level=SENTRY_LOG_LEVEL,  # Capture info and above as breadcrumbs
     event_level=logging.ERROR,  # Send errors as events
 )
-integrations = [sentry_logging, DjangoIntegration(), CeleryIntegration(), RedisIntegration()]
+integrations = [
+    sentry_logging,
+    DjangoIntegration(),
+    CeleryIntegration(),
+    RedisIntegration(),
+]
 sentry_sdk.init(
     dsn=SENTRY_DSN,
     integrations=integrations,
@@ -201,6 +207,6 @@ CELERY_TASK_EAGER_PROPAGATES = True
 # Your stuff...
 # ------------------------------------------------------------------------------
 # Stripe
-STRIPE_PUBLIC_KEY="pk_test_51IHqbQFJjGPNRnAAwoHpztfF08VrSVvJBsLeDSU4We2yX6bBfBxE0YQpMKX2tjmKRwqKjAnOzWfFCKc85EDWJI7l007bxiDRUt"
-STRIPE_SECRET_KEY="sk_test_51IHqbQFJjGPNRnAAqbd6q21BpgKn7QVT74zpI337vBS3tu5W3BkXPR0Ayg7lE8avUK4IbIKlBDITRRusYCD2Q1WX00G8ivzKtG"
-STRIPE_WEBHOOK_SECRET="whsec_81Ky6iI05X2PtAAhMuDAsQEw95XYWRLl"
+STRIPE_PUBLIC_KEY = "pk_test_51IHqbQFJjGPNRnAAwoHpztfF08VrSVvJBsLeDSU4We2yX6bBfBxE0YQpMKX2tjmKRwqKjAnOzWfFCKc85EDWJI7l007bxiDRUt"
+STRIPE_SECRET_KEY = "sk_test_51IHqbQFJjGPNRnAAqbd6q21BpgKn7QVT74zpI337vBS3tu5W3BkXPR0Ayg7lE8avUK4IbIKlBDITRRusYCD2Q1WX00G8ivzKtG"
+STRIPE_WEBHOOK_SECRET = "whsec_81Ky6iI05X2PtAAhMuDAsQEw95XYWRLl"

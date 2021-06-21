@@ -5,11 +5,11 @@
 {% load crispy_forms_tags %}
 {% load waffle_tags %}
 
-{% block head_title %} {{ user.username }} - Team_List {% endblock head_title %}
+{% block head_title %} {{ user.username }} - Team List {% endblock head_title %}
 
 
 {% block content %}
-{% flag "create_team" %}
+{% flag "detail_team" %}
 
     <a id="create-team" class="btn btn-primary float-right" href="{% url 'teams:create' %}">{% trans "Add New Team" %}</a>
     <h1>Your Teams</h1>
@@ -26,7 +26,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive ">
-                    <table class="table table-sortable" id="myTable" width="100%" cellspacing="0">
+                    <table class="table table-sortable table-hover" id="myTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <!-- <th><div>Name <div class="container"><i class='fas fa-caret-up'></i> <i class='fas fa-caret-down'></i></div></div></th> -->
@@ -124,10 +124,10 @@
     </script>
 {% else %}
     {% if request.user.is_admin %}
-        <h3>To manage Teams, please upgrade your subscription.</h3>
-        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+        <h3>{% trans "To manage Teams, please upgrade your subscription." %}</h3>
+        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}"> {% trans "Upgrade now" %}</a>
     {% else %}
-        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade.</h3>
+        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans " The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade." %}</h3>
     {% endif %}
 {% endflag %}
 

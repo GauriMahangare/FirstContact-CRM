@@ -11,8 +11,12 @@ REDIS_URL=redis://redis:6379/0
 CELERY_BROKER_URL=amqp://firstcontact_crm:password1@localhost:5672/test_crm
 
 # Flower
-CELERY_FLOWER_USER=FSQofEYcCpwZgmTaSEoEhNzYMlMGltbz
-CELERY_FLOWER_PASSWORD=SCDkXqkYpTBCLzHPttoeeFugEFlx1fEPbXNZzkv7PBAKmHNFmQWy0zEj5YXRZ3yV
+#CELERY_FLOWER_USER=FSQofEYcCpwZgmTaSEoEhNzYMlMGltbz
+#CELERY_FLOWER_PASSWORD=SCDkXqkYpTBCLzHPttoeeFugEFlx1fEPbXNZzkv7PBAKmHNFmQWy0zEj5YXRZ3yV
+
+# Flower
+CELERY_FLOWER_USER=debug
+CELERY_FLOWER_PASSWORD=debug
 
 # ------------------------------------------------------------------------------
 #Stripe

@@ -311,28 +311,51 @@
 
           <!-- Nav Item - Pages Collapse Menu -->
           <li class="nav-item">
-              <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCRM"
-                  aria-expanded="true" aria-controls="collapseCRM">
-                  <i class="fas fa-address-book"></i>
-                  <span>Contact Management</span>
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLeads"
+                  aria-expanded="true" aria-controls="collapseLeads">
+                  <i class="fas fa-user-friends"></i>
+                  <span>Leads Management</span>
               </a>
-              <div id="collapseCRM" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div id="collapseLeads" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
                   <div class="bg-white py-2 collapse-inner rounded">
-                      <h6 class="collapse-header">Contacts</h6>
-                      <a class="collapse-item" href="#">View Contact List</a>
-                      <a class="collapse-item" href="#">Add new contact</a>
-                      <a class="collapse-item" href="#">Upload CSV </a>
-                      <div class="collapse-divider"></div>
-                      <h6 class="collapse-header">Leads</h6>
-                      <a class="collapse-item" href="{% url 'leads:list' %}">All Leads</a>
-                      <a class="collapse-item" href="#">My Leads</a>
-                      <a class="collapse-item" href="#">My Tasks</a>
-                      <h6 class="collapse-header">Lists</h6>
-                      <a class="collapse-item" href="#">My lists</a>
-                      <a class="collapse-item" href="#">Create new list</a>
-                      <a class="collapse-item" href="#">Import contacts</a>
+                    <h6 class="collapse-header">Leads</h6>
+                        <a class="collapse-item" href="{% url 'leads:list' %}">All Leads</a>
+                        <a class="collapse-item" href="{% url 'leads:listcategory' %}">Lead Categories</a>
+                        <a class="collapse-item" href="#">Products</a>
+                        <a class="collapse-item" href="#">Update Leads</a>
+                    <h6 class="collapse-header">Marketing Automations</h6>
+                        <a class="collapse-item" href="#">Create Campaigns</a>
+                        <a class="collapse-item" href="#">View segments</a>
+                        <a class="collapse-item" href="#">Add new segments</a>
+                        <a class="collapse-item" href="#">Create Custom Journey</a>
+                    <h6 class="collapse-header"> Emails</h6>
+                        <a class="collapse-item" href="#">Templates</a>
+                        <a class="collapse-item" href="#">Create new template</a>
+                        <a class="collapse-item" href="#">Update template</a>
                   </div>
-              </div>
+            </div>
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseContacts"
+              aria-expanded="true" aria-controls="collapseContacts">
+              <i class="fas fa-address-book"></i>
+              <span>Contact Management</span>
+            </a>
+            <div id="collapseContacts" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Contacts</h6>
+                        <a class="collapse-item" href="{% url 'leads:list' %}">Contacts</a>
+                        <a class="collapse-item" href="#">Contact Categories</a>
+                        <a class="collapse-item" href="#">Upload Contacts</a>
+                    <h6 class="collapse-header">Campaigns</h6>
+                        <a class="collapse-item" href="#">Create campaigns</a>
+                        <a class="collapse-item" href="#">Create new lists</a>
+                    <h6 class="collapse-header"> Quotes</h6>
+                        <a class="collapse-item" href="#">Quotes</a>
+                        <a class="collapse-item" href="#">Create Quotes</a>
+                    <h6 class="collapse-header"> Invoice</h6>
+                        <a class="collapse-item" href="#">Invoices</a>
+                        <a class="collapse-item" href="#">Create Invoice</a>
+                </div>
+            </div>
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseEmail"
               aria-expanded="true" aria-controls="collapseEmail">
               <i class="fas fa-mail-bulk"></i>

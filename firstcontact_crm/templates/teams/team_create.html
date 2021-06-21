@@ -5,7 +5,7 @@
 {% load crispy_forms_tags %}
 {% load waffle_tags %}
 
-{% block head_title %} {{ user.username }} - Team_Create {% endblock head_title %}
+{% block head_title %} {{ user.username }} - Team Create {% endblock head_title %}
 
 {% block inner %}
 {% flag "create_team" %}
@@ -26,8 +26,12 @@
         <a id="create-team" class="btn-link ml-5" href="{% url 'teams:list' %}">{% trans "Cancel" %}</a>
     </form>
 {% else %}
-    <h3>To manage Teams, please upgrade your subscription.</h3>
-    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}"> {% trans "Upgrade now" %}</a>
+    {% if request.user.is_admin %}
+        <h3>{% trans "To manage Teams, please upgrade your subscription." %}</h3>
+        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">{% trans "Upgrade now" %}</a>
+    {% else %}
+        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans " The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade." %}</h3>
+    {% endif %}
 {% endflag %}
 
 {% endblock %}

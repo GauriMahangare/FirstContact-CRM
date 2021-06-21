@@ -1,0 +1,40 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load waffle_tags %}
+
+{% block head_title %} {{ user.username }} - Category Delete {% endblock head_title %}
+
+{% block inner %}
+{% flag "delete_category" %}
+    {% if category.organisation == user.userorganization %}
+        <h1>Delete Category</h1>
+        <hr/>
+        </br >
+        <form id="myForm" method="post">{% csrf_token %}
+            <h2>Are you sure you want to delete the Category "{{category.status}}"? </h2>
+            <br>
+            <h5>If you have any Leads or Contacts categorised as {{category.status}}, these will be automatically recategoried to a blank status. </h5>
+            <br>
+            <button class="btn btn-danger" type="submit">
+                <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                <span class="btn-txt">{% trans "Yes, I'm sure" %} &raquo;</span>
+            </button>
+            <a id="delete-team" class="btn btn-secondary ml-5" href="{% url 'leads:listcategory' %}">{% trans "No, take me back" %} &raquo;</a>
+        </form>
+    {% else %}
+        <h1>We're sorry</h1>
+        <hr/>
+        <p>The page you're looking for can't be found. </p>
+    {% endif %}
+{% else %}
+    {% if request.user.is_admin %}
+        <h3>To manage Cateogy, please upgrade your subscription.</h3>
+        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+    {% else %}
+        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade.</h3>
+    {% endif %}
+{% endflag %}
+{% endblock %}

@@ -1,4 +1,3 @@
-
 from django.http import response
 from payment.models import Pricing, PaymentMethod, Subscription
 from typing import Any
@@ -49,7 +48,17 @@ user_detail_view = UserDetailView.as_view()
 class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
     model = User
-    fields = ["email", "title", "first_name", "last_name", "phone_number", "mobile_number", ]
+    fields = [
+        "email",
+        "title",
+        "first_name",
+        "last_name",
+        "phone_number",
+        "mobile_number",
+        "country",
+        "language",
+        "profile_picture",
+    ]
     success_message = _("Information successfully updated")
 
     def get_success_url(self):
@@ -71,14 +80,15 @@ class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
             return super(UserUpdateView, self).form_valid(form)
         else:
             try:
-                if (user.first_name and user.last_name and user.mobile_number):
+                if user.first_name and user.last_name and user.mobile_number:
                     user.is_profile_complete = True
                 user.save()
             except Exception as e:
                 print(str(e))
-                logger.critical('Error updating user profile')
+                logger.critical("Error updating user profile")
                 raise Http404(
-                    "There was an error updating your profile. If the error persists, please try again after sometime.")
+                    "There was an error updating your profile. If the error persists, please try again after sometime."
+                )
         return super(UserUpdateView, self).form_valid(form)
 
 
@@ -104,36 +114,48 @@ class UserSubscriptionView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = context['user']
+        user = context["user"]
         if user.is_admin:
             # Sync with Stripe
             try:
-                customer_subscription = stripe.Subscription.retrieve(user.subscription.stripe_subscription_id)
+                customer_subscription = stripe.Subscription.retrieve(
+                    user.subscription.stripe_subscription_id
+                )
             except Exception as e:
                 print(str(e))
-                logger.warning('Customer Subscription not found.')
+                logger.warning("Customer Subscription not found.")
             else:
-                context['billing_thresholds'] = customer_subscription['billing_thresholds']
-                context['cancel_at'] = customer_subscription['cancel_at']
-                context['cancel_at_period_end'] = customer_subscription['cancel_at_period_end']
-                context['canceled_at'] = customer_subscription['canceled_at']
-                context['collection_method'] = customer_subscription['collection_method']
-                context['current_period_end'] = datetime.utcfromtimestamp(
-                    customer_subscription['current_period_end']).strftime('%d %B %Y')
-                context['current_period_start'] = datetime.utcfromtimestamp(
-                    customer_subscription['current_period_start']).strftime('%d %B %Y')
-                context['days_until_due'] = customer_subscription['days_until_due']
-                context['default_payment_method'] = customer_subscription['default_payment_method']
-                context['discount'] = customer_subscription['discount']
-                context['ended_at'] = customer_subscription['ended_at']
-                #context['trial_start'] = datetime.utcfromtimestamp(customer_subscription['trial_start']).strftime('%d %B %Y')
-                #context['trial_end'] = datetime.utcfromtimestamp(customer_subscription['trial_end']).strftime('%d %B %Y')
-                context['trial_start'] = user.date_joined
-                context['trial_end'] = user.subscription.freeTrialEndDate
-                context['status'] = customer_subscription['status']
+                context["billing_thresholds"] = customer_subscription[
+                    "billing_thresholds"
+                ]
+                context["cancel_at"] = customer_subscription["cancel_at"]
+                context["cancel_at_period_end"] = customer_subscription[
+                    "cancel_at_period_end"
+                ]
+                context["canceled_at"] = customer_subscription["canceled_at"]
+                context["collection_method"] = customer_subscription[
+                    "collection_method"
+                ]
+                context["current_period_end"] = datetime.utcfromtimestamp(
+                    customer_subscription["current_period_end"]
+                ).strftime("%d %B %Y")
+                context["current_period_start"] = datetime.utcfromtimestamp(
+                    customer_subscription["current_period_start"]
+                ).strftime("%d %B %Y")
+                context["days_until_due"] = customer_subscription["days_until_due"]
+                context["default_payment_method"] = customer_subscription[
+                    "default_payment_method"
+                ]
+                context["discount"] = customer_subscription["discount"]
+                context["ended_at"] = customer_subscription["ended_at"]
+                # context['trial_start'] = datetime.utcfromtimestamp(customer_subscription['trial_start']).strftime('%d %B %Y')
+                # context['trial_end'] = datetime.utcfromtimestamp(customer_subscription['trial_end']).strftime('%d %B %Y')
+                context["trial_start"] = user.date_joined
+                context["trial_end"] = user.subscription.freeTrialEndDate
+                context["status"] = customer_subscription["status"]
                 stripe_price_id = customer_subscription["plan"]["id"]
                 pricing = Pricing.objects.get(stripe_price_id=stripe_price_id)
-                context['pricing_name'] = pricing.name
+                context["pricing_name"] = pricing.name
                 # if (customer_subscription['status'] != "canceled"):
                 # items  = customer_subscription['items']
                 # data_list = items['data']
@@ -144,22 +166,22 @@ class UserSubscriptionView(LoginRequiredMixin, DetailView):
                 # context['currency'] = price['currency']
 
                 pmt_method_qs = PaymentMethod.objects.filter(user=user)
-                context['pmt_method_qs'] = pmt_method_qs
+                context["pmt_method_qs"] = pmt_method_qs
 
-# Retreive Latest Invoice status for the user from Stripe
+                # Retreive Latest Invoice status for the user from Stripe
                 customer_id = user.stripe_customer_id
                 try:
                     customerInvoiceList = stripe.Invoice.list(customer=customer_id)
                     print(customerInvoiceList)
-                    context['customer_invoice_list'] = customerInvoiceList['data']
+                    context["customer_invoice_list"] = customerInvoiceList["data"]
                 except Exception as e:
                     print(str(e))
-                    logger.critical('No invoice found for {customer_id} - ', exc_info=1)
+                    logger.critical("No invoice found for {customer_id} - ", exc_info=1)
 
         return context
 
     def get(self, request, *args, **kwargs):
-        previous_url = self.request.META.get('HTTP_REFERER')
+        previous_url = self.request.META.get("HTTP_REFERER")
         return super().get(request, *args, **kwargs)
 
 
@@ -170,7 +192,9 @@ class CancelSubscriptionView(LoginRequiredMixin, View):
     # form_class = CancelSubscriptionForm
 
     def get_success_url(self):
-        return reverse("users:subscription", kwargs={"username": self.request.user.username})
+        return reverse(
+            "users:subscription", kwargs={"username": self.request.user.username}
+        )
 
     def get(self, request, *args, **kwargs):
         context = {
@@ -179,7 +203,7 @@ class CancelSubscriptionView(LoginRequiredMixin, View):
             "subscriptionId": self.request.user.subscription.stripe_subscription_id,
             "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY,
         }
-        return render(request, 'users/user_confirm_subscription_cancel.html', context)
+        return render(request, "users/user_confirm_subscription_cancel.html", context)
 
     # def post(self, request, *args, **kwargs):
     #     try:
@@ -213,26 +237,31 @@ class PaymentMethodUpdateView(LoginRequiredMixin, SuccessMessageMixin, View):
             payment_method.save()
         except Exception as e:
             print(str(e))
-            logger.critical('Payment Method Update error')
+            logger.critical("Payment Method Update error")
             raise Http404(
-                "There was an error updating your payment method. If the error persists, please try again after sometime.")
+                "There was an error updating your payment method. If the error persists, please try again after sometime."
+            )
         else:
             customer_id = request.user.stripe_customer_id
             try:
                 stripe.Customer.modify(
                     customer_id,
                     invoice_settings={
-                        'default_payment_method': payment_method.stripe_payment_method_id,
+                        "default_payment_method": payment_method.stripe_payment_method_id,
                     },
                 )
             except Exception as e:
                 print(str(e))
-                logger.critical('Stripe default payment method update error', exc_info=1)
+                logger.critical(
+                    "Stripe default payment method update error", exc_info=1
+                )
                 return e
             else:
-                messages.success(self.request, "Payment method has been set as default.")
+                messages.success(
+                    self.request, "Payment method has been set as default."
+                )
                 # return reverse("users:subscription", kwargs={"username": self.request.user.username})
-                return HttpResponseRedirect('/users/~subscription/redirect/')
+                return HttpResponseRedirect("/users/~subscription/redirect/")
         # else:
         #    messages.error(self.request, "Please update your subscription to continue using this feature.")
         #    return super(PaymentMethodUpdateView, self).form_valid(form)
@@ -246,7 +275,9 @@ class UserSubscriptionRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self):
-        return reverse("users:subscription", kwargs={"username": self.request.user.username})
+        return reverse(
+            "users:subscription", kwargs={"username": self.request.user.username}
+        )
 
 
 user_subscription_redirect_view = UserSubscriptionRedirectView.as_view()
@@ -265,13 +296,14 @@ class PaymentMethodAddView(LoginRequiredMixin, SuccessMessageMixin, View):
             payment_method.save()
         except Exception as e:
             print(str(e))
-            logger.critical('Payment Method Update error')
+            logger.critical("Payment Method Update error")
             raise Http404(
-                "There was an error updating your payment method. If the error persists, please try again after sometime.")
+                "There was an error updating your payment method. If the error persists, please try again after sometime."
+            )
         else:
             messages.success(self.request, "Payment method has been set as default.")
             # return reverse("users:subscription", kwargs={"username": self.request.user.username})
-            return HttpResponseRedirect('/users/~subscription/redirect/')
+            return HttpResponseRedirect("/users/~subscription/redirect/")
         # else:
         #    messages.error(self.request, "Please update your subscription to continue using this feature.")
         #    return super(PaymentMethodUpdateView, self).form_valid(form)

@@ -38,8 +38,12 @@
         {% endif %}
     {% endif %}
 {% else %}
-    <h3>To manage Team members, please upgrade your subscription.</h3>
-    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}"> {% trans "Upgrade now" %}</a>
+    {% if request.user.is_admin %}
+    <h3>{% trans "To manage Teams, please upgrade your subscription." %}</h3>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">{% trans "Upgrade now" %}</a>
+    {% else %}
+    <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans " The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade." %}</h3>
+    {% endif %}
 {% endflag %}
 
 {% endblock %}

@@ -24,8 +24,8 @@ CACHES = {
 }
 
 # EMAIL
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = 'LocalEmails/app-messages'
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_FILE_PATH = "LocalEmails/app-messages"
 
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-hosts
@@ -65,7 +65,10 @@ CELERY_TASK_ALWAYS_EAGER = False
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#task-eager-propagates
 CELERY_TASK_EAGER_PROPAGATES = True
 # Your stuff...
-CELERY_BROKER_URL = "amqp://firstcontact_crm:password1@localhost:5672/test_crm"
+CELERY_BROKER_URL = env(
+    "CELERY_BROKER_URL",
+    default="amqp://firstcontact_crm:password1@localhost:5672/test_crm",
+)
 # ------------------------------------------------------------------------------
 # Stripe
 STRIPE_PUBLIC_KEY = "pk_test_51IHqbQFJjGPNRnAAwoHpztfF08VrSVvJBsLeDSU4We2yX6bBfBxE0YQpMKX2tjmKRwqKjAnOzWfFCKc85EDWJI7l007bxiDRUt"

@@ -45,7 +45,9 @@ LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres://postgres:admin@localhost/firstcontactcrm")
+    "default": env.db(
+        "DATABASE_URL", default="postgres://postgres:admin@localhost/firstcontactcrm"
+    )
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
@@ -91,12 +93,21 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "firstcontact_crm.users.apps.UsersConfig",
+    # Universal Apps
+    "prodUsageUnit.apps.ProdusageunitConfig",
+    "country.apps.CountryConfig",
+    "currency.apps.CurrencyConfig",
+    "language.apps.LanguageConfig",
     # Your stuff: custom apps go here
     "organisation.apps.OrganisationConfig",
     "payment.apps.PaymentConfig",
     "feature.apps.FeatureConfig",
     "teams.apps.TeamsConfig",
     "leads.apps.LeadsConfig",
+    # Product related apps
+    "products.apps.ProductsConfig",
+    "prodManufacturer.apps.ProdmanufacturerConfig",
+    "prodCategory.apps.ProdcategoryConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -217,7 +228,7 @@ TEMPLATES = [
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 # http://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
-#CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+# CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # FIXTURES
@@ -281,7 +292,7 @@ LOGGING = {
     "root": {"level": "INFO", "handlers": ["console"]},
 }
 
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # Celery
 # ------------------------------------------------------------------------------
@@ -289,11 +300,14 @@ if USE_TZ:
     # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-timezone
     CELERY_TIMEZONE = TIME_ZONE
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-broker_url
-CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="amqp://firstcontact_crm:password1@localhost:5672/test_crm")
+CELERY_BROKER_URL = env(
+    "CELERY_BROKER_URL",
+    default="amqp://firstcontact_crm:password1@localhost:5672/test_crm",
+)
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-result_backend
-#CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_CACHE_BACKEND = 'django-cache'
+# CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_RESULT_BACKEND = "django-db"
+# CELERY_CACHE_BACKEND = 'django-cache'
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-accept_content
 CELERY_ACCEPT_CONTENT = ["json"]
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-task_serializer
@@ -308,12 +322,14 @@ CELERY_TASK_TIME_LIMIT = 5 * 60
 CELERY_TASK_SOFT_TIME_LIMIT = 60
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#beat-scheduler
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+############## Export Import via Celery #############
 # https://github.com/auto-mat/django-import-export-celery
 IMPORT_EXPORT_CELERY_INIT_MODULE = "FIRSTCONTACT_CRM.config.celery_app"
 
 
 def leadresource():  # Optional
-    from firstcontact_crm.leads.resources import LeadResource
+    from leads.resources import LeadResource
+
     return LeadResource
 
 
@@ -329,7 +345,7 @@ IMPORT_EXPORT_CELERY_MODELS = {
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-#ACCOUNT_AUTHENTICATION_METHOD = "username"
+# ACCOUNT_AUTHENTICATION_METHOD = "username"
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_EMAIL_REQUIRED = True
@@ -340,16 +356,16 @@ ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 # ACCOUNT_ADAPTER = "firstcontact_crm.users.adapters.AccountAdapter"
-ACCOUNT_ADAPTER = 'invitations.models.InvitationsAdapter'
+ACCOUNT_ADAPTER = "invitations.models.InvitationsAdapter"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_ADAPTER = "firstcontact_crm.users.adapters.SocialAccountAdapter"
-# django-compressor
-COMPRESS_ROOT = STATIC_ROOT
-COMPRESS_URL = STATIC_URL
 # ------------------------------------------------------------------------------
 # https://django-compressor.readthedocs.io/en/latest/quickstart/#installation
 INSTALLED_APPS += ["compressor"]
 STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
+# django-compressor
+COMPRESS_ROOT = STATIC_ROOT
+COMPRESS_URL = STATIC_URL
 # django-rest-framework
 # -------------------------------------------------------------------------------
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
@@ -367,10 +383,10 @@ CORS_URLS_REGEX = r"^/api/.*$"
 # ------------------------------------------------------------------------------
 
 # Waffle Feature flags
-WAFFLE_FLAG_MODEL = 'feature.Flag'
+WAFFLE_FLAG_MODEL = "feature.Flag"
 
 # Invitation Email Setup
-INVITATION_EXPIRY = '2'  # 2 days from the date of sent.
+INVITATION_EXPIRY = "2"  # 2 days from the date of sent.
 INVITATION_ONLY = True
 ACCEPT_INVITE_AFTER_SIGNUP = True
 ALLOW_JSON_INVITES = True
