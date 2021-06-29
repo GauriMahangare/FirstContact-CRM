@@ -1,0 +1,133 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load waffle_tags %}
+
+{% block head_title %} {{ user.username }} - Product Category List {% endblock head_title %}
+
+
+{% block content %}
+{% flag "detail_prodcategory" %}
+
+    <a id="create-category" href="{% url 'prodCategory:create' %}" class="btn btn-info btn-circle float-right"  title="Add Category"><i class="material-icons">add_circle</i></a>
+    <h1>{% trans " Manage Product Categories" %}</h1>
+    <hr/>
+
+    <div class="List_category" id="List_category_form">
+    {% if category_list %}
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-lg-inline ">
+                <div class=" col-xs-2 float-right" >
+                    <input id="myInput" class="form-control m-0" type="text" placeholder="Search..">
+                </div>
+                <h6 class="m-0 font-weight-bold text-primary">{% trans "Categories your Products" %}</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive table-hover">
+                    <table class="table table-sortable" id="myTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <!-- <th><div>Name <div class="container"><i class='fas fa-caret-up'></i> <i class='fas fa-caret-down'></i></div></div></th> -->
+                                <th class="asc" onclick="sortTable()">Type </th>
+                                <th class="asc" onclick="sortTable()">Description </th>
+                                <th class="asc" onclick="sortTable()">Updated By </th>
+                                <th class="asc" onclick="sortTable()">Changed DateTime </th>
+                                <th>Update </th>
+                                <th>Delete </th>
+                            </tr>
+                        </thead>
+                        <tbody id="myTable">
+                            {% for category in category_list %}
+                            <tr>
+                                <td class="text-break"> {{ category.name }}</td>
+                                <td class="text-break"> {{ category.description }}</td>
+                                <td> {{ category.created_by }}</td>
+                                <td> {{ category.dateTimeModified }}</td>
+                                <td> <a href="{% url 'prodCategory:update' category.pk %}" class="btn btn-warning btn-circle btn-sm"  title="Update Category"><i class="fas fa-edit"></i></a></td>
+                                <td> <a href="{% url 'prodCategory:delete' category.pk %}" class="btn btn-danger btn-circle btn-sm" title="Delete Category"><i class="fas fa-trash"></i></a></td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if is_paginated %}
+                        <!-- <span class="page-current page-item">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                        </span> -->
+                        <nav aria-label="team-pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item"> <a class="page-link" href="?page={{ page_obj.previous_page_number }}" >Previous</a></li>
+                                {% else %}
+                                    <li class="page-item disabled"> <a class="page-link" href="#" >Previous</a></li>
+                                {% endif %}
+                                {% if page_list %}
+                                    {% for page_nbr in page_list %}
+                                    <li class="page-item"><a class="page-link" href="?page={{page_nbr}}">{{page_nbr}}<span class="sr-only">(current)</span></a></li>
+                                    {% endfor %}
+                                {%endif%}
+                                {% if page_obj.has_next %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" >Next</a></li>
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link " href="#" >Next</a></li>
+                                {% endif %}
+                            </ul>
+
+                        </nav>
+                    {% endif %}
+                </div>
+            </div>
+    {% else %}
+        <h5>{% trans "You don't have any Product Categories set up yet." %}</h5>
+        </br >
+    {%endif%}
+
+    </div>
+    <script>
+        function sortTable() {
+          var table, rows, switching, i, x, y, shouldSwitch;
+          table = document.getElementById("myTable");
+          switching = true;
+          /*Make a loop that will continue until
+          no switching has been done:*/
+          while (switching) {
+            //start by saying: no switching is done:
+            switching = false;
+            rows = table.rows;
+            /*Loop through all table rows (except the
+            first, which contains table headers):*/
+            for (i = 1; i < (rows.length - 1); i++) {
+              //start by saying there should be no switching:
+              shouldSwitch = false;
+              /*Get the two elements you want to compare,
+              one from current row and one from the next:*/
+              x = rows[i].getElementsByTagName("TD")[0];
+              y = rows[i + 1].getElementsByTagName("TD")[0];
+              //check if the two rows should switch place:
+              if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                //if so, mark as a switch and break the loop:
+                shouldSwitch = true;
+                break;
+              }
+            }
+            if (shouldSwitch) {
+              /*If a switch has been marked, make the switch
+              and mark that a switch has been done:*/
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+            }
+          }
+        }
+    </script>
+{% else %}
+    {% if request.user.is_admin %}
+    <h3>{% trans "To manage Product Category, please upgrade your subscription." %}</h3>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">{% trans "Upgrade now" %}</a>
+    {% else %}
+    <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans "The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade." %}</h3>
+    {% endif %}
+{% endflag %}
+
+{% endblock content %}

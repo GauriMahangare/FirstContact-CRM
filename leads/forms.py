@@ -1,26 +1,16 @@
-from datetime import timezone
 from django import forms
-from django.conf import settings
+from .models import Lead, Note
+from category.models import Category
+from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import (
-    Button,
-    Div,
-    Field,
     HTML,
     Layout,
-    Fieldset,
-    ButtonHolder,
     Submit,
 )
-from crispy_forms.bootstrap import Tab, TabHolder, FormActions
-from crispy_forms.layout import Div
-
-from .models import Lead, Note
-from django.contrib.auth import get_user_model
+from crispy_forms.bootstrap import Tab, TabHolder
 
 User = get_user_model()
-
-# Div.template = 'my_div_template.html'
 
 
 class LeadModelForm(forms.ModelForm):
@@ -178,15 +168,16 @@ class LeadModelForm(forms.ModelForm):
         return data
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        user_org = kwargs.pop("user_org", None)
         super(LeadModelForm, self).__init__(*args, **kwargs)
-        instance = kwargs.get("instance")
         users_in_org = User.objects.none()
-        if instance:
-            users_in_org = User.objects.filter(
-                userorganization_id=instance.organisation_id
-            )
+        users_in_org = User.objects.filter(userorganization=user_org)
+        category_in_org = Category.objects.none()
+        category_in_org = Category.objects.filter(organisation=user_org)
 
         self.fields["assigned_to"].queryset = users_in_org
+        self.fields["status"].queryset = category_in_org
         self.helper = FormHelper()
         self.helper.layout = Layout(
             TabHolder(
@@ -200,17 +191,14 @@ class LeadModelForm(forms.ModelForm):
                           <div class="card">
                             <div class="text-center">
                                 {% if form.profile_picture.value %}
-                                    <img class="center" src= "{{ MEDIA_URL }}{{ form.profile_picture.value }}" width="200" height="200" crop="center" >
+                                    <img class="center" src= "{{ MEDIA_URL }}{{ form.profile_picture.value }}" width ="250" height="250" alt="Profile Image"  >
                                 {% else %}
-                                    <p>No Picture</p>
+                                    <p>No Image</p>
                                 {% endif %}
                             </div>
                             <div class="card-body">
-                                {% if form.profile_picture.value %}
-                                    {{ form.profile_picture }}
-                                {% else %}
-                                    <p>No Picture</p>
-                                {% endif %}
+                                <h5 class="card-title">Profile Picture</h5>
+                                <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
                             </div>
                           </div>
                         </div>
@@ -243,7 +231,12 @@ class LeadModelForm(forms.ModelForm):
                                                 {{form.age}}
                                             </div>
                                         </div>
-
+                                        <div class="form-row">
+                                            <div class="form-group col-md-9">
+                                                <label for="id_profile_picture">Profile Image - </label>
+                                                {{ form.profile_picture }}
+                                            </div>
+                                        </div>
                                 </div>
                             </div>
                         </div>
@@ -322,11 +315,11 @@ class LeadModelForm(forms.ModelForm):
                                         <label for="inputannual_revenue">Annual Revenue</label>
                                         {{form.annual_revenue}}
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-2">
                                         <label for="inputannual_revenue">Currency</label>
                                         {{form.currency}}
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-2">
                                         <label for="inputnbr_of_employees">Number of Employees</label>
                                         {{form.nbr_of_employees}}
                                     </div>
@@ -461,21 +454,20 @@ class LeadModelForm(forms.ModelForm):
                             <div class="card-body">
                                 <h5 class="card-title">External referrences</h5>
 
-                                    <div class="form-row">
-                                        <div class="form-group col-md-12">
-                                            <label for="inputexternal_ref1">External Reference 1</label>
-                                            {{form.external_ref1}}
-                                        </div>
-                                        <div class="form-group col-md-12">
-                                            <label for="inputexternal_ref2">External Reference 2 </label>
-                                            {{form.external_ref2}}
-                                        </div>
-                                        <div class="form-group col-md-12">
-                                            <label for="inputexternal_ref3">External Reference 3 </label>
-                                            {{form.external_ref3}}
-                                        </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-12">
+                                        <label for="inputexternal_ref1">External Reference 1</label>
+                                        {{form.external_ref1}}
                                     </div>
-
+                                    <div class="form-group col-md-12">
+                                        <label for="inputexternal_ref2">External Reference 2 </label>
+                                        {{form.external_ref2}}
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label for="inputexternal_ref3">External Reference 3 </label>
+                                        {{form.external_ref3}}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

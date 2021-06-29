@@ -220,9 +220,13 @@
                         {% else %}
                             <a class="collapse-item" href="{% url 'organisation:update' %}" >Update Organisation</a>
                         {% endif %}
-                        <h6 class="collapse-header">Manage Users</h6>
+                        <h6 class="collapse-header">Users</h6>
                         <a class="collapse-item" href="{% url 'organisation:list' %}">Manage Users</a>
                         <a class="collapse-item" href="{% url 'invitations:send-invite' %}">Invite Users</a>
+                        <h6 class="collapse-header">Products</h6>
+                        <a class="collapse-item" href="{% url 'product:list' %}">Products</a>
+                        <a class="collapse-item" href="{% url 'prodCategory:list' %}">Product Categories</a>
+                        <a class="collapse-item" href="{% url 'manufacturer:list' %}">Product Manufacturers</a>
                     </div>
                 </div>
             </li>
@@ -320,7 +324,7 @@
                   <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Leads</h6>
                         <a class="collapse-item" href="{% url 'leads:list' %}">All Leads</a>
-                        <a class="collapse-item" href="{% url 'leads:listcategory' %}">Lead Categories</a>
+                        <a class="collapse-item" href="{% url 'category:list' %}">Lead Categories</a>
                         <a class="collapse-item" href="#">Products</a>
                         <a class="collapse-item" href="#">Update Leads</a>
                     <h6 class="collapse-header">Marketing Automations</h6>

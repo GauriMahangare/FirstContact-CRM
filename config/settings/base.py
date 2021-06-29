@@ -98,14 +98,16 @@ LOCAL_APPS = [
     "country.apps.CountryConfig",
     "currency.apps.CurrencyConfig",
     "language.apps.LanguageConfig",
+    "industry.apps.IndustryConfig",
     # Your stuff: custom apps go here
     "organisation.apps.OrganisationConfig",
     "payment.apps.PaymentConfig",
     "feature.apps.FeatureConfig",
     "teams.apps.TeamsConfig",
     "leads.apps.LeadsConfig",
+    "category.apps.CategoryConfig",
     # Product related apps
-    "products.apps.ProductsConfig",
+    "product.apps.ProductConfig",
     "prodManufacturer.apps.ProdmanufacturerConfig",
     "prodCategory.apps.ProdcategoryConfig",
 ]

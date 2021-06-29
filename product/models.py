@@ -1,3 +1,4 @@
+from product.validators import validate_code
 from currency.models import Currency
 from django.db import models
 from django.utils import timezone
@@ -58,6 +59,9 @@ class Product(models.Model):
     code = models.CharField(
         "Product Code",
         max_length=40,
+        validators=[
+            validate_code,
+        ],
     )
     name = models.CharField(
         "Product Name",

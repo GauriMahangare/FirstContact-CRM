@@ -43,6 +43,13 @@ urlpatterns = [
     path("invitations/", include("invitations.urls", namespace="invitations")),
     path("teams/", include("teams.urls", namespace="teams")),
     path("leads/", include("leads.urls", namespace="leads")),
+    path("category/", include("category.urls", namespace="category")),
+    path("product/", include("product.urls", namespace="product")),
+    path("product-category/", include("prodCategory.urls", namespace="prodCategory")),
+    path(
+        "product-manufacturer/",
+        include("prodManufacturer.urls", namespace="prodManufacturer"),
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
     # Static file serving when using Gunicorn + Uvicorn for local web socket development

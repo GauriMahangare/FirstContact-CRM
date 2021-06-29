@@ -11,8 +11,8 @@
 {% block content %}
 {% flag "detail_category" %}
 
-    <a id="create-category" href="{% url 'leads:createcategory' %}" class="btn btn-info btn-circle float-right"  title="Add Category"><i class="material-icons">add_circle</i></a>
-    <h1> Manage Categories</h1>
+    <a id="create-category" href="{% url 'category:create' %}" class="btn btn-info btn-circle float-right"  title="Add Category"><i class="material-icons">add_circle</i></a>
+    <h1>{% trans " Manage Categories" %}</h1>
     <hr/>
 
     <div class="List_category" id="List_category_form">
@@ -45,8 +45,8 @@
                                 <td class="text-break"> {{ category.description }}</td>
                                 <td> {{ category.created_by }}</td>
                                 <td> {{ category.dateTimeModified }}</td>
-                                <td> <a href="{% url 'leads:updatecategory' category.pk %}" class="btn btn-warning btn-circle btn-sm"  title="Update Category"><i class="fas fa-edit"></i></a></td>
-                                <td> <a href="{% url 'leads:deletecategory' category.pk %}" class="btn btn-danger btn-circle btn-sm" title="Delete Category"><i class="fas fa-trash"></i></a></td>
+                                <td> <a href="{% url 'category:update' category.pk %}" class="btn btn-warning btn-circle btn-sm"  title="Update Category"><i class="fas fa-edit"></i></a></td>
+                                <td> <a href="{% url 'category:delete' category.pk %}" class="btn btn-danger btn-circle btn-sm" title="Delete Category"><i class="fas fa-trash"></i></a></td>
 
                             </tr>
                         {% endfor %}
@@ -123,10 +123,10 @@
     </script>
 {% else %}
     {% if request.user.is_admin %}
-        <h3>To manage Categories, please upgrade your subscription.</h3>
-        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+    <h3>{% trans "To manage Cateogy, please upgrade your subscription." %}</h3>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">{% trans "Upgrade now" %}</a>
     {% else %}
-        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade.</h3>
+    <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans "The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade." %}</h3>
     {% endif %}
 {% endflag %}
 

@@ -1,0 +1,44 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load waffle_tags %}
+
+{% block head_title %} {{ user.username }} - Product Update {% endblock head_title %}
+
+{% block inner %}
+{% flag "update_product" %}
+
+    {% if object.organisation == user.userorganization %}
+        <h1>{% trans "Update Product" %}</h1>
+        <hr/>
+        <h5>{% trans "Update Product" %}</h5>
+        </br >
+        <form class="update_product" enctype="multipart/form-data" id="myForm" method="post" action="{% url 'product:update' product.pk %}">
+            {% csrf_token %}
+            {{ form|crispy }}
+            {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+            <button class="btn btn-primary" type="submit">
+                <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                <span class="btn-txt">{% trans "Update Product" %} &raquo;</span>
+            </button>
+            <a id="create-product" class="btn-link ml-5" href="{% url 'product:list' %}">{% trans "Cancel" %}</a>
+        </form>
+    {% else %}
+        <h1>{% trans "We're sorry." %}</h1>
+        <hr/>
+        <p>{% trans "The page you're looking for can't be found." %} </p>
+    {% endif %}
+{% else %}
+    {% if request.user.is_admin %}
+        <h3>{% trans "To manage Product, please upgrade your subscription." %}</h3>
+        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">{% trans "Upgrade now" %}</a>
+    {% else %}
+        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans "The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade." %}</h3>
+    {% endif %}
+{% endflag %}
+
+{% endblock %}

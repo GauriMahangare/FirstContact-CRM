@@ -15,7 +15,7 @@
         <hr/>
         <h5>{% trans "Update Category" %}</h5>
         </br >
-        <form class="update_category" id="myForm" method="post" action="{% url 'leads:updatecategory' category.pk %}">
+        <form class="update_category" id="myForm" method="post" action="{% url 'category:update' category.pk %}">
             {% csrf_token %}
             {{ form|crispy }}
             {% if redirect_field_value %}
@@ -25,19 +25,19 @@
                 <i class="loading-icon fa fa-spinner fa-spin hide"></i>
                 <span class="btn-txt">{% trans "Update Category" %} &raquo;</span>
             </button>
-            <a id="create-category" class="btn-link ml-5" href="{% url 'leads:listcategory' %}">{% trans "Cancel" %}</a>
+            <a id="create-category" class="btn-link ml-5" href="{% url 'category:list' %}">{% trans "Cancel" %}</a>
         </form>
     {% else %}
-        <h1>We're sorry</h1>
+        <h1>{% trans "We're sorry" %}</h1>
         <hr/>
-        <p>The page you're looking for can't be found. </p>
+        <p>{% trans "The page you're looking for can't be found." %} </p>
     {% endif %}
 {% else %}
     {% if request.user.is_admin %}
-        <h3>To manage Category, please upgrade your subscription.</h3>
-        <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">Upgrade now</a>
+    <h3>{% trans "To manage Cateogy, please upgrade your subscription." %}</h3>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">{% trans "Upgrade now" %}</a>
     {% else %}
-        <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade.</h3>
+    <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans "The subscription of your Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade." %}</h3>
     {% endif %}
 {% endflag %}
 

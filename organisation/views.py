@@ -51,6 +51,7 @@ class OrganisationUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView
         "country",
         "language",
         "currency",
+        "industry",
     ]
     success_message = _("Information successfully updated")
 
@@ -81,6 +82,7 @@ class OrganisationCreateView(
         "country",
         "language",
         "currency",
+        "industry",
     ]
     # success_message = _("Congratulations!!Organisation has been set; Now create your team and you are all set")
     # waffle_flag = "Create Organsation"

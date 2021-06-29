@@ -24,7 +24,8 @@
                 {% if redirect_field_value %}
                     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                 {% endif %}
-                <a id="create-team" class="btn-link ml-5" href="{% url 'leads:detail' lead.pk %}">{% trans "Cancel" %}</a>
+                <a id="leaddetail" class="card-link ml-5" href="{% url 'leads:detail' lead.pk %}">{% trans "Cancel" %}</a>
+                <!-- <a id="leaddetail" class="card-link float-right ml-3" href="{% url 'leads:detail' lead.pk %}">{% trans "Cancel" %}</a> -->
             </form>
         </div>
     </div>

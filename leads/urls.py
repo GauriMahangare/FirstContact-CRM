@@ -15,12 +15,6 @@ from leads.views import (
     Note_update_view,
     Note_delete_view,
     Note_list_view,
-    ####### Category view ##########
-    Category_create_view,
-    Category_update_view,
-    Category_delete_view,
-    Category_list_view,
-    Category_redirect_view,
 )
 
 app_name = "leads"
@@ -54,22 +48,4 @@ urlpatterns = [
         name="deletenote",
     ),
     path("~note/list/<uuid:pk>", view=Note_list_view, name="listnote"),
-    ################# Categories URLS #################
-    path(
-        "~category/create/>",
-        view=Category_create_view,
-        name="createcategory",
-    ),
-    path(
-        "~category/update/<int:pk>",
-        view=Category_update_view,
-        name="updatecategory",
-    ),
-    path(
-        "~category/delete/<int:pk>",
-        view=Category_delete_view,
-        name="deletecategory",
-    ),
-    path("~category/", view=Category_list_view, name="listcategory"),
-    path("~category/redirect/", view=Category_redirect_view, name="redirectcategory"),
 ]

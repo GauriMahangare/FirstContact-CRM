@@ -1,3 +1,4 @@
+from industry.models import Industry
 from language.models import Language
 from country.models import Country
 from currency.models import Currency
@@ -56,6 +57,7 @@ class Organisation(models.Model):
     country = models.ForeignKey(Country, null=True, on_delete=models.SET_NULL)
     language = models.ForeignKey(Language, null=True, on_delete=models.SET_NULL)
     currency = models.ForeignKey(Currency, null=True, on_delete=models.SET_NULL)
+    industry = models.ForeignKey(Industry, null=True, on_delete=models.SET_NULL)
 
     dateTimeModified = models.DateTimeField(
         "Last Modified",

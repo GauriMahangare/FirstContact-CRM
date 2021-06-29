@@ -72,7 +72,8 @@
                                 {% endthumbnail %}
                             </div>
                             <div class="card-body">
-                                <p class="card-text"><a href="{{ MEDIA_URL }}{{ lead.profile_picture }}">{{ lead.profile_picture }}</a></p>
+                                <h5 class="card-title">Profile Picture</h5>
+                                <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
                             </div>
                           </div>
                         </div>
@@ -103,6 +104,12 @@
                                             <div class="form-group col-md-2">
                                                 <label for="inputage">{% trans "Age" %}</label>
                                                 <input type="text" class="form-control" id="inputage" value="{{lead.age}}" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-9">
+                                                <label for="id_profile_picture">Profile Image - </label>
+                                                {{ lead.profile_picture }}
                                             </div>
                                         </div>
                                     </form>
@@ -179,7 +186,11 @@
                                                 <label for="inputannual_revenue">{% trans "Annual Revenue" %}</label>
                                                 <input type="text" class="form-control" id="inputannual_revenue" value="{{lead.annual_revenue}}" readonly>
                                             </div>
-                                            <div class="form-group col-md-4">
+                                            <div class="form-group col-md-2">
+                                                <label for="inputcurrency">Currency</label>
+                                                <input type="text" class="form-control" id="inputindustry" value="{{lead.currency}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-2">
                                                 <label for="inputnbr_of_employees">{% trans "Number of Employees" %}</label>
                                                 <input type="text" class="form-control" id="inputnbr_of_employees" value="{{lead.nbr_of_employees}}" readonly>
                                             </div>
@@ -224,6 +235,10 @@
                                             <label for="inputpreferred_contact_time">{% trans "Contact Time Preference" %}</label>
                                             <input type="text" class="form-control" id="inputpreferred_contact_time" value="{{lead.preferred_contact_time}}" readonly>
                                         </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="inputpreferred_language">{% trans "Preferred Language" %}</label>
+                                            <input type="text" class="form-control" id="inputpreferred_language" value="{{lead.preferred_communication_language}}" readonly>
+                                        </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-9">
@@ -253,7 +268,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="float-lg-right">
-                                    {% trans "Last Updated By: " %} <strong>{{lead.created_by}}</strong> on {{lead.dateTimeModified}}
+                                    <i class='fas fa-user-clock'></i> {% trans "Last Updated By: " %} <strong>{{lead.created_by}}</strong> on {{lead.dateTimeModified}}
                                 </div>
                                 <h5 class="card-title">Lead Status</h5>
                                 <form>
@@ -321,7 +336,6 @@
                 </div>
             </div>
         </div>
-
     {% else %}
         <h1>We're sorry</h1>
         <hr/>

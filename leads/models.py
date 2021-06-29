@@ -13,6 +13,8 @@ from organisation.models import Organisation
 from currency.models import Currency
 from country.models import Country
 from teams.models import Team
+from industry.models import Industry
+from category.models import Category
 
 # from leads.admin import LeadResource
 from django.urls import reverse
@@ -44,69 +46,6 @@ User = settings.AUTH_USER_MODEL
 #     class Meta:
 #         verbose_name = 'Campaign'
 #         verbose_name_plural = 'Campaigns'
-
-
-class Category(models.Model):
-    created_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-
-    organisation = models.ForeignKey(
-        Organisation,
-        on_delete=models.CASCADE,
-    )
-
-    status = models.CharField(
-        "status",
-        max_length=200,
-    )
-    description = models.TextField(
-        "Description",
-        blank=True,
-    )
-    dateTimeModified = models.DateTimeField(
-        "Last Modified",
-        auto_now=True,
-    )
-
-    dateTimeCreated = models.DateTimeField(
-        "Created",
-        auto_now_add=True,
-    )
-
-    def __str__(self):
-        return "{self.status}".format(self=self)
-
-    class Meta:
-        verbose_name = "Lead Category"
-        verbose_name_plural = "Lead Category"
-
-
-class Industry(models.Model):
-    created_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-
-    title = models.CharField(
-        "Title",
-        max_length=200,
-    )
-    description = models.TextField(
-        "Description",
-        blank=True,
-    )
-    dateTimeModified = models.DateTimeField(
-        "Last Modified",
-        auto_now=True,
-    )
-
-    dateTimeCreated = models.DateTimeField(
-        "Created",
-        auto_now_add=True,
-    )
-
-    def __str__(self):
-        return "{self.title}".format(self=self)
-
-    class Meta:
-        verbose_name = "Industry"
-        verbose_name_plural = "Industry"
 
 
 # class LeadManager(models.Manager):
@@ -336,7 +275,7 @@ class Lead(models.Model):
     )
 
     status = models.ForeignKey(
-        "Category",
+        Category,
         related_name="leads_Status",
         null=True,
         blank=True,
