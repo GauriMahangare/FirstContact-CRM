@@ -363,39 +363,17 @@
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseEmail"
               aria-expanded="true" aria-controls="collapseEmail">
               <i class="fas fa-mail-bulk"></i>
-              <span>Emails</span>
+              <span>Quotes and Invoices</span>
           </a>
           <div id="collapseEmail" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
               <div class="bg-white py-2 collapse-inner rounded">
-                  <h6 class="collapse-header">Manage Templates:</h6>
-                  <a class="collapse-item" href="#">View List</a>
-                  <a class="collapse-item" href="#">Create</a>
-                  <h6 class="collapse-header">Emails</h6>
+                  <h6 class="collapse-header">Quotes</h6>
+                  <a class="collapse-item" href="{% url 'quote:list' %}">Manage Quotes</a>
+                  <h6 class="collapse-header">Invoices</h6>
                   <a class="collapse-item" href="#">Inbox</a>
-                  <a class="collapse-item" href="#">Sent</a>
-                  <a class="collapse-item" href="#">Schduled</a>
-                  <a class="collapse-item" href="#">Drafts</a>
-                  <a class="collapse-item" href="#">Trash</a>
-                  <h6 class="collapse-header">Team Inbox</h6>
+                  <h6 class="collapse-header">Purchase Orders</h6>
                   <a class="collapse-item" href="#">Inbox</a>
-                  <a class="collapse-item" href="#">Sent</a>
-                  <a class="collapse-item" href="#">Schduled</a>
-                  <a class="collapse-item" href="#">Drafts</a>
-                  <a class="collapse-item" href="#">Trash</a>
-                  <h6 class="collapse-header">Connect external ESPs</h6>
-                  <a class="collapse-item" href="#">Integration</a>
-                  <h6 class="collapse-header">Bulk Emails</h6>
-                  <a class="collapse-item" href="#">Scheduled</a>
-                  <a class="collapse-item" href="#">Drafts</a>
-                  <h6 class="collapse-header">Email Tracking</h6>
-                  <a class="collapse-item" href="#">Opens</a>
-                  <a class="collapse-item" href="#">Clicks</a>
-                  <a class="collapse-item" href="#">Bounces</a>
                   <div class="collapse-divider"></div>
-                  <!-- <h6 class="collapse-header">Manage Leads:</h6>
-                  <a class="collapse-item" href="#">Assign Agent</a>
-                  <a class="collapse-item" href="#">My Leads</a>
-                  <a class="collapse-item" href="#">My Tasks</a> -->
               </div>
           </div>
           </li>
@@ -699,11 +677,11 @@
                 {% endif %}
                 {% block content %}
                     <div class="row">
-                    <div class="col-md-6 offset-md-3">
-                        {% block inner %}
-                        <!-- Put your code here -->
-                        {% endblock %}
-                    </div>
+                        <div class="col-md-6 offset-md-3">
+                            {% block inner %}
+                            <!-- Put your code here -->
+                            {% endblock %}
+                        </div>
                     </div>
                 {% endblock content %}
 

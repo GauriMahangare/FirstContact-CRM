@@ -1,0 +1,91 @@
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load waffle_tags %}
+
+{% block head_title %} {{ user.username }} - Quote Add {% endblock head_title %}
+
+{% block content %}
+{% flag "create_quote" %}
+<h1>{% trans "Create Quote" %}</h1>
+<hr />
+<div class="card-body">
+    {% crispy form %}
+</div>
+
+
+{% else %}
+{% if request.user.is_admin %}
+<h3>{% trans "To manage Quote, please upgrade your subscription." %}</h3>
+<a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">{% trans "Upgrade now" %}</a>
+{% else %}
+<h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans "The subscription of your
+    Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade." %}
+</h3>
+{% endif %}
+{% endflag %}
+
+{% endblock content %}
+
+{% block pageend-js %}
+<script>
+    $(document).ready(function () {
+        console.log("in side table row")
+        var lineitemsum = 0;
+        var quantity = 1;
+        var quantityParsed = 0;
+        var amount = 0;
+        var amountParsed = 0;
+        var discount = 0;
+        var discountParsed = 0;
+        var finalvatrate = 0;
+        var vatrateIndex = 0;
+        var selectedText = "";
+
+
+        $('.row1').change(function () {
+            console.log("in each function")
+            quantityParsed = parseFloat($(this).find('.quantity').val());
+            console.log(quantityParsed)
+
+            amountParsed = parseFloat($(this).find('.amount').val());
+            console.log(amountParsed)
+
+            discountParsed = parseFloat($(this).find('.discount').val());
+            console.log(discountParsed)
+
+            $(this).find('.vatrate').each(function () {
+                console.log("inside vatrate")
+                var vatrateIndex = ($(this).prop('selectedIndex'));
+                console.log(vatrateIndex)
+                var selectedText = $(".vatrate option:selected").html();
+                if (vatrateIndex !== 0) {
+                    var vatrate = selectedText.split("-");
+                    finalvatrate = parseFloat(vatrate[1])
+                } else {
+                    finalvatrate = 0
+                }
+                console.log(vatrateIndex)
+                console.log(selectedText)
+                console.log(vatrate)
+                console.log(finalvatrate)
+
+            })
+
+            costprice = quantityParsed * amountParsed;
+            discountedCost = costprice - (costprice * discountParsed / 100);
+            discountedCostVat = discountedCost + (discountedCost * finalvatrate / 100);
+            lineitemsum = discountedCostVat;
+
+            $('.linetotal').val(lineitemsum);
+
+        })
+
+    })
+
+
+</script>
+
+{% endblock pageend-js %}

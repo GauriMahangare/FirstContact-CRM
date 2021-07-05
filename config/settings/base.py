@@ -106,6 +106,8 @@ LOCAL_APPS = [
     "teams.apps.TeamsConfig",
     "leads.apps.LeadsConfig",
     "category.apps.CategoryConfig",
+    "vatRate.apps.VatrateConfig",
+    "quote.apps.QuoteConfig",
     # Product related apps
     "product.apps.ProductConfig",
     "prodManufacturer.apps.ProdmanufacturerConfig",

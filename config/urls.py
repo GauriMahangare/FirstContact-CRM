@@ -50,6 +50,7 @@ urlpatterns = [
         "product-manufacturer/",
         include("prodManufacturer.urls", namespace="prodManufacturer"),
     ),
+    path("quote/", include("quote.urls", namespace="quote")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
     # Static file serving when using Gunicorn + Uvicorn for local web socket development

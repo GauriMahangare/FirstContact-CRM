@@ -79,21 +79,11 @@ class LeadModelForm(forms.ModelForm):
                 attrs={"class": "form-control", "type": "date"}
             ),
             "age": forms.NumberInput(attrs={"class": "form-control"}),
-            "work_org_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Work Organisation Name"}
-            ),
-            "work_address_line1": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Address Line 1"}
-            ),
-            "work_address_line2": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Address Line 2"}
-            ),
-            "work_address_line3": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Address Line 3"}
-            ),
-            "work_address_line4": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Address Line 4"}
-            ),
+            "work_org_name": forms.TextInput(attrs={"class": "form-control"}),
+            "work_address1": forms.TextInput(attrs={"class": "form-control"}),
+            "work_address2": forms.TextInput(attrs={"class": "form-control"}),
+            "work_address3": forms.TextInput(attrs={"class": "form-control"}),
+            "work_address4": forms.TextInput(attrs={"class": "form-control"}),
             "work_address_city": forms.TextInput(attrs={"class": "form-control"}),
             "work_address_state_county": forms.TextInput(
                 attrs={"class": "form-control"}
@@ -144,21 +134,21 @@ class LeadModelForm(forms.ModelForm):
 
     def clean_work_address_line1(self):
         # update field validations here..
-        data = self.cleaned_data.get("work_address_line1")
+        data = self.cleaned_data.get("work_address1")
         if len(data) <= 0:
             raise forms.ValidationError("This field is required")
         return data
 
     def clean_work_address_line2(self):
-        data = self.cleaned_data("work_address_line2")
+        data = self.cleaned_data("work_address2")
         return data
 
     def clean_work_address_line3(self):
-        data = self.cleaned_data("work_address_line3")
+        data = self.cleaned_data("work_address3")
         return data
 
     def clean_work_address_line4(self):
-        data = self.cleaned_data("work_address_line4")
+        data = self.cleaned_data("work_address4")
         return data
 
     def clean_work_address_postcode(self):
