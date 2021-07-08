@@ -149,6 +149,7 @@ class Quote(models.Model):
     title = models.CharField(
         "Title",
         max_length=25,
+        blank=True,
         choices=TitleChoices.choices,
         default=TitleChoices.default,
     )
@@ -158,12 +159,12 @@ class Quote(models.Model):
         max_length=60,
     )
     last_name = models.CharField(
-        "First Name",
+        "Last Name",
         max_length=60,
     )
 
     work_org_name = models.CharField(
-        "Work organisation",
+        "Work Organisation",
         max_length=200,
     )
     email = models.EmailField(
@@ -207,70 +208,86 @@ class Quote(models.Model):
         on_delete=models.SET_NULL,
         related_name="billing_country",
     )
-    shipping_address1 = models.CharField(
-        "Address Line 1",
-        max_length=200,
-        blank=True,
-    )
-    shipping_address2 = models.CharField(
-        "Address Line 2",
-        max_length=200,
-        blank=True,
-    )
-    shipping_address3 = models.CharField(
-        "Address Line 3",
-        max_length=200,
-        blank=True,
-    )
-    shipping_address4 = models.CharField(
-        "Address Line 4",
-        max_length=200,
-        blank=True,
-    )
-    shipping_address_city = models.CharField(
-        "City",
-        max_length=60,
-        blank=True,
-    )
-    shipping_address_state_county = models.CharField(
-        "State/County",
-        max_length=60,
-        blank=True,
-    )
-    shipping_address_postcode = models.CharField(
-        "State/County",
-        max_length=60,
-        blank=True,
-    )
-    shipping_address_country = models.ForeignKey(
-        Country,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name="shipping_country",
-    )
+    # shipping_address1 = models.CharField(
+    #     "Address Line 1",
+    #     max_length=200,
+    #     blank=True,
+    # )
+    # shipping_address2 = models.CharField(
+    #     "Address Line 2",
+    #     max_length=200,
+    #     blank=True,
+    # )
+    # shipping_address3 = models.CharField(
+    #     "Address Line 3",
+    #     max_length=200,
+    #     blank=True,
+    # )
+    # shipping_address4 = models.CharField(
+    #     "Address Line 4",
+    #     max_length=200,
+    #     blank=True,
+    # )
+    # shipping_address_city = models.CharField(
+    #     "City",
+    #     max_length=60,
+    #     blank=True,
+    # )
+    # shipping_address_state_county = models.CharField(
+    #     "State/County",
+    #     max_length=60,
+    #     blank=True,
+    # )
+    # shipping_address_postcode = models.CharField(
+    #     "State/County",
+    #     max_length=60,
+    #     blank=True,
+    # )
+    # shipping_address_country = models.ForeignKey(
+    #     Country,
+    #     blank=True,
+    #     on_delete=models.SET_NULL,
+    #     related_name="shipping_country",
+    # )
 
     terms_conditions = models.TextField(blank=True, max_length=400)
     notes = models.TextField(blank=True, max_length=400)
 
-    currency = models.ForeignKey(Currency, null=True, on_delete=models.SET_NULL)
+    # currency = models.ForeignKey(Currency, blank=True, on_delete=models.SET_NULL)
 
     sub_total_amount = models.DecimalField(
-        "Sub Total", max_digits=11, decimal_places=2, default=0
+        "Sub Total",
+        max_digits=11,
+        decimal_places=2,
+        default=0,
+        blank=True,
     )
     discount = models.DecimalField(
-        "Discount", max_digits=11, decimal_places=2, default=0
+        "Discount %",
+        max_digits=11,
+        decimal_places=2,
+        default=0,
+        null=True,
     )
     shipping_charges = models.DecimalField(
         "Shipping Charges", max_digits=11, decimal_places=2, default=0
     )
     shipping_vat = models.ForeignKey(
-        VatRate, default=0, null=True, on_delete=models.SET_NULL
+        VatRate, blank=True, null=True, on_delete=models.SET_NULL
     )
     adjustment = models.DecimalField(
-        "Shipping Charges", max_digits=11, decimal_places=2, default=0
+        "Adjustment",
+        max_digits=11,
+        decimal_places=2,
+        default=0,
+        blank=True,
     )
     total_amount = models.DecimalField(
-        "Total", max_digits=11, decimal_places=2, default=0
+        "Total",
+        max_digits=11,
+        decimal_places=2,
+        default=0,
+        blank=True,
     )
     file = models.FileField(
         null=True, blank=True, upload_to=quote_attachment_directory_path
@@ -316,14 +333,20 @@ class QuotedItem(models.Model):
     amount = models.DecimalField(
         "Cost of items", default=0, max_digits=11, decimal_places=2
     )
-    currency = models.ForeignKey(Currency, null=True, on_delete=models.SET_NULL)
+    # currency = models.ForeignKey(Currency, null=True, on_delete=models.SET_NULL)
     discount = models.DecimalField(
-        "Discount", default=0, null=True, max_digits=11, decimal_places=2
+        "Discount %", default=0, null=True, max_digits=11, decimal_places=2
     )
 
-    vat_rate = models.ForeignKey(VatRate, null=True, on_delete=models.SET_NULL)
+    vat_rate = models.ForeignKey(
+        VatRate, blank=True, null=True, on_delete=models.SET_NULL
+    )
     line_total = models.DecimalField(
-        "Total", default=0, max_digits=11, decimal_places=2
+        "Total",
+        default=0,
+        max_digits=11,
+        decimal_places=2,
+        blank=True,
     )
     dateTimeModified = models.DateTimeField(
         "Last Modified",

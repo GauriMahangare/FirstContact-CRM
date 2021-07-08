@@ -12,80 +12,434 @@
 <h1>{% trans "Create Quote" %}</h1>
 <hr />
 <div class="card-body">
-    {% crispy form %}
-</div>
+    <form class="create_quote form-container" enctype="multipart/form-data" id="myForm" method="post"
+        action="{% url 'quote:create' %}">
+        {% csrf_token %}
+        {{ quoteform.errors.as_ul }}
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Create Quotes/Estimates</h5>
+                    <small class="form-text text-muted">Your References</small>
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.quote_id.label}}</label>
+                            {{quoteform.quote_id}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.contactType.label}}</label>
+                            {{quoteform.contactType}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.leadId.label}}</label>
+                            {{quoteform.leadId}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.reference.label}}</label>
+                            {{quoteform.reference}}
+                        </div>
+                    </div>
+                    <hr>
+                    <small class="form-text text-muted">Estimate details</small>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>{{quoteform.deal_name.label}}</label>
+                            {{quoteform.deal_name}}
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>{{quoteform.subject.label}}</label>
+                            {{quoteform.subject}}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.owner.label}}</label>
+                            {{quoteform.owner}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.start_date.label}}</label>
+                            {{quoteform.start_date}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.end_date.label}}</label>
+                            {{quoteform.end_date}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.stage.label}}</label>
+                            {{quoteform.stage}}
+                        </div>
+                    </div>
+                    <hr>
+                    <small class="form-text text-muted">Customer Details</small>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label>{{quoteform.title.label}}</label>
+                            {{quoteform.title}}
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>{{quoteform.first_name.label}}</label>
+                            {{quoteform.first_name}}
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>{{quoteform.last_name.label}}</label>
+                            {{quoteform.last_name}}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>{{quoteform.work_org_name.label}}</label>
+                            {{quoteform.work_org_name}}
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>{{quoteform.email.label}}</label>
+                            {{quoteform.email}}
+                        </div>
+                    </div>
+                    <p> Billing Address </p>
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.billing_address1.label}}</label>
+                            {{quoteform.billing_address1}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.billing_address2.label}}</label>
+                            {{quoteform.billing_address2}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.billing_address3.label}}</label>
+                            {{quoteform.billing_address3}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.billing_address4.label}}</label>
+                            {{quoteform.billing_address4}}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.billing_address_city.label}}</label>
+                            {{quoteform.billing_address_city}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.billing_address_state_county.label}}</label>
+                            {{quoteform.billing_address_state_county}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.billing_address_postcode.label}}</label>
+                            {{quoteform.billing_address_postcode}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>{{quoteform.billing_address_country.label}}</label>
+                            {{quoteform.billing_address_country}}
+                        </div>
+                    </div>
+                    <hr>
+                    <h6>Add Products</h6>
+                    {{ formset.management_form |crispy }}
+                    <div class="table-responsive table-hover">
+                        <table class="table table-sortable" id="myTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity </th>
+                                    <th>Cost per Item </th>
+                                    <th>Discount </th>
+                                    <th>VAT Rate </th>
+                                    <th>Line Total </th>
+                                    <th>Action </th>
+                                </tr>
+                            </thead>
+                            <tbody id="myTableBody">
+                                {% for form in formset %}
+                                <div class="item-form">
+                                    <tr class="tr_clone {% cycle 'row1' 'row2' %} formset_row-{{ formset.prefix }}">
+                                        {{ form.errors.as_ul }}
+                                        <td> {{ form.item}}</td>
+                                        <td class="txtCal quantity"> {{ form.quantity}}</td>
+                                        <td class="txtCal amount"> {{ form.amount}}</td>
+                                        <td class="txtCal discount"> {{ form.discount}}</td>
+                                        <td class="txtCal vatrate"> {{ form.vat_rate}}</td>
+                                        <td id="line_total" class="total"> {{ form.line_total}}</td>
+                                        <td></td>
+                                    </tr>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>{{quoteform.notes.label}}</label>
+                                {{quoteform.notes}}
+                            </div>
+                            <div class="form-group col-md-6">
+                                <div class="form-group row">
+                                    <label for="inputorg"
+                                        class="col-md-4 col-form-label text-md-right">{{quoteform.sub_total_amount.label}}</label>
+                                    <div class="col-md-4">
+                                        {{quoteform.sub_total_amount}}
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputorg"
+                                        class="col-md-4 col-form-label text-md-right">{{quoteform.discount.label}}</label>
+                                    <div class="col-md-4">
+                                        {{quoteform.discount}}
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputorg"
+                                        class="col-md-4 col-form-label text-md-right">{{quoteform.shipping_charges.label}}</label>
+                                    <div class="col-md-4">
+                                        {{quoteform.shipping_charges}}
+                                    </div>
+                                </div>
+                                <div class="form-group row ">
+                                    <label for="inputorg"
+                                        class="col-md-4 col-form-label text-md-right">{{quoteform.shipping_vat.label}}</label>
+                                    <div class="col-md-4">
+                                        {{quoteform.shipping_vat}}
+                                    </div>
+                                </div>
+                                <div class="form-group row ">
+                                    <label for="inputorg"
+                                        class="col-md-4 col-form-label text-md-right">{{quoteform.adjustment.label}}</label>
+                                    <div class="col-md-4">
+                                        {{quoteform.adjustment}}
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="form-group  row  pt-1 font-weight-bold">
+                                    <label for="inputorg"
+                                        class="col-md-4 col-form-label text-md-right">{{quoteform.total_amount.label}}</label>
+                                    <div class="col-md-4 ">
+                                        {{quoteform.total_amount}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-row">
+                            <div class="form-group col-md-6 ml-4">
+                                <label>{{quoteform.terms_conditions.label}}</label>
+                                {{quoteform.terms_conditions}}
+                            </div>
+                            <div class="form-group col-md-4 ml-4">
+                                <label>{{quoteform.quoteform.label}}</label>
+                                {{quoteform.file}}
+                            </div>
+                        </div>
+                        <br>
+                        {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                        {% endif %}
+                        <button class="btn btn-primary" type="submit" id="id_quote_create_submit">
+                            <i class="loading-icon fa fa-spinner fa-spin hide"></i>
+                            <span class="btn-txt">{% trans "Add Quote" %} &raquo;</span>
+                        </button>
+                        <a id="create-quote" class="btn-link ml-5" href="{% url 'quote:list' %}">{% trans "Cancel"%}</a>
+                    </div>
+                </div>
+            </div>
+    </form>
 
 
-{% else %}
-{% if request.user.is_admin %}
-<h3>{% trans "To manage Quote, please upgrade your subscription." %}</h3>
-<a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">{% trans "Upgrade now" %}</a>
-{% else %}
-<h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans "The subscription of your
-    Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade." %}
-</h3>
-{% endif %}
-{% endflag %}
+    {% else %}
+    {% if request.user.is_admin %}
+    <h3>{% trans "To manage Quote, please upgrade your subscription." %}</h3>
+    <a class="btn btn-success btn-md" href="{% url 'payment:enroll' %}">{% trans "Upgrade now" %}</a>
+    {% else %}
+    <h3 class="btn btn-warning"><i class='fas fa-sad-tear' style='font-size:36px'></i> {% trans "The subscription of
+        your
+        Organisation does not allow you to use this feature. Please contact your organisation administrator to upgrade."
+        %}
+    </h3>
+    {% endif %}
+    {% endflag %}
 
-{% endblock content %}
+    {% endblock content %}
 
-{% block pageend-js %}
-<script>
-    $(document).ready(function () {
-        console.log("in side table row")
-        var lineitemsum = 0;
-        var quantity = 1;
-        var quantityParsed = 0;
-        var amount = 0;
-        var amountParsed = 0;
-        var discount = 0;
-        var discountParsed = 0;
-        var finalvatrate = 0;
-        var vatrateIndex = 0;
-        var selectedText = "";
+    {% block pageend-js %}
 
+    <script>
+        function sumInputsIn(inputs) {
+            var values = []
+            var lineitemsum = 0;
+            var quantity = 1;
+            var quantityParsed = 0;
+            var amount = 0;
+            var amountParsed = 0;
+            var discount = 0;
+            var discountParsed = 0;
 
-        $('.row1').change(function () {
-            console.log("in each function")
-            quantityParsed = parseFloat($(this).find('.quantity').val());
-            console.log(quantityParsed)
+            inputs.each(function () {
+                values.push(this.value)
+            });
 
-            amountParsed = parseFloat($(this).find('.amount').val());
-            console.log(amountParsed)
+            if (isNaN(values[0])) {
+                quantityParsed = 0
+            } else {
+                quantityParsed = parseInt(values[0]);
+            }
 
-            discountParsed = parseFloat($(this).find('.discount').val());
-            console.log(discountParsed)
+            if (isNaN(values[1])) {
+                amountParsed = 0
+            } else {
+                amountParsed = parseFloat(values[1]);
+            }
 
-            $(this).find('.vatrate').each(function () {
-                console.log("inside vatrate")
-                var vatrateIndex = ($(this).prop('selectedIndex'));
-                console.log(vatrateIndex)
-                var selectedText = $(".vatrate option:selected").html();
-                if (vatrateIndex !== 0) {
-                    var vatrate = selectedText.split("-");
-                    finalvatrate = parseFloat(vatrate[1])
-                } else {
-                    finalvatrate = 0
-                }
-                console.log(vatrateIndex)
-                console.log(selectedText)
-                console.log(vatrate)
-                console.log(finalvatrate)
+            if (isNaN(values[2])) {
+                discountParsed = 0
+            } else {
+                discountParsed = parseFloat(values[2]);
+            }
 
-            })
 
             costprice = quantityParsed * amountParsed;
+
             discountedCost = costprice - (costprice * discountParsed / 100);
-            discountedCostVat = discountedCost + (discountedCost * finalvatrate / 100);
-            lineitemsum = discountedCostVat;
 
-            $('.linetotal').val(lineitemsum);
+            return discountedCost;
+        }
 
-        })
+        function getVat(inputs, rowIndex) {
+            var values = [];
+            finalvatrate = 0;
+            inputs.each(function () {
+                values.push(this.value)
+            });
 
-    })
+            var vatrateIndex = values[1]
+
+            id_vat_rate = "#id_form-" + rowIndex + "-vat_rate" + " option:selected"
+
+            var selectedText = $(id_vat_rate).html();
+
+            if (vatrateIndex > 0) {
+                var vatrate = selectedText.split("-");
+                finalvatrate = parseFloat(vatrate[1])
+            } else {
+                finalvatrate = 0
+            }
+            return finalvatrate
+        }
+
+        function getShippingVat() {
+            var selectedText = $("#id_shipping_vat option:selected").html();
+            vatrateIndex = $("#id_shipping_vat").prop('selectedIndex')
+
+            if (vatrateIndex !== "") {
+                var vatrate = selectedText.split("-");
+                var finalvatrate = parseFloat(vatrate[1])
+            } else {
+                finalvatrate = 0
+            }
+            return finalvatrate
+        }
+
+        function getTotalAmount() {
+            var subTotal = parseFloat($("#id_sub_total_amount").val());
 
 
-</script>
+            var final_discount = parseFloat($("#id_discount").val());
 
-{% endblock pageend-js %}
+
+            var shipping_charges = parseFloat($("#id_shipping_charges").val());
+
+
+            var shipping_vat = getShippingVat();
+            if (isNaN(shipping_vat)) {
+                shipping_vat = 0
+            }
+
+
+            var adjustment = parseFloat($("#id_adjustment").val());
+
+
+            var total1 = subTotal - (subTotal * final_discount / 100);
+
+
+            var totalshipping = shipping_charges + (shipping_charges * shipping_vat / 100)
+
+            var finalTotal = total1 + totalshipping - adjustment
+
+
+            $("#id_total_amount").attr("value", finalTotal.toFixed(2));
+
+            if (finalTotal <= 0) {
+                $("#id_quote_create_submit").prop('disabled', true);
+            } else {
+                $("#id_quote_create_submit").prop('disabled', false);
+            }
+
+        }
+
+        $("input,select").change(function (event) {
+            var row = $(event.target).closest('tr');
+            var rowIndex = $(event.target).closest('tr').index();
+
+            if (rowIndex >= 0) {
+                discountedCostVat = 0;
+                discountedCost = 0;
+                discountedCost = sumInputsIn(row.find('td input'));
+
+                vatRate = getVat(row.find('td select'), rowIndex);
+
+                discountedCostVat = parseFloat(discountedCost + (discountedCost * vatRate / 100)).toFixed(2);
+                id_line_total = "#id_form-" + rowIndex + "-line_total";
+                $(id_line_total).attr("value", discountedCostVat);
+
+                var formCount = parseInt($('#id_form-TOTAL_FORMS').val());
+                var subTotal = 0;
+                for (i = 0; i < formCount; i++) {
+                    id_line_total = "#id_form-" + i + "-line_total";
+                    subTotal = subTotal + parseFloat($(id_line_total).val());
+                }
+                $(id_sub_total_amount).attr("value", subTotal.toFixed(2));
+                getTotalAmount();
+            }
+
+        });
+
+
+        $("#id_discount").change(function () {
+            getTotalAmount();
+        });
+
+        $("#id_shipping_charges").change(function () {
+            getTotalAmount();
+        });
+
+        $("#id_shipping_vat").change(function () {
+            getTotalAmount();
+        });
+
+        $("#id_adjustment").change(function () {
+            getTotalAmount();
+        });
+
+        $("#id_total_amount").change(function () {
+            document.getElementById("id_quote_create_submit").disabled = false;
+        });
+
+        $(document).ready(function () {
+            finalTotal = parseFloat($("#id_total_amount").val()).toFixed(2);
+            if (finalTotal == 0) {
+                $("#id_quote_create_submit").prop('disabled', true);
+            } else {
+                $("#id_quote_create_submit").prop('disabled', false);
+            }
+        });
+    </script>
+    <script src="{% static 'js/django-dynamic-formset/jquery.formset.js' %}"></script>
+    <script type="text/javascript">
+        $('.formset_row-{{ formset.prefix }}').formset({
+            addText: '<span class="icon text-white-50"><i class="fas fa-plus"></i></span><span class="text">Add Another</span>',
+            addCssClass: 'btn btn-primary btn-icon-split',
+            deleteText: '<span class="align-middle"><i class="fas fa-times"></i></span>',
+            deleteCssClass: 'btn btn-danger btn-circle btn-sm',
+            prefix: '{{ formset.prefix }}',
+            keepFieldValues: 'input',
+        });
+    </script>
+
+    {% endblock pageend-js %}

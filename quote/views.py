@@ -1,5 +1,5 @@
 import logging
-from quote.forms import QuoteItemsInlineFormset, QuoteModelForm
+from quote.forms import QuoteModelForm, QuotedItemFormSet
 from typing import Any, Optional
 import waffle
 from django.http import HttpResponse
@@ -28,7 +28,7 @@ from django.contrib.auth import get_user_model
 from waffle.mixins import WaffleFlagMixin
 from django.http import Http404
 
-from .models import Quote
+from .models import Quote, QuotedItem
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -79,31 +79,32 @@ class QuoteCreateView(
     success_url = reverse_lazy("quote:redirect")
 
     def get_context_data(self, **kwargs: Any):
-        data = super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         if self.request.POST:
-            data["quoteItems"] = QuoteItemsInlineFormset(self.request.POST)
+            print("request is post")
+            context["quoteform"] = QuoteModelForm(self.request.POST)
+            context["formset"] = QuotedItemFormSet(self.request.POST)
+            print(context["quoteform"])
+            print(context["formset"])
         else:
-            data["quoteItems"] = QuoteItemsInlineFormset()
-        return data
+            context["quoteform"] = QuoteModelForm(self.request.GET or None)
+            context["formset"] = QuotedItemFormSet(queryset=QuotedItem.objects.none())
+        return context
 
     def form_valid(self, form):
+        print("form is valid")
         if waffle.flag_is_active(self.request, "create_quote"):
+            print("feature flag active")
             context = self.get_context_data()
-            quoteItems = context["quoteItems"]
-            with transaction.atomic():
-                form.instance.created_by = self.request.user
-                form.instance.organisation = self.request.user.userorganization
-
-                # quote = form.save(commit=False)
-                # quote.created_by = self.request.user
-                # quote.organisation = self.request.user.userorganization
-                # if not quote.status:
-                #     messages.error(self.request, "Quote name is required")
-                #     return super(QuoteCreateView, self).form_valid(form)
-
-                # else:
+            print(context)
+            quoteform = context["quoteform"]
+            formset = context["formset"]
+            if quoteform.is_valid() and formset.is_valid():
+                quote = quoteform.save(commit=False)
+                quote.created_by = self.request.user
+                quote.organisation = self.request.user.userorganization
                 try:
-                    self.object = form.save()
+                    quote.save()
                 except Exception as e:
                     print(str(e))
                     logger.critical("Quote Create error")
@@ -111,11 +112,11 @@ class QuoteCreateView(
                         "There was an error creating your quote. If the error persists, please try again after sometime."
                     )
                 else:
-                    if quoteItems.is_valid():
-                        quoteItems.instance = self.object
-                        quoteItems.instance.created_by = self.request.user
+                    for form in formset:
+                        quotedItem = form.save(commit=False)
+                        quotedItem.quote = quote
                         try:
-                            quoteItems.save()
+                            quotedItem.save()
                         except Exception as e:
                             print(str(e))
                             logger.critical("Quoted items  Create error")
