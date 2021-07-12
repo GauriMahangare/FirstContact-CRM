@@ -35,8 +35,8 @@ def quote_attachment_directory_path(instance, filename):
     org_name = instance.organisation.work_org_name
     org_name_no_space = org_name.replace(" ", "")
 
-    return "org_{0}/quote/{1}/quote_attachments/{3}".format(
-        org_name_no_space, instance.id, filename
+    return "org_{0}/quote/{1}/{2}-quote_attachments/{3}".format(
+        org_name_no_space, instance.id, instance.quote_id, filename
     )
 
 
@@ -290,7 +290,7 @@ class Quote(models.Model):
         blank=True,
     )
     file = models.FileField(
-        null=True, blank=True, upload_to=quote_attachment_directory_path
+        "Attachment", null=True, blank=True, upload_to=quote_attachment_directory_path
     )
 
     dateTimeModified = models.DateTimeField(

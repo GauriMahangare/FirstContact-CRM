@@ -7,6 +7,8 @@ from quote.views import (
     Quote_delete_view,
     Quote_list_view,
     Quote_redirect_view,
+    Quote_detail_view,
+    Quote_display_view,
 )
 
 app_name = "quote"
@@ -21,6 +23,16 @@ urlpatterns = [
         "~update/<int:pk>",
         view=Quote_update_view,
         name="update",
+    ),
+    path(
+        "~detail/<int:pk>",
+        view=Quote_detail_view,
+        name="detail",
+    ),
+    path(
+        "~display/<int:pk>",
+        view=Quote_display_view,
+        name="display",
     ),
     path(
         "~delete/<int:pk>",

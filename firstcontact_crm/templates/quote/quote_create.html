@@ -15,7 +15,7 @@
     <form class="create_quote form-container" enctype="multipart/form-data" id="myForm" method="post"
         action="{% url 'quote:create' %}">
         {% csrf_token %}
-        {{ quoteform.errors.as_ul }}
+        {{ form.errors.as_ul }}
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body">
@@ -23,113 +23,113 @@
                     <small class="form-text text-muted">Your References</small>
                     <div class="form-row">
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.quote_id.label}}</label>
-                            {{quoteform.quote_id}}
+                            <label>{{form.quote_id.label}}</label>
+                            {{form.quote_id}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.contactType.label}}</label>
-                            {{quoteform.contactType}}
+                            <label>{{form.contactType.label}}</label>
+                            {{form.contactType}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.leadId.label}}</label>
-                            {{quoteform.leadId}}
+                            <label>{{form.leadId.label}}</label>
+                            {{form.leadId}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.reference.label}}</label>
-                            {{quoteform.reference}}
+                            <label>{{form.reference.label}}</label>
+                            {{form.reference}}
                         </div>
                     </div>
                     <hr>
                     <small class="form-text text-muted">Estimate details</small>
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label>{{quoteform.deal_name.label}}</label>
-                            {{quoteform.deal_name}}
+                            <label>{{form.deal_name.label}}</label>
+                            {{form.deal_name}}
                         </div>
                         <div class="form-group col-md-6">
-                            <label>{{quoteform.subject.label}}</label>
-                            {{quoteform.subject}}
+                            <label>{{form.subject.label}}</label>
+                            {{form.subject}}
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.owner.label}}</label>
-                            {{quoteform.owner}}
+                            <label>{{form.owner.label}}</label>
+                            {{form.owner}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.start_date.label}}</label>
-                            {{quoteform.start_date}}
+                            <label>{{form.start_date.label}}</label>
+                            {{form.start_date}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.end_date.label}}</label>
-                            {{quoteform.end_date}}
+                            <label>{{form.end_date.label}}</label>
+                            {{form.end_date}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.stage.label}}</label>
-                            {{quoteform.stage}}
+                            <label>{{form.stage.label}}</label>
+                            {{form.stage}}
                         </div>
                     </div>
                     <hr>
                     <small class="form-text text-muted">Customer Details</small>
                     <div class="form-row">
                         <div class="form-group col-md-4">
-                            <label>{{quoteform.title.label}}</label>
-                            {{quoteform.title}}
+                            <label>{{form.title.label}}</label>
+                            {{form.title}}
                         </div>
                         <div class="form-group col-md-4">
-                            <label>{{quoteform.first_name.label}}</label>
-                            {{quoteform.first_name}}
+                            <label>{{form.first_name.label}}</label>
+                            {{form.first_name}}
                         </div>
                         <div class="form-group col-md-4">
-                            <label>{{quoteform.last_name.label}}</label>
-                            {{quoteform.last_name}}
+                            <label>{{form.last_name.label}}</label>
+                            {{form.last_name}}
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label>{{quoteform.work_org_name.label}}</label>
-                            {{quoteform.work_org_name}}
+                            <label>{{form.work_org_name.label}}</label>
+                            {{form.work_org_name}}
                         </div>
                         <div class="form-group col-md-6">
-                            <label>{{quoteform.email.label}}</label>
-                            {{quoteform.email}}
+                            <label>{{form.email.label}}</label>
+                            {{form.email}}
                         </div>
                     </div>
                     <p> Billing Address </p>
                     <div class="form-row">
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.billing_address1.label}}</label>
-                            {{quoteform.billing_address1}}
+                            <label>{{form.billing_address1.label}}</label>
+                            {{form.billing_address1}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.billing_address2.label}}</label>
-                            {{quoteform.billing_address2}}
+                            <label>{{form.billing_address2.label}}</label>
+                            {{form.billing_address2}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.billing_address3.label}}</label>
-                            {{quoteform.billing_address3}}
+                            <label>{{form.billing_address3.label}}</label>
+                            {{form.billing_address3}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.billing_address4.label}}</label>
-                            {{quoteform.billing_address4}}
+                            <label>{{form.billing_address4.label}}</label>
+                            {{form.billing_address4}}
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.billing_address_city.label}}</label>
-                            {{quoteform.billing_address_city}}
+                            <label>{{form.billing_address_city.label}}</label>
+                            {{form.billing_address_city}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.billing_address_state_county.label}}</label>
-                            {{quoteform.billing_address_state_county}}
+                            <label>{{form.billing_address_state_county.label}}</label>
+                            {{form.billing_address_state_county}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.billing_address_postcode.label}}</label>
-                            {{quoteform.billing_address_postcode}}
+                            <label>{{form.billing_address_postcode.label}}</label>
+                            {{form.billing_address_postcode}}
                         </div>
                         <div class="form-group col-md-3">
-                            <label>{{quoteform.billing_address_country.label}}</label>
-                            {{quoteform.billing_address_country}}
+                            <label>{{form.billing_address_country.label}}</label>
+                            {{form.billing_address_country}}
                         </div>
                     </div>
                     <hr>
@@ -142,7 +142,7 @@
                                     <th>Item</th>
                                     <th>Quantity </th>
                                     <th>Cost per Item </th>
-                                    <th>Discount </th>
+                                    <th>Discount % </th>
                                     <th>VAT Rate </th>
                                     <th>Line Total </th>
                                     <th>Action </th>
@@ -152,6 +152,9 @@
                                 {% for form in formset %}
                                 <div class="item-form">
                                     <tr class="tr_clone {% cycle 'row1' 'row2' %} formset_row-{{ formset.prefix }}">
+                                        {% for hidden in form.hidden_fields %}
+                                        {{ hidden }}
+                                        {% endfor %}
                                         {{ form.errors.as_ul }}
                                         <td> {{ form.item}}</td>
                                         <td class="txtCal quantity"> {{ form.quantity}}</td>
@@ -168,51 +171,51 @@
                         <hr>
                         <div class="form-row">
                             <div class="form-group col-md-6">
-                                <label>{{quoteform.notes.label}}</label>
-                                {{quoteform.notes}}
+                                <label>{{form.notes.label}}</label>
+                                {{form.notes}}
                             </div>
                             <div class="form-group col-md-6">
                                 <div class="form-group row">
                                     <label for="inputorg"
-                                        class="col-md-4 col-form-label text-md-right">{{quoteform.sub_total_amount.label}}</label>
+                                        class="col-md-4 col-form-label text-md-right">{{form.sub_total_amount.label}}</label>
                                     <div class="col-md-4">
-                                        {{quoteform.sub_total_amount}}
+                                        {{form.sub_total_amount}}
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="inputorg"
-                                        class="col-md-4 col-form-label text-md-right">{{quoteform.discount.label}}</label>
+                                        class="col-md-4 col-form-label text-md-right">{{form.discount.label}}</label>
                                     <div class="col-md-4">
-                                        {{quoteform.discount}}
+                                        {{form.discount}}
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="inputorg"
-                                        class="col-md-4 col-form-label text-md-right">{{quoteform.shipping_charges.label}}</label>
+                                        class="col-md-4 col-form-label text-md-right">{{form.shipping_charges.label}}</label>
                                     <div class="col-md-4">
-                                        {{quoteform.shipping_charges}}
+                                        {{form.shipping_charges}}
                                     </div>
                                 </div>
                                 <div class="form-group row ">
                                     <label for="inputorg"
-                                        class="col-md-4 col-form-label text-md-right">{{quoteform.shipping_vat.label}}</label>
+                                        class="col-md-4 col-form-label text-md-right">{{form.shipping_vat.label}}</label>
                                     <div class="col-md-4">
-                                        {{quoteform.shipping_vat}}
+                                        {{form.shipping_vat}}
                                     </div>
                                 </div>
                                 <div class="form-group row ">
                                     <label for="inputorg"
-                                        class="col-md-4 col-form-label text-md-right">{{quoteform.adjustment.label}}</label>
+                                        class="col-md-4 col-form-label text-md-right">{{form.adjustment.label}}</label>
                                     <div class="col-md-4">
-                                        {{quoteform.adjustment}}
+                                        {{form.adjustment}}
                                     </div>
                                 </div>
                                 <hr>
                                 <div class="form-group  row  pt-1 font-weight-bold">
                                     <label for="inputorg"
-                                        class="col-md-4 col-form-label text-md-right">{{quoteform.total_amount.label}}</label>
+                                        class="col-md-4 col-form-label text-md-right">{{form.total_amount.label}}</label>
                                     <div class="col-md-4 ">
-                                        {{quoteform.total_amount}}
+                                        {{form.total_amount}}
                                     </div>
                                 </div>
                             </div>
@@ -220,12 +223,12 @@
                         <hr>
                         <div class="form-row">
                             <div class="form-group col-md-6 ml-4">
-                                <label>{{quoteform.terms_conditions.label}}</label>
-                                {{quoteform.terms_conditions}}
+                                <label>{{form.terms_conditions.label}}</label>
+                                {{form.terms_conditions}}
                             </div>
                             <div class="form-group col-md-4 ml-4">
-                                <label>{{quoteform.quoteform.label}}</label>
-                                {{quoteform.file}}
+                                <label>{{form.file.label}}</label>
+                                {{form.file}}
                             </div>
                         </div>
                         <br>

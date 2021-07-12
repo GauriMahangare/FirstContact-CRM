@@ -16,6 +16,10 @@ class OrganisationModelForm(forms.ModelForm):
             "country",
             "language",
             "currency",
+            "quote_template",
+            "bank_account_number",
+            "bank_account_sort_code",
+            "bank_name",
         ]
         exclude = [
             "is_verified",
@@ -48,6 +52,26 @@ class OrganisationModelForm(forms.ModelForm):
             "country": forms.Select(attrs={"class": "form-control"}),
             "language": forms.Select(attrs={"class": "form-control"}),
             "currency": forms.Select(attrs={"class": "form-control"}),
+            "quote_template": forms.widgets.ClearableFileInput(
+                attrs={
+                    "class": "form-control-file btn-primary",
+                }
+            ),
+            "bank_account_number": forms.IntegerField(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "bank_account_sort_code": forms.IntegerField(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "bank_name": forms.CharField(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
         }
 
     def clean_work_org_name(self):

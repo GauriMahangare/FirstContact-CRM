@@ -1,9 +1,12 @@
+from vatRate.models import VatRate
+from product.models import Product
 from typing import Sequence
 from django import forms
 from django.forms import modelformset_factory
+from django.contrib.auth import get_user_model
 from django.forms.models import inlineformset_factory
 
-from .models import QuotedItem, Quote
+from .models import QuotedItem, Quote, Stage
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import (
     Layout,
@@ -17,6 +20,8 @@ from crispy_forms.layout import (
 )
 from crispy_forms.bootstrap import Tab, TabHolder
 from .custom_layout_object import *
+
+User = get_user_model()
 
 
 class QuoteModelForm(forms.ModelForm):
@@ -127,7 +132,43 @@ class QuoteModelForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        user_org = kwargs.pop("user_org", None)
         super(QuoteModelForm, self).__init__(*args, **kwargs)
+
+        users_in_org = User.objects.none()
+        users_in_org = User.objects.exclude(userorganization=None).filter(
+            userorganization=user_org
+        )
+        self.fields["owner"].queryset = users_in_org
+
+        vatrate_in_org = VatRate.objects.none()
+        vatrate_in_org = VatRate.objects.filter(organisation=user_org)
+        self.fields["shipping_vat"].queryset = vatrate_in_org
+        stage_in_org = Stage.objects.none()
+        stage_in_org = Stage.objects.filter(organisation=user_org)
+        self.fields["stage"].queryset = stage_in_org
+
+    def clean_discount(self):
+        # update field validations here..
+        data = self.cleaned_data.get("discount")
+        if data < 0:
+            raise forms.ValidationError("This field needs to be a +ve number")
+        return data
+
+    def clean_shipping_charges(self):
+        # update field validations here..
+        data = self.cleaned_data.get("shipping_charges")
+        if data < 0:
+            raise forms.ValidationError("This field needs to be a +ve number")
+        return data
+
+    def clean_adjustment(self):
+        # update field validations here..
+        data = self.cleaned_data.get("adjustment")
+        if data < 0:
+            raise forms.ValidationError("This field needs to be a +ve number")
+        return data
 
 
 class QuotedItemModelForm(forms.ModelForm):
@@ -172,14 +213,71 @@ class QuotedItemModelForm(forms.ModelForm):
             ),
         }
 
+    def __init__(self, *args, **kwargs):
 
-QuotedItemFormSet = modelformset_factory(
+        self.user = kwargs.pop("user", None)
+        self.user_org = kwargs.pop("user_org", None)
+        super(QuotedItemModelForm, self).__init__(*args, **kwargs)
+        products_in_org = Product.objects.none()
+        products_in_org = Product.objects.filter(organisation=self.user_org)
+        self.fields["item"].queryset = products_in_org
+        vatrate_in_org = VatRate.objects.none()
+        vatrate_in_org = VatRate.objects.filter(organisation=self.user_org)
+        self.fields["vat_rate"].queryset = vatrate_in_org
+
+    def clean_item(self):
+        # update field validations here..
+        data = self.cleaned_data.get("item")
+        if data is None:
+            raise forms.ValidationError("This field is required")
+        return data
+
+    def clean_quantity(self):
+        # update field validations here..
+        data = self.cleaned_data.get("quantity")
+        if data == 0:
+            raise forms.ValidationError("This field is required")
+        if data < 0:
+            raise forms.ValidationError("This field needs to be a +ve number")
+        return data
+
+    def clean_amount(self):
+        # update field validations here..
+        data = self.cleaned_data.get("amount")
+        if data == 0:
+            raise forms.ValidationError("This field is required")
+        if data < 0:
+            raise forms.ValidationError("This field needs to be a +ve number")
+        return data
+
+    def clean_discount(self):
+        # update field validations here..
+        data = self.cleaned_data.get("discount")
+        if data < 0:
+            raise forms.ValidationError("This field needs to be a +ve number")
+        return data
+
+
+BaseQuotedItemFormSet = modelformset_factory(
     QuotedItem,
     QuotedItemModelForm,
-    extra=1,
+    extra=0,
     can_delete=True,
     min_num=1,
+    max_num=20,
 )
-QuoteFormSet = inlineformset_factory(
-    Quote, QuotedItem, form=QuotedItemModelForm, extra=1, can_delete=True
-)
+
+
+class QuotedItemFormSet(BaseQuotedItemFormSet):  # sub class it
+    def __init__(self, *args, **kwargs):
+        #  create a user attribute and take it out from kwargs
+        # so it doesn't messes up with the other formset kwargs
+        self.user = kwargs.pop("user")
+        self.user_org = kwargs.pop("user_org")
+        super(QuotedItemFormSet, self).__init__(*args, **kwargs)
+
+    def _construct_form(self, *args, **kwargs):
+        # inject user in each form on the formset
+        kwargs["user"] = self.user
+        kwargs["user_org"] = self.user_org
+        return super(QuotedItemFormSet, self)._construct_form(*args, **kwargs)

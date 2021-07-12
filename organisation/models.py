@@ -16,8 +16,21 @@ from django.utils.text import slugify
 User = settings.AUTH_USER_MODEL
 
 
+def quote_template_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT / user_<id>/<filename>
+    org_name = instance.work_org_name
+    org_name_no_space = org_name.replace(" ", "")
+
+    return "org_{0}/quote/templates/{1}".format(org_name_no_space, filename)
+
+
 class Organisation(models.Model):
-    created_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    created_by = models.ForeignKey(
+        User, null=True, on_delete=models.SET_NULL, related_name="org_created_by"
+    )
+    modified_by = models.ForeignKey(
+        User, null=True, on_delete=models.SET_NULL, related_name="org_modified_by"
+    )
 
     slug = models.SlugField(null=True, unique=True)
 
@@ -58,7 +71,25 @@ class Organisation(models.Model):
     language = models.ForeignKey(Language, null=True, on_delete=models.SET_NULL)
     currency = models.ForeignKey(Currency, null=True, on_delete=models.SET_NULL)
     industry = models.ForeignKey(Industry, null=True, on_delete=models.SET_NULL)
-
+    quote_template = models.FileField(
+        "Quote Template", null=True, blank=True, upload_to=quote_template_directory_path
+    )
+    bank_account_number = models.IntegerField(
+        "Bank Account number",
+        default=0,
+        blank=True,
+    )
+    bank_account_sort_code = models.IntegerField(
+        "Sort Code",
+        default=0,
+        blank=True,
+    )
+    bank_name = models.CharField(
+        "Bank Name",
+        max_length=30,
+        default="",
+        blank=True,
+    )
     dateTimeModified = models.DateTimeField(
         "Last Modified",
         auto_now=True,

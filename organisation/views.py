@@ -52,6 +52,10 @@ class OrganisationUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView
         "language",
         "currency",
         "industry",
+        "quote_template",
+        "bank_account_number",
+        "bank_account_sort_code",
+        "bank_name",
     ]
     success_message = _("Information successfully updated")
 
@@ -83,6 +87,10 @@ class OrganisationCreateView(
         "language",
         "currency",
         "industry",
+        "quote_template",
+        "bank_account_number",
+        "bank_account_sort_code",
+        "bank_name",
     ]
     # success_message = _("Congratulations!!Organisation has been set; Now create your team and you are all set")
     # waffle_flag = "Create Organsation"

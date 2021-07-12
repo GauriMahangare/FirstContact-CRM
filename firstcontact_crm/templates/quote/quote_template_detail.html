@@ -1,0 +1,11 @@
+{% load html_tags %}
+
+{% block body %}
+<div style="padding: 2rem;">
+    {% if request.user.is_authenticated %}
+    {% read_html_file request.user.userorganization.quote_template %}
+    {% else %}
+    <p>You must logged in to see.</p>
+    {% endif %}
+</div>
+{% endblock %}
